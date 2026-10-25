@@ -13,7 +13,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "泉の像"
  },
  {
   "id": "osm-n794415300",
@@ -28,7 +29,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "中島公園駅前"
  },
  {
   "id": "osm-n2429775199",
@@ -43,7 +45,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "ゲームコーナー"
  },
  {
   "id": "osm-n2903662001",
@@ -133,7 +136,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "アトリエ・モリヒコ"
  },
  {
   "id": "osm-n6436452258",
@@ -148,7 +152,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "Tマークシティホテル札幌"
  },
  {
   "id": "osm-n6437880291",
@@ -178,7 +183,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "竹江寿司"
  },
  {
   "id": "osm-n6911174588",
@@ -193,7 +199,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "泉の像"
  },
  {
   "id": "osm-n12021340181",
@@ -208,7 +215,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "札幌市時計台"
  },
  {
   "id": "osm-n12621413410",
@@ -223,7 +231,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "プロント"
  },
  {
   "id": "osm-n14005978829",
@@ -238,7 +247,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "宮田屋珈琲"
  },
  {
   "id": "osm-w302546269",
@@ -268,7 +278,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "７条公園"
  },
  {
   "id": "osm-w384391778",
@@ -283,7 +294,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "南9条緑地"
  },
  {
   "id": "osm-w690375402",
@@ -298,7 +310,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "ホテルリソルトリニティ札幌"
  },
  {
   "id": "osm-w782403108",
@@ -313,7 +326,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "大通公園 インフォメーションセンター"
  },
  {
   "id": "osm-w814132084",
@@ -343,7 +357,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "ローソン"
  },
  {
   "id": "osm-w948575902",
@@ -388,7 +403,8 @@ const TOILETS=[
   "brand": null,
   "loan": null,
   "floor": null,
-  "source": "osm"
+  "source": "osm",
+  "area": "しまだや"
  },
  {
   "id": "osm-n1669763953",

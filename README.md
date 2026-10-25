@@ -17,6 +17,10 @@ iOS ネイティブ版(Expo)は `../sapporo-loo-map`。データとマスコッ�
 - 「いま空いてる」チップ: `js/hours.js` が OSM の opening_hours(曜日・時間帯・日またぎ・off)を読んで日本時間で判定。**営業時間が分からないものは出す**(営業時間外と分かるものだけ隠す)。営業中/営業時間外のタグも表示
 - 現在地が遠い(1.5km 超)ときは「すすきのへ」ボタンで地図を移動
 
+- 名前のないトイレは「トイレ(○○ 付近)」と表示(近くの施設・通りの名前。`../sapporo-loo-map/tools/fetch-areas.js` が OSM から取り `areas.json` に書き、`build-data.js` が取り込む。木・駅の出口・長い名前は除外)
+- プライバシー・データ出典は `privacy.html`(「使う前に」の下から開く)。App Store に出すときのポリシーにも流用する
+- キャッシュ対策: `node tools/stamp.js` が index.html の `?v=` を各ファイルのハッシュにそろえる。`.git/hooks/pre-commit` で自動実行(別の PC では、`.git/hooks/pre-commit` に `node tools/stamp.js && git add index.html` を置く)
+
 ## 構成
 - 地図: MapLibre GL 4.7.1 + OpenFreeMap `positron`(淡い地図。キー不要。ラベルの整え方は sakabazu と同じ)
 - デザイン: ミニマル・フロスト(すりガラス・アクセント1色 #c4521f・細線アイコン `js/icons.js`)。色の意味は 橙=トイレ / 緑=借りられる・無料 / 橙黄=声かけ / 黒=選択中

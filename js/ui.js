@@ -43,11 +43,11 @@ function renderSheet(){
     if (far) h+=`<div class="bubble"><span>ちょっと遠いよ。まずはすすきの周辺だけ載ってるよ</span><button class="sub small" id="gosus">すすきのへ</button></div>`;
     const t=nearest.t;
     h+=`<div class="near">${bearSvg(46,far?'worried':'normal')}<div><div class="eyebrow">いちばん近いトイレ</div>
-      <button class="nhead" id="nhead" data-id="${t.id}"><div class="nrow"><div class="nname">${esc(t.name||'トイレ')}</div>
+      <button class="nhead" id="nhead" data-id="${t.id}"><div class="nrow"><div class="nname">${esc(nameOf(t))}</div>
       <div class="nmeta">${fmtDist(nearest.d)}<i>徒歩${walkMin(nearest.d)}分</i>${t.type==='conv'?`<i class="lo lo-${loanOf(t)}">${loanLabel(loanOf(t))}</i>`:''}</div></div></button></div></div>
       <button class="cta${far?' far':''}" id="nbtn">ナビを開始${icon('arrow',20)}</button>`;
   }
-  if (st.open) h+='<div class="sech"><span class="sec">近い順</span><button class="x" id="lx" aria-label="リストを閉じる">'+icon('close',16)+'</button></div><div class="list">'+st.sorted.slice(0,30).map(({t,d})=>`<button class="row" data-id="${t.id}"><span class="ri${t.type==='conv'?' conv':''}">${icon(t.type==='conv'?'store':'wc',20)}</span><span class="rn"><b>${esc(t.name||'トイレ')}</b><span class="tags">${tagsOf(t)}</span></span><span class="rd">${fmtDist(d)}</span>${icon('chevron',16)}</button>`).join('')+'</div>';
+  if (st.open) h+='<div class="sech"><span class="sec">近い順</span><button class="x" id="lx" aria-label="リストを閉じる">'+icon('close',16)+'</button></div><div class="list">'+st.sorted.slice(0,30).map(({t,d})=>`<button class="row" data-id="${t.id}"><span class="ri${t.type==='conv'?' conv':''}">${icon(t.type==='conv'?'store':'wc',20)}</span><span class="rn"><b>${esc(nameOf(t))}</b><span class="tags">${tagsOf(t)}</span></span><span class="rd">${fmtDist(d)}</span>${icon('chevron',16)}</button>`).join('')+'</div>';
   body.innerHTML=h; body.style.animation='none'; void body.offsetWidth; body.style.animation='';
   const gs=$('gosus'); if (gs) gs.onclick=()=>{ buzz(); map.flyTo({center:[SUSUKINO.lng,SUSUKINO.lat],zoom:15.5}); };
   const lx=$('lx'); if (lx) lx.onclick=()=>setTab('map');
@@ -57,7 +57,7 @@ function renderSheet(){
 
 function renderDetail(body,t){
   const d=distanceM(origin(),t), {c,mine:mine0}=reportCounts(t.id), lc=loanCounts(t.id), mine=(st.reports.find(r=>r.toiletId===t.id&&r.mine)||{}).kind||mine0;
-  body.innerHTML=`<div class="dhead"><div class="av">${bearSvg(36)}</div><div><h2>${esc(t.name||'トイレ')}</h2>
+  body.innerHTML=`<div class="dhead"><div class="av">${bearSvg(36)}</div><div><h2>${esc(nameOf(t))}</h2>
     <div class="d">${fmtDist(d)}・徒歩${walkMin(d)}分</div></div><button class="x" id="dx" aria-label="閉じる">${icon('close',16)}</button></div>
     <div class="tags">${tagsOf(t)}${t.source==='user'?'<span class="tag user">追加された情報</span>':''}</div>
     ${t.note?`<div class="note">${esc(t.note)}</div>`:''}
@@ -109,6 +109,8 @@ function showGuide(){
     <li><b>お客さん専用のトイレもあるよ</b><span>お店や商業施設のトイレは、お客さんだけが使えることがあります。使えなかったときは、無理せず別の場所へ。</span></li>
     <li><b>できるだけ、お店で買い物を</b><span>コンビニなどはお店のご厚意で借りています。できれば何か買って、混んでいる時間は遠慮して、きれいに使いましょう。声をかけるときは「お手洗いをお借りできますか?」と一言。</span></li>
     <li><b>情報はみんなの投稿です</b><span>古い・違うこともあります。気づいたら、報告や追加で教えてね。</span></li>
-    </ol><button class="cta" id="gok">わかった</button></div>`;
+    </ol>
+    <p class="gfoot">地図とトイレ・コンビニの位置は © OpenStreetMap contributors のデータです。現在地は端末の中だけで使い、送りません。<a href="privacy.html" target="_blank" rel="noopener">くわしく</a></p>
+    <button class="cta" id="gok">わかった</button></div>`;
   g.hidden=false; $('gok').onclick=()=>{ g.hidden=true; try{ localStorage.setItem('loo-guide','1'); }catch(e){} };
 }

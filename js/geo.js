@@ -12,3 +12,6 @@ function distanceM(a,b){
 }
 const fmtDist=m=>m<1000?`${Math.round(m/10)*10}m`:`${(m/1000).toFixed(1)}km`;
 const walkMin=m=>Math.max(1,Math.round(m/80));   // 徒歩 80m/分
+
+// 名前のないトイレは、近くの施設や通りの名前(area)で見分けられるようにする
+const nameOf=t=>t.name||(t.area?`トイレ(${t.area} 付近)`:'トイレ');

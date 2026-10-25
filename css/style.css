@@ -245,3 +245,6 @@ body.adding #sheet{max-height:86vh}
 .pin:not(.conv) .pi{background:linear-gradient(90deg,var(--wc-blue) 50%,var(--wc-red) 50%)}
 .pin.sel:not(.conv) .pi{background:var(--ink)}
 .ri:not(.conv){background:linear-gradient(90deg,var(--wc-blue) 50%,var(--wc-red) 50%);color:#fff}
+
+.gfoot{font-size:11.5px;color:var(--sub);line-height:1.6;margin:12px 0 0}
+.gfoot a{color:var(--accent)}

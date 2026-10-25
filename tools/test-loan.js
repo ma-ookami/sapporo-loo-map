@@ -4,7 +4,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
   const ctx = await b.newContext({ viewport: { width: 390, height: 780 }, hasTouch: true, geolocation: { latitude: 43.0545, longitude: 141.3530 }, permissions: ['geolocation'] });
   await ctx.addInitScript(() => localStorage.setItem('loo-guide','1')); const p = await ctx.newPage(); p.on('pageerror', e => console.log('ERR', e.message));
-  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html'); await p.waitForTimeout(4500);
+  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1'); await p.waitForTimeout(4500);
   const vis = sel => p.evaluate(s => [...document.querySelectorAll(s)].filter(e => e.offsetParent !== null).length, sel);
   console.log('1 conv pins (unknown, visible):', await vis('.pin.conv.loan-null'), '| all pins in DOM:', await p.locator('.pin').count());
   await p.screenshot({ path: 'tools/shot-loan1.png' });

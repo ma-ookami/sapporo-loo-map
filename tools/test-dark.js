@@ -6,7 +6,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   const ctx = await b.newContext({ viewport: { width: 390, height: 780 }, hasTouch: true, colorScheme: 'dark', geolocation: { latitude: 42.7752, longitude: 141.6923 }, permissions: ['geolocation'] });
   await ctx.addInitScript(() => localStorage.setItem('loo-guide', '1'));
   const p = await ctx.newPage(); p.on('pageerror', e => console.log('ERR', e.message));
-  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html'); await p.waitForTimeout(4500);
+  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1'); await p.waitForTimeout(4500);
   console.log('1 dark map style:', await p.evaluate(() => map.getStyle().name || map.getStyle().sprite), '| body bg:', await p.evaluate(() => getComputedStyle(document.body).backgroundColor));
   console.log('2 far bubble + button:', await p.locator('#gosus').count());
   await p.screenshot({ path: 'tools/shot-dark1.png' });

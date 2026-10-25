@@ -5,13 +5,15 @@ const cloud={
   async init(onToilets,onReports){
     this._ot=onToilets; this._or=onReports;
     const cfg=window.FIREBASE_CONFIG;
-    if (cfg && cfg.projectId && window.firebase){
+    // ?local=1 のときは、設定があってもこの端末だけに保存する(テスト・試し書き用)
+    const forceLocal=location.search.includes('local=1');
+    if (cfg && cfg.projectId && window.firebase && !forceLocal){
       try{
         firebase.initializeApp(cfg);
         const cred=await firebase.auth().signInAnonymously();
         this.uid=cred.user.uid; this.mode='cloud'; this.fb=firebase.firestore();
-        this.fb.collection('toilets').onSnapshot(s=>onToilets(s.docs.map(d=>this._row(d.id,d.data()))),()=>{});
-        this.fb.collection('reports').onSnapshot(s=>onReports(s.docs.map(d=>{ const r=d.data(); return {toiletId:r.toiletId,kind:r.kind,mine:r.uid===this.uid,at:r.createdAt?r.createdAt.toMillis():Date.now()}; })),()=>{});
+        this.fb.collection('loo-toilets').onSnapshot(s=>onToilets(s.docs.map(d=>this._row(d.id,d.data()))),()=>{});
+        this.fb.collection('loo-reports').onSnapshot(s=>onReports(s.docs.map(d=>{ const r=d.data(); return {toiletId:r.toiletId,kind:r.kind,mine:r.uid===this.uid,at:r.createdAt?r.createdAt.toMillis():Date.now()}; })),()=>{});
         return;
       }catch(e){ console.warn('firebase 失敗。ローカルモードで動きます',e); }
     }
@@ -26,7 +28,7 @@ const cloud={
   _loadR(){ return this._get('loo-reports').map(r=>({toiletId:r.toiletId,kind:r.kind,mine:true,at:r.at})); },
   async add(t){
     if (this.mode==='cloud'){
-      await this.fb.collection('toilets').add({name:t.name,lat:t.lat,lng:t.lng,fee:t.fee,wheelchair:t.wheelchair,floor:t.floor,ease:t.ease??null,find:t.find??null,type:t.type,brand:t.brand,loan:t.loan,note:t.note,uid:this.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      await this.fb.collection('loo-toilets').add({name:t.name,lat:t.lat,lng:t.lng,fee:t.fee,wheelchair:t.wheelchair,floor:t.floor,ease:t.ease??null,find:t.find??null,type:t.type,brand:t.brand,loan:t.loan,note:t.note,uid:this.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       return;
     }
     const a=this._get('loo-added'); a.push({...t,id:String(Date.now()),uid:'local'});
@@ -34,13 +36,13 @@ const cloud={
   },
   async remove(id){
     const raw=id.slice(2);
-    if (this.mode==='cloud'){ await this.fb.collection('toilets').doc(raw).delete(); return; }
+    if (this.mode==='cloud'){ await this.fb.collection('loo-toilets').doc(raw).delete(); return; }
     localStorage.setItem('loo-added',JSON.stringify(this._get('loo-added').filter(d=>d.id!==raw))); this._ot(this._loadT());
   },
   // kind が null なら取り消し
   async report(toiletId,kind){
     if (this.mode==='cloud'){
-      const ref=this.fb.collection('reports').doc(toiletId+'_'+this.uid);
+      const ref=this.fb.collection('loo-reports').doc(toiletId+'_'+this.uid);
       if (kind) await ref.set({toiletId,kind,uid:this.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); else await ref.delete();
       return;
     }

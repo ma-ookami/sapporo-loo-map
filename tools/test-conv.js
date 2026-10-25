@@ -4,7 +4,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
   const ctx = await b.newContext({ viewport: { width: 390, height: 780 }, hasTouch: true, geolocation: { latitude: 43.0545, longitude: 141.3530 }, permissions: ['geolocation'] });
   await ctx.addInitScript(() => localStorage.setItem('loo-guide','1')); const p = await ctx.newPage(); p.on('pageerror', e => console.log('ERR', e.message));
-  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html'); await p.waitForTimeout(4000);
+  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1'); await p.waitForTimeout(4000);
   const add = async (brand, loan, name) => {
     await p.click('#tabadd'); await p.waitForTimeout(700); await p.click('#pok'); await p.waitForTimeout(400);
     await p.click('.seg[data-k=type] button[data-v=conv]');

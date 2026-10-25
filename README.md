@@ -26,14 +26,15 @@ iOS ネイティブ版(Expo)は `../sapporo-loo-map`。データとマスコッ�
 - 確認: `node tools/test-hours.js`(営業時間の判定)/ `test-dark.js` / `test-add.js` / `node tools/test-conv.js`(ローカルモードで 絞り込み・リスト・追加・詳細・報告・削除 を通す。playwright-core は taskline のを借用)
 
 ## 保存先(Firebase)
-- `firebase-config.js` が空なら **ローカルモード**(この端末の localStorage)。設定すると **Firestore で全員に共有**(toilets / reports)
-- Firestore 版は未確認(Java が無くエミュレータが使えない)
-### 設定手順
-1. Firebase コンソールで新しいプロジェクトを作り、Web アプリを追加して `firebaseConfig` を `firebase-config.js` に貼る
-2. Authentication → Sign-in method で **匿名** を有効にする
-3. Firestore Database を作成し、`firestore.rules` の中身をルールに貼って公開する(**rules を変えたら毎回貼り直す**)
-4. Authentication → 設定 → 承認済みドメインに公開先(`<ユーザー>.github.io`)を追加する
-- 荒らし対策は簡易(項目・文字数・札幌周辺の座標の制限、削除は本人のみ、報告は1人1トイレ1件)。連続投稿の制限は未実装
+- 保存先は PaP と同じ **playground**(`playground-d8897`)の Firestore。コレクションは `loo-toilets`(追加されたトイレ)と `loo-reports`(一言報告)。他のアプリと名前が重ならないよう `loo-` を付けている
+- `firebase-config.js` は playground の設定を入れてある。`?local=1` を付けて開くと、この端末だけに保存するローカルモード(テスト・試し書き用。テストは全部これで動く)
+- Firestore につないだ状態は未確認(Java が無くエミュレータが使えない)
+### ルールを足す手順(playground は他のアプリと共有)
+1. Firebase コンソール → Firestore → ルール を開く
+2. 現在のルールの `match /databases/{database}/documents { ... }` の中に、`firestore.playground-snippet.rules` の `match` 2つ(`loo-toilets` と `loo-reports`)を足して公開する
+   - PaP のルールだけが入っている場合は、`firestore.playground.rules`(PaP + 札幌トイレマップ)をそのまま貼ってもよい。**他のアプリのルールもコンソールに入っているなら、これは使わずスニペットだけを足す**
+3. Authentication で **匿名** が有効なこと(PaP が使っているので有効のはず)と、承認済みドメインに `ma-ookami.github.io` があること(PaP と同じドメインなら追加不要)を確認
+- 荒らし対策は簡易(項目・文字数・札幌周辺の座標の制限、削除は本人のみ、報告は1人1トイレ1件)。連続投稿の制限は未実装。App Check は PaP と同じく未設定
 
 ## 状態・課題
 - 未実施: GitHub リポジトリ作成と Pages 公開、実機 Safari での確認(位置情報・ホーム画面追加・シートのスワイプ)

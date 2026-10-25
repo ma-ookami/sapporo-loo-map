@@ -1,0 +1,186 @@
+// playground 用の完全版: PaP のルール + 札幌トイレマップ(loo-)。他にもこのプロジェクトを使うアプリがあれば、コンソールの現在のルールにスニペットだけを足すこと
+rules_version = '2';
+
+// PaP のデータを守るルール。
+// - PCとスマホは「ペア」でつながる(pairs/<鍵>)。中を開けるのは、ペアに登録された端末(members/<uid>)だけ。
+//   ペアの一覧を取り出すことはできない
+// - 登録できるのは、ペアを作った端末と、10分だけ使える8文字のコード(codes/<コード>)を持ってきた端末。
+//   QRコードの中身もこのコード。コードは1回使うと消える
+// - 登録された端末は、ほかの端末を外せる(外された端末は、新しいコードなしでは戻れない)
+// - devices/<端末ID> は画面に出す「つながっている端末」の名前と種類
+// - 「Google で守る」をオンにしたペアは、登録されていても、その Google アカウントでログインした端末しか開けない
+// - users/<uid> は Google でログインした本人だけ:そのアカウントで守っているペアの鍵(新しい端末で探すため)
+// - 保存できる項目と長さは、アプリが使うものだけに制限する
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    // signed in with Google, or an anonymous device that linked its Google account
+    function google() { return signedIn() && 'google.com' in request.auth.token.firebase.identities; }
+    function nowMs() { return request.time.toMillis(); }
+    function pairPath(k) { return /databases/$(database)/documents/pairs/$(k); }
+    function memberPath(k) { return /databases/$(database)/documents/pairs/$(k)/members/$(request.auth.uid); }
+    function codePath(c) { return /databases/$(database)/documents/codes/$(c); }
+    // guarded by a Google account: only that account. Otherwise: devices registered in the pair
+    function openTo(k, p) {
+      return signedIn() && (('owner' in p) ? p.owner == request.auth.uid : exists(memberPath(k)));
+    }
+    function canUse(k) { return openTo(k, get(pairPath(k)).data); }
+    function optStr(d, k, n) { return !(k in d) || (d[k] is string && d[k].size() <= n); }
+    function optInt(d, k, lo, hi) { return !(k in d) || (d[k] is int && d[k] >= lo && d[k] <= hi); }
+
+    match /pairs/{k} {
+      // reading the pair itself tells the app whether it exists and is guarded (no contents)
+      allow get: if signedIn();
+      allow create: if signedIn()
+        && k.matches('[a-z0-9]{24,40}')
+        && request.resource.data.keys().hasOnly(['keep', 'at', 'creator'])
+        && request.resource.data.creator == request.auth.uid
+        && request.resource.data.keep in [0, 1, 7, 30]
+        && request.resource.data.at is int
+        && existsAfter(memberPath(k));
+      allow update: if openTo(k, resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['keep', 'owner'])
+        && request.resource.data.keep in [0, 1, 7, 30]
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['owner'])
+          // guard with my Google account
+          || (!('owner' in resource.data) && google() && request.resource.data.owner == request.auth.uid)
+          // stop guarding (only that account)
+          || (('owner' in resource.data) && !('owner' in request.resource.data))
+        );
+      allow delete: if openTo(k, resource.data);
+
+      // the devices allowed in (by Firebase uid)
+      match /members/{u} {
+        allow get: if u == request.auth.uid || canUse(k);
+        allow delete: if canUse(k) || u == request.auth.uid;
+        allow create: if signedIn() && u == request.auth.uid
+          && request.resource.data.keys().hasOnly(['at', 'code'])
+          && request.resource.data.at is int
+          && (
+            // the device that made the pair (in the same write)
+            getAfter(pairPath(k)).data.creator == request.auth.uid
+            // brought a live code for this pair, and uses it up in the same write
+            || ('code' in request.resource.data
+                && get(codePath(request.resource.data.code)).data.key == k
+                && get(codePath(request.resource.data.code)).data.exp > nowMs()
+                && !existsAfter(codePath(request.resource.data.code)))
+            // the Google account guarding the pair
+            || getAfter(pairPath(k)).data.get('owner', '') == request.auth.uid
+          );
+      }
+
+      // what the screen shows as "つながっている端末"
+      match /devices/{d} {
+        allow read, delete: if canUse(k);
+        allow create, update: if canUse(k)
+          && request.resource.data.keys().hasOnly(['name', 'kind', 'uid', 'at', 'seen'])
+          && request.resource.data.name is string && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 24
+          && request.resource.data.kind in ['phone', 'pc']
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.at is int && request.resource.data.seen is int;
+      }
+
+      // keep the limits in step with js/base.js
+      function validItem(d) {
+        return d.keys().hasAll(['kind', 'from', 'did', 'dev', 'at', 'pinned', 'ready'])
+          && d.keys().hasOnly(['kind', 'text', 'title', 'url', 'name', 'mime', 'size', 'parts', 'thumb', 'w', 'h',
+                               'from', 'did', 'dev', 'at', 'pinned', 'ready'])
+          && d.kind in ['text', 'link', 'image', 'file']
+          && optStr(d, 'text', 100000) && optStr(d, 'title', 500) && optStr(d, 'url', 4000)
+          && optStr(d, 'name', 200) && optStr(d, 'mime', 100) && optStr(d, 'thumb', 300000)
+          && optInt(d, 'size', 0, 10800000) && optInt(d, 'parts', 1, 15)
+          && optInt(d, 'w', 0, 100000) && optInt(d, 'h', 0, 100000)
+          && d.from is string && d.from.size() >= 1 && d.from.size() <= 24
+          && d.did is string && d.did.size() <= 40
+          && d.dev in ['phone', 'pc']
+          && d.at is int && d.at > nowMs() - 3600000 && d.at < nowMs() + 3600000
+          && d.pinned is bool && d.ready is bool
+          && (d.kind != 'link' || (d.url is string && d.url.matches('https?://.+')))
+          && (d.kind in ['text', 'link'] || ('parts' in d && 'size' in d && 'name' in d));
+      }
+
+      match /items/{id} {
+        allow read, delete: if canUse(k);
+        allow create: if canUse(k) && validItem(request.resource.data);
+        // only 📌, "送信中 → 届いた" and 既読(seen) change afterwards
+        allow update: if canUse(k)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pinned', 'ready', 'seen'])
+          && request.resource.data.pinned is bool && request.resource.data.ready is bool
+          && (!('seen' in request.resource.data) || request.resource.data.seen is int);
+      }
+
+      // the pieces of a file: blobs/<item id>_<0..14>
+      match /blobs/{id} {
+        allow read, delete: if canUse(k);
+        allow create: if canUse(k)
+          && id.matches('[A-Za-z0-9]+_([0-9]|1[0-4])')
+          && request.resource.data.keys().hasOnly(['d'])
+          && request.resource.data.d is string
+          && request.resource.data.d.size() <= 960000;
+      }
+    }
+
+    // a short-lived code that hands the key to another device (made only by a device that can open the pair)
+    match /codes/{c} {
+      allow get: if signedIn() && resource.data.exp > nowMs();
+      allow create: if signedIn()
+        && c.matches('[A-HJ-NP-Z2-9]{8}')
+        && request.resource.data.keys().hasOnly(['key', 'exp', 'name'])
+        && optStr(request.resource.data, 'name', 24)
+        && request.resource.data.key is string
+        && request.resource.data.exp is int
+        && request.resource.data.exp > nowMs() && request.resource.data.exp <= nowMs() + 900000
+        && canUse(request.resource.data.key);
+      allow delete: if signedIn();
+    }
+
+    // which pair this Google account guards
+    match /users/{uid} {
+      allow get, delete: if google() && request.auth.uid == uid;
+      allow create, update: if google() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['pair'])
+        && request.resource.data.pair is string && request.resource.data.pair.size() <= 40;
+    }
+
+    // ===== 札幌トイレマップ(loo-) ここから =====
+    match /loo-toilets/{id} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['name','lat','lng','fee','wheelchair','floor','ease','find','type','brand','loan','note','uid','createdAt'])
+        && request.resource.data.keys().hasAll(['name','lat','lng','fee','wheelchair','floor','ease','find','type','brand','loan','note','uid','createdAt'])
+        && (request.resource.data.ease == null || (request.resource.data.ease is int && request.resource.data.ease >= 1 && request.resource.data.ease <= 5))
+        && (request.resource.data.find == null || (request.resource.data.find is int && request.resource.data.find >= 1 && request.resource.data.find <= 5))
+        && request.resource.data.type in ['toilet','conv']
+        && (request.resource.data.brand == null || request.resource.data.brand in ['seven','family','lawson','seico','other'])
+        && (request.resource.data.loan == null || request.resource.data.loan in ['yes','ask','no'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 40
+        && request.resource.data.note is string && request.resource.data.note.size() <= 200
+        && request.resource.data.lat is number && request.resource.data.lat > 42.9 && request.resource.data.lat < 43.2
+        && request.resource.data.lng is number && request.resource.data.lng > 141.2 && request.resource.data.lng < 141.5
+        && (request.resource.data.fee == null || request.resource.data.fee is bool)
+        && (request.resource.data.wheelchair == null || request.resource.data.wheelchair is bool)
+        && (request.resource.data.floor == null || (request.resource.data.floor is int && request.resource.data.floor >= -3 && request.resource.data.floor <= 30))
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow update: if false;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    // 「きれい/混んでた/使えなかった」の一言。1人1トイレ1件(ID = トイレID_ユーザーID)。上書き・取り消しは本人だけ
+    match /loo-reports/{id} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly(['toiletId','kind','uid','createdAt'])
+        && request.resource.data.keys().hasAll(['toiletId','kind','uid','createdAt'])
+        && request.resource.data.toiletId is string && request.resource.data.toiletId.size() <= 60
+        && request.resource.data.kind in ['clean','crowded','closed','loan-yes','loan-ask','loan-no']
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && id == request.resource.data.toiletId + '_' + request.auth.uid;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+    // ===== 札幌トイレマップ(loo-) ここまで =====
+  }
+}

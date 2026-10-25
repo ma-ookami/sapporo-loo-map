@@ -6,7 +6,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   await ctx.addInitScript(() => localStorage.setItem('loo-guide', '1'));
   const p = await ctx.newPage();
   p.on('pageerror', e => console.log('ERR', e.message));
-  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html'); await p.waitForTimeout(5000);
+  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1'); await p.waitForTimeout(5000);
   console.log('pins', await p.locator('.pin').count(), 'canvas', await p.locator('canvas').count());
   await p.click('[data-t=list]'); await p.waitForTimeout(600);
   await p.screenshot({ path: process.argv[2] || 'tools/shot.png' });

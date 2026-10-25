@@ -7,7 +7,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   p.on('pageerror', e => console.log('ERR', e.message));
   const vis = () => p.evaluate(() => [...document.querySelectorAll('.pin')].filter(e => !e.hidden).length);
   const shot = n => p.screenshot({ path: `tools/shot-${n}.png` });
-  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html'); await p.waitForTimeout(4000);
+  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1'); await p.waitForTimeout(4000);
   console.log('1 pins', await vis(), '| nearest:', await p.locator('.nname').innerText());
   await shot('home');
   await p.click('[data-f=free]'); console.log('2 free filter ->', await vis()); await p.click('[data-f=free]');

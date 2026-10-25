@@ -1,12 +1,13 @@
 rules_version = '2';
 
-// 札幌トイレマップ: ユーザーが追加したトイレ(toilets)だけを扱う。
+// 札幌トイレマップ: ユーザーが追加したトイレ(loo-toilets)と一言報告(loo-reports)だけを扱う。
+// 他のアプリと同じ Firebase プロジェクト(playground)で使うため、コレクション名は loo- で始める。
 // - 読むのは誰でも。追加は匿名ログイン済みなら誰でも(項目・長さ・札幌周辺の座標に制限)
 // - 書き換えは禁止。削除は追加した本人だけ
-// - reports(一言報告)は 1人1トイレ1件。読むのは誰でも、書く・消すのは本人だけ
+// - loo-reports(一言報告)は 1人1トイレ1件。読むのは誰でも、書く・消すのは本人だけ
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /toilets/{id} {
+    match /loo-toilets/{id} {
       allow read: if true;
       allow create: if request.auth != null
         && request.resource.data.keys().hasOnly(['name','lat','lng','fee','wheelchair','floor','ease','find','type','brand','loan','note','uid','createdAt'])
@@ -30,7 +31,7 @@ service cloud.firestore {
     }
 
     // 「きれい/混んでた/使えなかった」の一言。1人1トイレ1件(ID = トイレID_ユーザーID)。上書き・取り消しは本人だけ
-    match /reports/{id} {
+    match /loo-reports/{id} {
       allow read: if true;
       allow create, update: if request.auth != null
         && request.resource.data.keys().hasOnly(['toiletId','kind','uid','createdAt'])

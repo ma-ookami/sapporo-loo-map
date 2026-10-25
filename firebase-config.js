@@ -1,9 +1,10 @@
-// Firebase の設定(README の手順で作った firebaseConfig を貼る)。公開しても問題ない値。
-// 空のままなら「この端末だけ」に保存するローカルモードで動く。
-window.FIREBASE_CONFIG = null;
-/* 例:
+// Firebase の設定。PaP と同じ playground プロジェクトを使う(この値は公開しても問題ない。データは firestore.rules で守る)。
+// null にすると、この端末だけに保存するローカルモードで動く。
 window.FIREBASE_CONFIG = {
-  apiKey: "...", authDomain: "xxx.firebaseapp.com", projectId: "xxx",
-  storageBucket: "xxx.firebasestorage.app", messagingSenderId: "...", appId: "..."
+  apiKey: "AIzaSyACHSOBRzrTLz2jNdgps7SnOlotzPouo6o",
+  authDomain: "playground-d8897.firebaseapp.com",
+  projectId: "playground-d8897",
+  storageBucket: "playground-d8897.firebasestorage.app",
+  messagingSenderId: "314986303136",
+  appId: "1:314986303136:web:b9080ef780c03fed23c3c5"
 };
-*/

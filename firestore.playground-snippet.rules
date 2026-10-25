@@ -1,0 +1,39 @@
+// playground の firestore.rules に、次の2つの match を「match /databases/{database}/documents { ... }」の中へ足す(他のアプリの match の後ろでよい)
+    // ===== 札幌トイレマップ(loo-) ここから =====
+    match /loo-toilets/{id} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['name','lat','lng','fee','wheelchair','floor','ease','find','type','brand','loan','note','uid','createdAt'])
+        && request.resource.data.keys().hasAll(['name','lat','lng','fee','wheelchair','floor','ease','find','type','brand','loan','note','uid','createdAt'])
+        && (request.resource.data.ease == null || (request.resource.data.ease is int && request.resource.data.ease >= 1 && request.resource.data.ease <= 5))
+        && (request.resource.data.find == null || (request.resource.data.find is int && request.resource.data.find >= 1 && request.resource.data.find <= 5))
+        && request.resource.data.type in ['toilet','conv']
+        && (request.resource.data.brand == null || request.resource.data.brand in ['seven','family','lawson','seico','other'])
+        && (request.resource.data.loan == null || request.resource.data.loan in ['yes','ask','no'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 40
+        && request.resource.data.note is string && request.resource.data.note.size() <= 200
+        && request.resource.data.lat is number && request.resource.data.lat > 42.9 && request.resource.data.lat < 43.2
+        && request.resource.data.lng is number && request.resource.data.lng > 141.2 && request.resource.data.lng < 141.5
+        && (request.resource.data.fee == null || request.resource.data.fee is bool)
+        && (request.resource.data.wheelchair == null || request.resource.data.wheelchair is bool)
+        && (request.resource.data.floor == null || (request.resource.data.floor is int && request.resource.data.floor >= -3 && request.resource.data.floor <= 30))
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow update: if false;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    // 「きれい/混んでた/使えなかった」の一言。1人1トイレ1件(ID = トイレID_ユーザーID)。上書き・取り消しは本人だけ
+    match /loo-reports/{id} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly(['toiletId','kind','uid','createdAt'])
+        && request.resource.data.keys().hasAll(['toiletId','kind','uid','createdAt'])
+        && request.resource.data.toiletId is string && request.resource.data.toiletId.size() <= 60
+        && request.resource.data.kind in ['clean','crowded','closed','loan-yes','loan-ask','loan-no']
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && id == request.resource.data.toiletId + '_' + request.auth.uid;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+    // ===== 札幌トイレマップ(loo-) ここまで =====

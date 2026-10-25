@@ -26,7 +26,6 @@ function bearSvg(size,mood){
 </g>
 <circle cx="23" cy="23" r="5.6" fill="#f2b8a0"/><circle cx="77" cy="23" r="5.6" fill="#f2b8a0"/>
 <ellipse cx="50" cy="76" rx="25" ry="15" fill="${CREAM}"/>
-<g transform="translate(50 76) scale(.85) translate(-12 -12)" fill="#c4521f">${WC_PATHS}</g>
 <ellipse cx="28" cy="53" rx="6.5" ry="3.8" fill="#ff8f7a" opacity=".55"/><ellipse cx="72" cy="53" rx="6.5" ry="3.8" fill="#ff8f7a" opacity=".55"/>
 <ellipse cx="50" cy="52" rx="14" ry="10.5" fill="${CREAM}"/>
 <ellipse cx="50" cy="47.5" rx="5" ry="3.4" fill="${INK}"/><ellipse cx="48.8" cy="46.4" rx="1.5" ry=".9" fill="#fff" opacity=".7"/>

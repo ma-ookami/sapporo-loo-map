@@ -2,13 +2,13 @@
 const MAP_LIGHT='https://tiles.openfreemap.org/styles/positron';
 const MAP_DARK='https://tiles.openfreemap.org/styles/dark';
 const darkQ=window.matchMedia('(prefers-color-scheme: dark)');
-const mapStyle=()=>darkQ.matches?MAP_DARK:MAP_LIGHT;
+const mapStyle=()=>isDark()?MAP_DARK:MAP_LIGHT;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const st={toilets:[],added:[],reports:[],adding:false,here:null,sel:null,open:false,tab:'map',
   filters:{free:false,wheel:false,open:false,h24:false,conv:false},sorted:[]};
 let map, hereMarker; const markers=new Map();
-const buzz=()=>{ try{ navigator.vibrate&&navigator.vibrate(10); }catch(e){} };
+const buzz=()=>{ try{ st.settings.vibrate&&navigator.vibrate&&navigator.vibrate(10); }catch(e){} };
 const routeUrl=t=>`https://www.google.com/maps/dir/?api=1&destination=${t.lat},${t.lng}&travelmode=walking`;
 const floorLabel=n=>n==null?'':n<0?`B${-n}`:`${n}F`;
 
@@ -39,7 +39,7 @@ function loanOf(t){
   return top.length===1?top[0]:'ask';
 }
 // 最寄り・リストに出すのは、トイレと、貸し出し〇/声かけ のコンビニだけ
-const usable=t=>t.type!=='conv'||['yes','ask'].includes(loanOf(t));
+const usable=t=>t.type!=='conv'||((st.settings.nearConv||st.filters.conv)&&['yes','ask'].includes(loanOf(t)));
 function resort(){
   const o=origin();
   st.sorted=st.toilets.filter(t=>passes(t)&&usable(t)).map(t=>({t,d:distanceM(o,t)})).sort((a,b)=>a.d-b.d);
@@ -60,7 +60,7 @@ function syncPins(){
   const t2=new Map(st.toilets.map(t=>[t.id,t]));
   for (const [id,m] of markers){
     const e=m.getElement(), t=t2.get(id);
-    e.hidden=!passes(t)&&id!==st.sel;
+    e.hidden=(!passes(t)||(t.type==='conv'&&!st.settings.showUnknown&&loanOf(t)===null))&&id!==st.sel;
     if (t.type==='conv'){ e.classList.remove('loan-yes','loan-ask','loan-no','loan-null'); e.classList.add('loan-'+(loanOf(t)||'null')); }
     e.classList.toggle('sel',id===st.sel);
     e.classList.toggle('near',id===near&&id!==st.sel);

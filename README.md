@@ -13,7 +13,7 @@ iOS ネイティブ版(Expo)は `../sapporo-loo-map`。データとマスコッ�
 - 追加時の星評価(使いやすさ・場所のわかりやすさ 1〜5。同じ星をもう一度で取り消し)。詳細に星で表示
 - 配慮の案内: 初回に「使う前に」(お客さん専用のトイレもある / できるだけ買い物を・混雑時は遠慮 / 情報は投稿)を1回表示。右上の ⓘ でいつでも。詳細にも短い注意書き
 
-- ダークモード: 端末の設定に自動で合わせる(地図は OpenFreeMap `dark`、画面は CSS 変数)。手動の切り替えは無し
+- ダークモード: 設定で 自動/ライト/ダーク を選べる(自動は端末に合わせる。地図は OpenFreeMap `dark`、画面は CSS 変数)
 - 「いま空いてる」チップ: `js/hours.js` が OSM の opening_hours(曜日・時間帯・日またぎ・off)を読んで日本時間で判定。**営業時間が分からないものは出す**(営業時間外と分かるものだけ隠す)。営業中/営業時間外のタグも表示
 - 現在地が遠い(1.5km 超)ときは「すすきのへ」ボタンで地図を移動
 
@@ -21,11 +21,13 @@ iOS ネイティブ版(Expo)は `../sapporo-loo-map`。データとマスコッ�
 - プライバシー・データ出典は `privacy.html`(「使う前に」の下から開く)。App Store に出すときのポリシーにも流用する
 - キャッシュ対策: `node tools/stamp.js` が index.html の `?v=` を各ファイルのハッシュにそろえる。`.git/hooks/pre-commit` で自動実行(別の PC では、`.git/hooks/pre-commit` に `node tools/stamp.js && git add index.html` を置く)
 
+- 設定(右上の スライダーのアイコン): テーマ(自動/ライト/ダーク。`html[data-theme]`)・歩く速さ(60/80/100 m/分)・振動・最寄りにコンビニも出す・借りられるか不明のコンビニを地図に出す・自分が追加したもの/自分の報告(一覧と削除・取り消し)・使う前に/プライバシー/連絡/版/この端末の記録を消す。保存は localStorage `loo-settings`(`js/settings.js`)
+
 ## 構成
 - 地図: MapLibre GL 4.7.1 + OpenFreeMap `positron`(淡い地図。キー不要。ラベルの整え方は sakabazu と同じ)
 - デザイン: ミニマル・フロスト(すりガラス・アクセント1色 #c4521f・細線アイコン `js/icons.js`)。色の意味は 橙=トイレ / 緑=借りられる・無料 / 橙黄=声かけ / 黒=選択中
 - マスコット `js/bear.js`(丸い体・クリーム色のお腹・4表情・ゆれ/まばたき)。アイコン生成は `node tools/make-icons.js`
-- `js/geo.js` 距離 / `icons.js` アイコン / `icons.js` アイコン / `bear.js` マスコット SVG / `cloud.js` 保存 / `map.js` 地図・ピン・現在地 / `ui.js` シート・タブ・チップ / `add.js` 追加 / `main.js` 起動
+- `js/settings.js` 設定 / `js/geo.js` 距離 / `icons.js` アイコン / `icons.js` アイコン / `bear.js` マスコット SVG / `cloud.js` 保存 / `map.js` 地図・ピン・現在地 / `ui.js` シート・タブ・チップ / `add.js` 追加 / `main.js` 起動
 - データ: `data/toilets.js`(`node tools/to-js.js` で `../sapporo-loo-map/data/toilets.json` から生成)。`index.html` は直接開いて確認できる
 - 確認: `node tools/test-hours.js`(営業時間の判定)/ `test-dark.js` / `test-add.js` / `node tools/test-conv.js`(ローカルモードで 絞り込み・リスト・追加・詳細・報告・削除 を通す。playwright-core は taskline のを借用)
 

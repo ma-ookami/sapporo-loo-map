@@ -214,31 +214,52 @@ body.adding #sheet{max-height:86vh}
 
 /* ダークモード(端末の設定に合わせる) */
 @media (prefers-color-scheme: dark){
-  :root{
-    --accent:#e2683a;--accent-soft:rgba(226,104,58,.22);
+:root:not([data-theme=light]){--accent:#e2683a;--accent-soft:rgba(226,104,58,.22);
     --ink:#f3efe9;--sub:#a49e96;--bg:#1a1714;
     --ok:#3ec48a;--ok-soft:rgba(62,196,138,.18);--warn:#e8963e;--warn-soft:rgba(232,150,62,.2);
     --glass:rgba(36,32,28,.78);--glass-sheet:rgba(36,32,28,.58);--line:rgba(255,255,255,.1);
     --shadow:0 8px 28px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);
     --tint:rgba(255,255,255,.09);--grab:rgba(255,255,255,.25);--card:#2c2722;--field:rgba(255,255,255,.07);
-    --on-ink:#1a1714;--care-ink:#f0c58f;--toast:rgba(243,239,233,.92);--toast-ink:#1a1714;--rim:rgba(255,255,255,.12);
-  }
-  .cta{box-shadow:0 6px 16px rgba(226,104,58,.3)}
-  .tag.loan-ask,.reps button[data-k=crowded] i{color:#f0c58f}
-  .lq button[data-k=loan-ask] .lic{color:#f0c58f}
-  .pi{border-color:#2c2722}
-  .pin.conv .pi{color:var(--ink)}
-  .pin.conv.sel .pi,.pin.sel .pi{border-color:#2c2722}
-  .herem{border-color:#2c2722}
-  #guide{background:rgba(0,0,0,.6)}
-  .row .ic{color:#5d564e}
-  .maplibregl-ctrl-attrib{background:rgba(36,32,28,.7)!important;color:#a49e96}
-  .maplibregl-ctrl-attrib a{color:#a49e96}
-  .stars button{color:#4a443d}
-  .st{color:#4a443d}
-  .stars button.on,.st.on{color:#f0b429}
-  .nmeta i.lo-ask{color:#f0c58f}
+    --on-ink:#1a1714;--care-ink:#f0c58f;--toast:rgba(243,239,233,.92);--toast-ink:#1a1714;--rim:rgba(255,255,255,.12);}
+:root:not([data-theme=light]) .cta{box-shadow:0 6px 16px rgba(226,104,58,.3)}
+:root:not([data-theme=light]) .tag.loan-ask,:root:not([data-theme=light]) .reps button[data-k=crowded] i{color:#f0c58f}
+:root:not([data-theme=light]) .lq button[data-k=loan-ask] .lic{color:#f0c58f}
+:root:not([data-theme=light]) .pi{border-color:#2c2722}
+:root:not([data-theme=light]) .pin.conv .pi{color:var(--ink)}
+:root:not([data-theme=light]) .pin.conv.sel .pi,:root:not([data-theme=light]) .pin.sel .pi{border-color:#2c2722}
+:root:not([data-theme=light]) .herem{border-color:#2c2722}
+:root:not([data-theme=light]) #guide{background:rgba(0,0,0,.6)}
+:root:not([data-theme=light]) .row .ic{color:#5d564e}
+:root:not([data-theme=light]) .maplibregl-ctrl-attrib{background:rgba(36,32,28,.7)!important;color:#a49e96}
+:root:not([data-theme=light]) .maplibregl-ctrl-attrib a{color:#a49e96}
+:root:not([data-theme=light]) .stars button{color:#4a443d}
+:root:not([data-theme=light]) .st{color:#4a443d}
+:root:not([data-theme=light]) .stars button.on,:root:not([data-theme=light]) .st.on{color:#f0b429}
+:root:not([data-theme=light]) .nmeta i.lo-ask{color:#f0c58f}
 }
+/* 設定でダークを選んだとき */
+:root[data-theme=dark]{--accent:#e2683a;--accent-soft:rgba(226,104,58,.22);
+    --ink:#f3efe9;--sub:#a49e96;--bg:#1a1714;
+    --ok:#3ec48a;--ok-soft:rgba(62,196,138,.18);--warn:#e8963e;--warn-soft:rgba(232,150,62,.2);
+    --glass:rgba(36,32,28,.78);--glass-sheet:rgba(36,32,28,.58);--line:rgba(255,255,255,.1);
+    --shadow:0 8px 28px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);
+    --tint:rgba(255,255,255,.09);--grab:rgba(255,255,255,.25);--card:#2c2722;--field:rgba(255,255,255,.07);
+    --on-ink:#1a1714;--care-ink:#f0c58f;--toast:rgba(243,239,233,.92);--toast-ink:#1a1714;--rim:rgba(255,255,255,.12);}
+:root[data-theme=dark] .cta{box-shadow:0 6px 16px rgba(226,104,58,.3)}
+:root[data-theme=dark] .tag.loan-ask,:root[data-theme=dark] .reps button[data-k=crowded] i{color:#f0c58f}
+:root[data-theme=dark] .lq button[data-k=loan-ask] .lic{color:#f0c58f}
+:root[data-theme=dark] .pi{border-color:#2c2722}
+:root[data-theme=dark] .pin.conv .pi{color:var(--ink)}
+:root[data-theme=dark] .pin.conv.sel .pi,:root[data-theme=dark] .pin.sel .pi{border-color:#2c2722}
+:root[data-theme=dark] .herem{border-color:#2c2722}
+:root[data-theme=dark] #guide{background:rgba(0,0,0,.6)}
+:root[data-theme=dark] .row .ic{color:#5d564e}
+:root[data-theme=dark] .maplibregl-ctrl-attrib{background:rgba(36,32,28,.7)!important;color:#a49e96}
+:root[data-theme=dark] .maplibregl-ctrl-attrib a{color:#a49e96}
+:root[data-theme=dark] .stars button{color:#4a443d}
+:root[data-theme=dark] .st{color:#4a443d}
+:root[data-theme=dark] .stars button.on,:root[data-theme=dark] .st.on{color:#f0b429}
+:root[data-theme=dark] .nmeta i.lo-ask{color:#f0c58f}
 
 /* トイレのマーク: 左が青(男性)・右が赤(女性)の半々。コンビニは従来どおり店アイコン */
 :root{--wc-blue:#2c6fe0;--wc-red:#e0453b}
@@ -248,3 +269,32 @@ body.adding #sheet{max-height:86vh}
 
 .gfoot{font-size:11.5px;color:var(--sub);line-height:1.6;margin:12px 0 0}
 .gfoot a{color:var(--accent)}
+
+/* 設定画面 */
+#settings{position:fixed;inset:0;z-index:20;background:rgba(29,26,23,.4);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;justify-content:center;align-items:flex-end;animation:up .2s ease both}
+#settings[hidden]{display:none}
+.spanel{background:var(--bg);width:100%;max-width:560px;max-height:92vh;border-radius:26px 26px 0 0;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.shead{display:flex;justify-content:space-between;align-items:center;padding:16px 18px 8px}
+.shead h3{margin:0;font-size:18px;font-weight:800;letter-spacing:0}
+.sbody2{overflow:auto;-webkit-overflow-scrolling:touch;padding:4px 16px calc(env(safe-area-inset-bottom) + 24px)}
+.sg{background:var(--card);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+.sg.srow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sl{font-size:14px;font-weight:700;margin-bottom:6px}
+.sg.srow .sl{margin-bottom:0}
+.shint{font-size:11.5px;color:var(--sub);margin-top:6px;line-height:1.5}
+.sg.srow .shint{margin-top:2px}
+.sw{width:50px;height:30px;border-radius:15px;background:var(--tint);position:relative;flex:none;border:1px solid var(--line)}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.3);transition:transform .2s}
+.sw[aria-pressed=true]{background:var(--ok);border-color:var(--ok)}
+.sw[aria-pressed=true]::after{transform:translateX(20px)}
+.ssec{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.06em;margin:18px 4px 8px}
+.mrow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border-radius:14px;padding:10px 14px;margin-bottom:6px}
+.mrow>div{min-width:0}
+.mrow b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow span{font-size:12px;color:var(--sub)}
+.mdel{font-size:13px;font-weight:700;color:#b3412f;padding:6px 10px;border-radius:10px;background:rgba(179,65,47,.1);flex:none}
+.empty{font-size:13px;color:var(--sub);padding:2px 6px 6px}
+.lrow{display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--card);border-radius:14px;padding:13px 14px;margin-bottom:6px;font-size:14px;font-weight:600;text-align:left;text-decoration:none;color:var(--ink)}
+.lrow .ic{color:var(--sub)}
+.lrow.plain{font-weight:600}
+.lrow.danger{color:#b3412f;justify-content:center}

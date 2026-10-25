@@ -7,7 +7,7 @@ function init(){
   map.addControl(new maplibregl.AttributionControl({compact:true}),'top-left');
   map.on('load',()=>tidyStyle(map));
   // 端末の明るさ設定が変わったら地図の色も切り替える
-  darkQ.addEventListener('change',()=>{ map.setStyle(mapStyle()); map.once('style.load',()=>tidyStyle(map)); });
+  darkQ.addEventListener('change',()=>{ if (st.settings.theme!=='auto') return; map.setStyle(mapStyle()); map.once('style.load',()=>tidyStyle(map)); });
   const zc=()=>$('map').classList.toggle('lowzoom',map.getZoom()<15);
   map.on('zoom',zc); zc();
   map.on('click',()=>{ if(!st.adding) unselect(); });
@@ -18,6 +18,6 @@ function init(){
   setInterval(()=>{ if (st.filters.open&&!st.adding&&!st.sel){ resort(); syncPins(); renderSheet(); } },60000);
   let seen=false; try{ seen=!!localStorage.getItem('loo-guide'); }catch(e){}
   if (!seen) showGuide();
-  cloud.init(list=>{ st.added=list; st.toilets=TOILETS.concat(list); refresh(); },rs=>{ st.reports=rs; resort(); syncPins(); if(!st.adding) renderSheet(); });
+  cloud.init(list=>{ st.added=list; st.toilets=TOILETS.concat(list); refresh(); if(!$('settings').hidden) renderSettings(); },rs=>{ st.reports=rs; resort(); syncPins(); if(!st.adding) renderSheet(); if(!$('settings').hidden) renderSettings(); });
 }
 init();

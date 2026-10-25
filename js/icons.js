@@ -9,6 +9,7 @@ const ICONS={
   check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
   chat:'<path d="M4 5.5h16v11H10l-4.5 3.5v-3.5H4z"/>',
   info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.1"/>',
+  sliders:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
   close:'<path d="M6 6l12 12M18 6 6 18"/>',
   chevron:'<path d="M9 6l6 6-6 6"/>',
   store:'<path d="M4 9l1.5-4.5h13L20 9M4 9v10.5h16V9"/><path d="M4 9c0 1.6 1.2 2.5 2.7 2.5S9.4 10.6 9.4 9c0 1.6 1.2 2.5 2.6 2.5s2.6-.9 2.6-2.5c0 1.6 1.2 2.5 2.7 2.5S20 10.6 20 9"/><path d="M10 19.5v-4.5h4v4.5"/>'

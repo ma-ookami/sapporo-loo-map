@@ -16,14 +16,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="トイレマップ">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
-<link rel="stylesheet" href="css/style.css?v=61505b76">
+<link rel="stylesheet" href="css/style.css?v=d2f93df3">
 </head>
 <body>
 <div id="map"></div>
 
 <header id="top">
   <div class="brand" id="brand"></div>
-  <div class="tr"><button id="info" class="round" aria-label="使う前に読む"></button><button id="here" class="round" aria-label="現在地へ"></button></div>
+  <div class="tr"><button id="info" class="round" aria-label="設定"></button><button id="here" class="round" aria-label="現在地へ"></button></div>
   <div id="filters">
     <button data-f="free" aria-pressed="false">無料</button>
     <button data-f="wheel" aria-pressed="false">車いす</button>
@@ -36,6 +36,7 @@
 <div id="cross" hidden></div>
 
 <div id="guide" hidden></div>
+<div id="settings" hidden></div>
 
 <section id="sheet">
   <div id="grab" aria-label="シートを開閉"><i></i></div>
@@ -54,14 +55,15 @@
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=b8099f3c"></script>
 <script src="data/toilets.js?v=02cfe460"></script>
-<script src="js/geo.js?v=df338edc"></script>
+<script src="js/geo.js?v=1a5e67f5"></script>
 <script src="js/hours.js?v=00fea5ba"></script>
-<script src="js/icons.js?v=f2124bc1"></script>
+<script src="js/icons.js?v=e01c3d47"></script>
 <script src="js/bear.js?v=abb4f48b"></script>
 <script src="js/cloud.js?v=1c62d3ac"></script>
-<script src="js/map.js?v=e57a3237"></script>
-<script src="js/ui.js?v=4ae629c3"></script>
+<script src="js/map.js?v=c84c8dc6"></script>
+<script src="js/settings.js?v=9587ba6d"></script>
+<script src="js/ui.js?v=59dea9fd"></script>
 <script src="js/add.js?v=03f4b26a"></script>
-<script src="js/main.js?v=e61445b5"></script>
+<script src="js/main.js?v=219871c9"></script>
 </body>
 </html>

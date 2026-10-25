@@ -298,3 +298,7 @@ body.adding #sheet{max-height:86vh}
 .lrow .ic{color:var(--sub)}
 .lrow.plain{font-weight:600}
 .lrow.danger{color:#b3412f;justify-content:center}
+
+/* 現在地の青い点: ゆっくり広がる輪で見つけやすく */
+.herem{position:relative}
+.herem::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid #2f6fed;animation:ring 2.2s ease-out infinite}

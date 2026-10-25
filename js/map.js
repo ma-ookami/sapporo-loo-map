@@ -81,15 +81,34 @@ function refresh(){ resort(); syncMarkers(); syncPins(); renderSheet(); }
 
 // 現在地。動いたら距離を更新(10m 以上動いたときだけ描き直す)
 let lastRender=null;
-function watchHere(onFirst){
-  if (!navigator.geolocation) return;
-  navigator.geolocation.watchPosition(p=>{
-    const h={lat:p.coords.latitude,lng:p.coords.longitude};
-    const first=!st.here; st.here=h;
-    if (first||!lastRender||distanceM(lastRender,h)>10){ lastRender=h; resort(); syncPins(); if(!st.adding) renderSheet(); }
-    else hereMarker&&hereMarker.setLngLat([h.lng,h.lat]);
-    if (first&&onFirst) onFirst(h);
-  },()=>{},{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
+// 位置情報が取れた(最初の1回は、地図を動かしていなくて、すすきの近くにいるなら、そこへ寄せる)
+function onPos(p){
+  const h={lat:p.coords.latitude,lng:p.coords.longitude};
+  const first=!st.here; st.here=h; st.locState='ok';
+  if (first||!lastRender||distanceM(lastRender,h)>10){ lastRender=h; resort(); syncPins(); if(!st.adding) renderSheet(); }
+  else hereMarker&&hereMarker.setLngLat([h.lng,h.lat]);
+  if (first&&!st.moved&&!st.adding&&!st.sel&&distanceM(h,SUSUKINO)<3000) map.easeTo({center:[h.lng,h.lat],zoom:16,duration:600});
+  if (!$('settings').hidden) renderSettings();
+}
+function onPosErr(err){
+  st.locState=err&&err.code===1?'denied':'unavailable';
+  if (!$('settings').hidden) renderSettings();
+}
+const LOC_HELP={
+  denied:'位置情報がオフです。iPhone は「設定 → プライバシー → 位置情報サービス → Safari」でオンにして、ページを開き直してね',
+  unavailable:'現在地がとれませんでした。電波のよいところで、もう一度ためしてね'
+};
+function watchHere(){
+  if (!navigator.geolocation){ st.locState='unavailable'; return; }
+  st.locState='pending';
+  navigator.geolocation.watchPosition(onPos,onPosErr,{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
+}
+// 現在地ボタン: 取れていればそこへ。まだなら、もう一度とりに行って、だめな理由を知らせる
+function locateNow(){
+  if (st.here){ map.flyTo({center:[st.here.lng,st.here.lat],zoom:16}); return; }
+  if (!navigator.geolocation){ toast(LOC_HELP.unavailable); return; }
+  toast('現在地をさがしています…');
+  navigator.geolocation.getCurrentPosition(p=>{ onPos(p); map.flyTo({center:[st.here.lng,st.here.lat],zoom:16}); },e=>{ onPosErr(e); toast(LOC_HELP[st.locState]); },{enableHighAccuracy:true,timeout:10000});
 }
 // シートの下に隠れないよう、地図の中心をシートの上に寄せる
 function padMap(){

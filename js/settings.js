@@ -4,6 +4,7 @@ const APP_VERSION='1.0';
 const DEFAULT_SETTINGS={theme:'auto',lang:'ja',vibrate:true,pace:80,nearConv:true,showUnknown:true};
 const KIND_LABEL={clean:'きれい','crowded':'混んでた',closed:'使えなかった','loan-yes':'借りられる','loan-ask':'声をかけて借りる','loan-no':'借りられない'};
 
+const LOC_TEXT={ok:'取得できています(地図の青い点です)',pending:'取得中…',denied:'許可されていません。端末の設定で、このサイトの位置情報をオンにしてね(iPhone: 設定 → プライバシー → 位置情報サービス → Safari)',unavailable:'いまは取得できません。電波のよいところでためしてね'};
 function loadSettings(){
   try{ return Object.assign({},DEFAULT_SETTINGS,JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')); }
   catch(e){ return Object.assign({},DEFAULT_SETTINGS); }
@@ -44,6 +45,7 @@ function renderSettings(){
   v.innerHTML=`<div class="spanel"><div class="shead"><h3>設定</h3><button class="x" id="sx" aria-label="閉じる">${icon('close',16)}</button></div>
   <div class="sbody2">
     <div class="sg"><div class="sl">テーマ</div>${seg3('theme',[['auto','自動'],['light','ライト'],['dark','ダーク']])}<div class="shint">自動は、端末の設定に合わせます</div></div>
+    <div class="sg srow"><div><div class="sl">現在地</div><div class="shint">${LOC_TEXT[st.locState]||LOC_TEXT.pending}</div></div><button class="sub small" id="slocate">さがす</button></div>
     <div class="sg"><div class="sl">地図の文字</div>${seg3('lang',[['ja','日本語'],['en','English']])}<div class="shint">地名・通り名の言語です。English でも、英語の名前がない場所は日本語で出ます</div></div>
     <div class="sg"><div class="sl">歩く速さ</div>${seg3('pace',[[60,'ゆっくり'],[80,'ふつう'],[100,'早足']])}<div class="shint">「徒歩○分」の計算に使います</div></div>
     <div class="sg srow"><div><div class="sl">振動</div><div class="shint">ボタンを押したとき(Android のみ)</div></div>${sw('vibrate')}</div>
@@ -60,6 +62,7 @@ function renderSettings(){
   </div></div>`;
   const nb=v.querySelector('.sbody2'); nb.scrollTop=top;
   $('sx').onclick=hideSettings;
+  $('slocate').onclick=()=>{ hideSettings(); locateNow(); };
   v.onclick=e=>{ if (e.target===v) hideSettings(); };
   v.querySelectorAll('.seg[data-s] button').forEach(b=>b.onclick=()=>{ buzz(); const k=b.parentNode.dataset.s, val=b.dataset.v; setSetting(k,k==='pace'?Number(val):val); renderSettings(); });
   v.querySelectorAll('.sw').forEach(b=>b.onclick=()=>{ buzz(); setSetting(b.dataset.s,!st.settings[b.dataset.s]); renderSettings(); });

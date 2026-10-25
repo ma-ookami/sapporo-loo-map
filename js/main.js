@@ -12,7 +12,8 @@ function init(){
   map.on('zoom',zc); zc();
   map.on('click',()=>{ if(!st.adding) unselect(); });
   initUi(); syncMarkers(); syncPins(); renderSheet();
-  $('here').onclick=()=>{ buzz(); if (st.here) map.flyTo({center:[st.here.lng,st.here.lat],zoom:16}); };
+  $('here').onclick=()=>{ buzz(); locateNow(); };
+  map.on('dragstart',()=>{ st.moved=true; });
   watchHere();
   // 営業中の判定は時間で変わるので、「いま空いてる」を使っている間は1分ごとに更新
   setInterval(()=>{ if (st.filters.open&&!st.adding&&!st.sel){ resort(); syncPins(); renderSheet(); } },60000);

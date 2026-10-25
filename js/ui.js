@@ -1,0 +1,114 @@
+/* 下のシート(ホーム・リスト・詳細)、タブバー、絞り込みチップ */
+const KINDS=[['clean','きれい'],['crowded','混んでた'],['closed','使えなかった']];
+
+const LKINDS=[['loan-yes','check','借りられる','そのまま'],['loan-ask','chat','声をかけて','店員さんに一言'],['loan-no','close','借りられない','断られた']];
+function loanCounts(id){ const c={'loan-yes':0,'loan-ask':0,'loan-no':0}; for (const r of st.reports) if (r.toiletId===id&&c[r.kind]!==undefined) c[r.kind]++; return c; }
+function reportCounts(id){
+  const since=Date.now()-24*3600*1000, c={clean:0,crowded:0,closed:0}; let mine=null;
+  for (const r of st.reports){ if (r.toiletId!==id||r.at<since||c[r.kind]===undefined) continue; c[r.kind]++; if (r.mine) mine=r.kind; }
+  return {c,mine};
+}
+const tagsOf=t=>(t.type==='conv'?`<span class="tag">${esc(brandLabel(t.brand))}</span>${(l=>`<span class="tag loan-${l||'null'}">${l?loanLabel(l):'借りられるか不明'}</span>`)(loanOf(t))}`:'')+(t.floor!=null?`<span class="tag">${floorLabel(t.floor)}</span>`:'')
+  +(t.fee===false?'<span class="tag free">無料</span>':t.fee===true?'<span class="tag">有料</span>':'')
+  +(t.wheelchair?'<span class="tag">車いす可</span>':'')+(t.hours==='24/7'?'<span class="tag free">24時間</span>':(o=>o===true?'<span class="tag free">営業中</span>':o===false?'<span class="tag loan-no">営業時間外</span>':t.hours&&t.type!=='conv'?`<span class="tag">${esc(t.hours)}</span>`:'')(openNow(t.hours)));
+
+function focus(id){
+  st.sel=id; st.open=false; buzz();
+  syncPins(); renderSheet();
+  const t=st.toilets.find(x=>x.id===id);
+  map.setPadding({top:0,left:0,right:0,bottom:padMap()});
+  map.easeTo({center:[t.lng,t.lat],zoom:Math.max(map.getZoom(),17),duration:450});
+}
+function unselect(){
+  if (!st.sel) return;
+  st.sel=null; syncPins(); renderSheet(); map.setPadding({top:0,left:0,right:0,bottom:0});
+}
+function setTab(tab){
+  if (st.adding) return;
+  buzz(); st.tab=tab; st.sel=null; st.open=tab==='list';
+  document.querySelectorAll('#tabs [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
+  syncPins(); renderSheet(); map.setPadding({top:0,left:0,right:0,bottom:0});
+}
+
+function renderSheet(){
+  if (st.adding) return;
+  const sh=$('sheet'), body=$('sbody');
+  sh.classList.toggle('open',st.open&&!st.sel);
+  const sel=st.sel&&st.toilets.find(x=>x.id===st.sel);
+  if (sel) return renderDetail(body,sel);
+  const nearest=st.sorted[0], far=!nearest||nearest.d>FAR_M;
+  let h='';
+  if (!nearest) h+=`<div class="bubble">${bearSvg(36,true)}<span>条件に合うトイレがないよ。絞り込みをゆるめてみてね</span></div>`;
+  else{
+    if (far) h+=`<div class="bubble"><span>ちょっと遠いよ。まずはすすきの周辺だけ載ってるよ</span><button class="sub small" id="gosus">すすきのへ</button></div>`;
+    const t=nearest.t;
+    h+=`<div class="near">${bearSvg(46,far?'worried':'normal')}<div><div class="eyebrow">いちばん近いトイレ</div>
+      <button class="nhead" id="nhead" data-id="${t.id}"><div class="nrow"><div class="nname">${esc(t.name||'トイレ')}</div>
+      <div class="nmeta">${fmtDist(nearest.d)}<i>徒歩${walkMin(nearest.d)}分</i>${t.type==='conv'?`<i class="lo lo-${loanOf(t)}">${loanLabel(loanOf(t))}</i>`:''}</div></div></button></div></div>
+      <button class="cta${far?' far':''}" id="nbtn">ナビを開始${icon('arrow',20)}</button>`;
+  }
+  if (st.open) h+='<div class="sech"><span class="sec">近い順</span><button class="x" id="lx" aria-label="リストを閉じる">'+icon('close',16)+'</button></div><div class="list">'+st.sorted.slice(0,30).map(({t,d})=>`<button class="row" data-id="${t.id}"><span class="ri${t.type==='conv'?' conv':''}">${icon(t.type==='conv'?'store':'wc',20)}</span><span class="rn"><b>${esc(t.name||'トイレ')}</b><span class="tags">${tagsOf(t)}</span></span><span class="rd">${fmtDist(d)}</span>${icon('chevron',16)}</button>`).join('')+'</div>';
+  body.innerHTML=h; body.style.animation='none'; void body.offsetWidth; body.style.animation='';
+  const gs=$('gosus'); if (gs) gs.onclick=()=>{ buzz(); map.flyTo({center:[SUSUKINO.lng,SUSUKINO.lat],zoom:15.5}); };
+  const lx=$('lx'); if (lx) lx.onclick=()=>setTab('map');
+  const nb=$('nbtn'); if (nb) nb.onclick=()=>{ buzz(); window.open(routeUrl(nearest.t),'_blank','noopener'); };
+  body.querySelectorAll('.row,#nhead').forEach(r=>r.onclick=()=>focus(r.dataset.id));
+}
+
+function renderDetail(body,t){
+  const d=distanceM(origin(),t), {c,mine:mine0}=reportCounts(t.id), lc=loanCounts(t.id), mine=(st.reports.find(r=>r.toiletId===t.id&&r.mine)||{}).kind||mine0;
+  body.innerHTML=`<div class="dhead"><div class="av">${bearSvg(36)}</div><div><h2>${esc(t.name||'トイレ')}</h2>
+    <div class="d">${fmtDist(d)}・徒歩${walkMin(d)}分</div></div><button class="x" id="dx" aria-label="閉じる">${icon('close',16)}</button></div>
+    <div class="tags">${tagsOf(t)}${t.source==='user'?'<span class="tag user">追加された情報</span>':''}</div>
+    ${t.note?`<div class="note">${esc(t.note)}</div>`:''}
+    ${(t.ease||t.find)?`<div class="rate">${t.ease?`<div><span>使いやすさ</span><span>${starsRow(t.ease)}</span></div>`:''}${t.find?`<div><span>場所のわかりやすさ</span><span>${starsRow(t.find)}</span></div>`:''}</div>`:''}
+    ${t.type==='conv'
+      ?`<div class="sec2">このコンビニのトイレ、借りられる?</div>
+    <div class="lq">${LKINDS.map(([k,ic,l,sub])=>`<button data-k="${k}" aria-pressed="${mine===k}"><span class="lic">${icon(ic,20)}</span><b>${l}</b><small>${sub}</small><em>${lc[k]?lc[k]+'人':'&nbsp;'}</em></button>`).join('')}</div>
+    <div class="repnote">${(n=>n?`${n}人が教えてくれました。借りたことがあれば、あなたも教えてね`:'まだ誰も教えてくれていません。借りたことがあれば、教えてね')(lc['loan-yes']+lc['loan-ask']+lc['loan-no'])}</div>`
+      :`<div class="sec2">いまの様子(24時間だけ表示)</div>
+    <div class="reps">${KINDS.map(([k,l])=>`<button data-k="${k}" aria-pressed="${mine===k}"><i></i>${l}${c[k]?` <b>${c[k]}</b>`:''}</button>`).join('')}</div>`}
+    <div class="care">${icon('info',16)}<span>${t.type==='conv'?'お店のご厚意で借りるトイレです。できればお買い物を。混んでいるときは遠慮して、きれいに使いましょう。お客さん専用のお店もあります。':'ビルやお店のトイレは、お客さん専用のこともあります。使えなかったときは、無理せず別の場所へ。'}</span></div>
+    <a class="cta" href="${routeUrl(t)}" target="_blank" rel="noopener">ここへ行く${icon('arrow',20)}</a>
+    ${t.mine?'<button class="del" id="del">この情報を削除</button>':''}`;
+  $('dx').onclick=unselect;
+  body.querySelectorAll('.reps button,.lq button').forEach(b=>b.onclick=async()=>{
+    buzz(); const k=b.dataset.k;
+    try{ await cloud.report(t.id,mine===k?null:k); }catch(e){ toast('送れませんでした'); }
+  });
+  const dl=$('del'); if(dl) dl.onclick=async()=>{ if(!confirm('削除しますか?')) return; try{ await cloud.remove(t.id); st.sel=null; renderSheet(); padMap(); }catch(e){ toast('削除できませんでした'); } };
+}
+
+function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.textContent=msg; document.body.appendChild(d); setTimeout(()=>d.remove(),2200); }
+
+function initUi(){
+  document.querySelectorAll('#tabs [data-t]').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+  $('tabadd').onclick=startAdd;
+  $('brand').innerHTML=bearSvg(30)+'札幌トイレマップ'; $('here').innerHTML=icon('locate',22); $('info').innerHTML=icon('info',22); $('info').onclick=()=>showGuide();
+  $('ic-map').innerHTML=icon('map',23); $('ic-list').innerHTML=icon('list',23); $('ic-add').innerHTML=icon('plus',28);
+  document.querySelectorAll('#filters [data-f]').forEach(b=>b.onclick=()=>{
+    buzz(); const k=b.dataset.f; st.filters[k]=!st.filters[k]; b.setAttribute('aria-pressed',String(st.filters[k])); refresh();
+  });
+  // つまみ: タップで開閉、上下スワイプ
+  const g=$('grab'); let y0=null, tAt=0;
+  g.addEventListener('touchstart',e=>{ y0=e.touches[0].clientY; },{passive:true});
+  g.addEventListener('touchend',e=>{
+    const dy=e.changedTouches[0].clientY-y0; y0=null; tAt=Date.now();
+    if (st.sel){ if(dy>30) unselect(); return; }
+    if (dy<-30) st.open=true; else if (dy>30) st.open=false; else st.open=!st.open;
+    st.tab=st.open?'list':'map'; document.querySelectorAll('#tabs [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===st.tab)); renderSheet();
+  });
+  g.onclick=()=>{ if (Date.now()-tAt<600) return; if (st.sel) unselect(); else { st.open=!st.open; renderSheet(); } };
+}
+
+// 使う前に(初回だけ自動で出す。右上の ⓘ からいつでも)
+function showGuide(){
+  const g=$('guide');
+  g.innerHTML=`<div class="gcard"><div class="ghd">${bearSvg(64,'happy')}<h3>使う前に、ちょっとだけ</h3></div>
+    <ol>
+    <li><b>お客さん専用のトイレもあるよ</b><span>お店や商業施設のトイレは、お客さんだけが使えることがあります。使えなかったときは、無理せず別の場所へ。</span></li>
+    <li><b>できるだけ、お店で買い物を</b><span>コンビニなどはお店のご厚意で借りています。できれば何か買って、混んでいる時間は遠慮して、きれいに使いましょう。声をかけるときは「お手洗いをお借りできますか?」と一言。</span></li>
+    <li><b>情報はみんなの投稿です</b><span>古い・違うこともあります。気づいたら、報告や追加で教えてね。</span></li>
+    </ol><button class="cta" id="gok">わかった</button></div>`;
+  g.hidden=false; $('gok').onclick=()=>{ g.hidden=true; try{ localStorage.setItem('loo-guide','1'); }catch(e){} };
+}

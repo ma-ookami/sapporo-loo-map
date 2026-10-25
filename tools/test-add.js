@@ -1,0 +1,32 @@
+// 画面の一通りの確認(ローカルモード): node tools/test-add.js
+const { chromium } = require('../../taskline/node_modules/playwright-core');
+(async () => {
+  const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
+  const ctx = await b.newContext({ viewport: { width: 390, height: 780 }, hasTouch: true, geolocation: { latitude: 43.0545, longitude: 141.3530 }, permissions: ['geolocation'] });
+  await ctx.addInitScript(() => localStorage.setItem('loo-guide','1')); const p = await ctx.newPage();
+  p.on('pageerror', e => console.log('ERR', e.message));
+  const vis = () => p.evaluate(() => [...document.querySelectorAll('.pin')].filter(e => !e.hidden).length);
+  const shot = n => p.screenshot({ path: `tools/shot-${n}.png` });
+  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html'); await p.waitForTimeout(4000);
+  console.log('1 pins', await vis(), '| nearest:', await p.locator('.nname').innerText());
+  await shot('home');
+  await p.click('[data-f=free]'); console.log('2 free filter ->', await vis()); await p.click('[data-f=free]');
+  await p.click('[data-t=list]'); await p.waitForTimeout(500); console.log('3 list rows', await p.locator('.row').count()); await shot('list');
+  await p.click('#lx'); await p.waitForTimeout(400); console.log('3b list closed by x:', await p.locator('.row').count() === 0);
+  await p.click('#tabadd'); await p.waitForTimeout(900); await shot('pick');
+  await p.click('#pok'); await p.waitForTimeout(500);
+  await p.click('#fsave'); console.log('4 empty-name toast', await p.locator('.toast').count());
+  await p.fill('#fname', 'テストビル'); await p.click('.seg[data-k=floor] button[data-v="3"]'); await p.click('.seg[data-k=fee] button[data-v=free]'); await p.click('.stars[data-k=ease] button[data-v="4"]'); await p.click('.stars[data-k=find] button[data-v="3"]');
+  await shot('form'); await p.click('#fsave'); await p.waitForTimeout(800);
+  console.log('5 pins after add', await vis());
+  await p.evaluate(() => { const a = [...document.querySelectorAll('.pin')]; a[a.length-1].click(); }); await p.waitForTimeout(800);
+  const NL = String.fromCharCode(10);
+  const flat = async sel => (await p.locator(sel).first().innerText()).split(NL).join(' ');
+  console.log('6 detail:', await p.locator('#sbody h2').innerText(), '|', await flat('#sbody .tags'), '| rate:', await flat('.rate'), '| care:', (await flat('.care')).slice(0, 18));
+  await p.click('.reps button[data-k=clean]'); await p.waitForTimeout(300);
+  console.log('7 report pressed:', await p.locator('.reps button[data-k=clean]').getAttribute('aria-pressed'), await p.locator('.reps button[data-k=clean]').innerText());
+  await shot('detail');
+  p.once('dialog', d => d.accept()); await p.click('#del'); await p.waitForTimeout(500);
+  console.log('8 pins after delete', await vis());
+  await b.close();
+})();

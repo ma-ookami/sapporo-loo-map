@@ -1,0 +1,91 @@
+/* 地図・ピン・現在地。MapLibre + OpenFreeMap(キー不要) */
+const MAP_LIGHT='https://tiles.openfreemap.org/styles/positron';
+const MAP_DARK='https://tiles.openfreemap.org/styles/dark';
+const darkQ=window.matchMedia('(prefers-color-scheme: dark)');
+const mapStyle=()=>darkQ.matches?MAP_DARK:MAP_LIGHT;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const st={toilets:[],added:[],reports:[],adding:false,here:null,sel:null,open:false,tab:'map',
+  filters:{free:false,wheel:false,open:false,h24:false,conv:false},sorted:[]};
+let map, hereMarker; const markers=new Map();
+const buzz=()=>{ try{ navigator.vibrate&&navigator.vibrate(10); }catch(e){} };
+const routeUrl=t=>`https://www.google.com/maps/dir/?api=1&destination=${t.lat},${t.lng}&travelmode=walking`;
+const floorLabel=n=>n==null?'':n<0?`B${-n}`:`${n}F`;
+
+// 日本語の名前だけ・店や施設のアイコンなし・バス停なし(sakabazu と同じ)
+function tidyStyle(m){
+  for (const l of m.getStyle().layers){
+    if (l.type!=='symbol') continue;
+    const sl=l['source-layer']||'', id=l.id;
+    if (id==='poi_transit') m.setFilter(id,['==',['get','class'],'rail']);
+    const hide=(sl==='poi'&&id!=='poi_transit')||/shield/.test(id)||sl==='housenumber'
+      ||(sl==='place'&&/neighbourhood|quarter|suburb|hamlet|other/.test(id));
+    if (hide){ m.setLayoutProperty(id,'visibility','none'); continue; }
+    if (m.getLayoutProperty(id,'text-field')) m.setLayoutProperty(id,'text-field',['coalesce',['get','name:ja'],['get','name']]);
+  }
+}
+
+const origin=()=>st.here||SUSUKINO;
+// 「借りられるコンビニ」: トイレは隠し、貸し出し 借りられる/声をかけて のコンビニだけ出す
+const passes=t=>(!st.filters.conv||(t.type==='conv'&&['yes','ask'].includes(loanOf(t))))&&(!st.filters.free||t.fee===false)&&(!st.filters.wheel||t.wheelchair===true)&&(!st.filters.open||openNow(t.hours)!==false)&&(!st.filters.h24||t.hours==='24/7');
+// コンビニの貸し出し: 報告(1人1票)の多数決。同数は「声をかけて」。追加した人の選択も1票。まだ無ければ null(未確認)
+function loanOf(t){
+  if (t.type!=='conv') return null;
+  const c={yes:0,ask:0,no:0};
+  if (t.source==='user'&&t.loan) c[t.loan]++;
+  for (const r of st.reports) if (r.toiletId===t.id&&r.kind.startsWith('loan-')) c[r.kind.slice(5)]++;
+  const max=Math.max(c.yes,c.ask,c.no); if (!max) return null;
+  const top=Object.keys(c).filter(k=>c[k]===max);
+  return top.length===1?top[0]:'ask';
+}
+// 最寄り・リストに出すのは、トイレと、貸し出し〇/声かけ のコンビニだけ
+const usable=t=>t.type!=='conv'||['yes','ask'].includes(loanOf(t));
+function resort(){
+  const o=origin();
+  st.sorted=st.toilets.filter(t=>passes(t)&&usable(t)).map(t=>({t,d:distanceM(o,t)})).sort((a,b)=>a.d-b.d);
+}
+
+function syncMarkers(){
+  const ids=new Set(st.toilets.map(t=>t.id));
+  for (const [id,m] of markers) if (!ids.has(id)){ m.remove(); markers.delete(id); }
+  for (const t of st.toilets){
+    if (markers.has(t.id)) continue;
+    const e=document.createElement('div'); e.className='pin'+(t.type==='conv'?' conv loan-'+(loanOf(t)||'null'):''); e.innerHTML='<div class="pi">'+icon(t.type==='conv'?'store':'wc',18)+'</div>';
+    e.onclick=ev=>{ ev.stopPropagation(); if(!st.adding) focus(t.id); };
+    markers.set(t.id,new maplibregl.Marker({element:e,anchor:'center'}).setLngLat([t.lng,t.lat]).addTo(map));
+  }
+}
+function syncPins(){
+  const near=st.sorted[0]&&st.sorted[0].d<=FAR_M?st.sorted[0].t.id:null;
+  const t2=new Map(st.toilets.map(t=>[t.id,t]));
+  for (const [id,m] of markers){
+    const e=m.getElement(), t=t2.get(id);
+    e.hidden=!passes(t)&&id!==st.sel;
+    if (t.type==='conv'){ e.classList.remove('loan-yes','loan-ask','loan-no','loan-null'); e.classList.add('loan-'+(loanOf(t)||'null')); }
+    e.classList.toggle('sel',id===st.sel);
+    e.classList.toggle('near',id===near&&id!==st.sel);
+  }
+  if (st.here){
+    if (!hereMarker){ const h=document.createElement('div'); h.className='herem'; hereMarker=new maplibregl.Marker({element:h}).setLngLat([st.here.lng,st.here.lat]).addTo(map); }
+    else hereMarker.setLngLat([st.here.lng,st.here.lat]);
+  }
+}
+function refresh(){ resort(); syncMarkers(); syncPins(); renderSheet(); }
+
+// 現在地。動いたら距離を更新(10m 以上動いたときだけ描き直す)
+let lastRender=null;
+function watchHere(onFirst){
+  if (!navigator.geolocation) return;
+  navigator.geolocation.watchPosition(p=>{
+    const h={lat:p.coords.latitude,lng:p.coords.longitude};
+    const first=!st.here; st.here=h;
+    if (first||!lastRender||distanceM(lastRender,h)>10){ lastRender=h; resort(); syncPins(); if(!st.adding) renderSheet(); }
+    else hereMarker&&hereMarker.setLngLat([h.lng,h.lat]);
+    if (first&&onFirst) onFirst(h);
+  },()=>{},{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
+}
+// シートの下に隠れないよう、地図の中心をシートの上に寄せる
+function padMap(){
+  const pad=st.adding||st.sel?Math.max(0,innerHeight-$('sheet').getBoundingClientRect().top):0;
+  map.setPadding({top:0,left:0,right:0,bottom:pad}); return pad;
+}

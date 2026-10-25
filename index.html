@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>札幌トイレマップ</title>
+<meta name="description" content="すすきの周辺のトイレを地図で探す。いちばん近いトイレへ一発ナビ。">
+<meta name="theme-color" content="#f6f4f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1714" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="トイレマップ">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="map"></div>
+
+<header id="top">
+  <div class="brand" id="brand"></div>
+  <div class="tr"><button id="info" class="round" aria-label="使う前に読む"></button><button id="here" class="round" aria-label="現在地へ"></button></div>
+  <div id="filters">
+    <button data-f="free" aria-pressed="false">無料</button>
+    <button data-f="wheel" aria-pressed="false">車いす</button>
+    <button data-f="open" aria-pressed="false">いま空いてる</button>
+    <button data-f="h24" aria-pressed="false">24時間</button>
+    <button data-f="conv" aria-pressed="false">借りられるコンビニ</button>
+  </div>
+</header>
+
+<div id="cross" hidden></div>
+
+<div id="guide" hidden></div>
+
+<section id="sheet">
+  <div id="grab" aria-label="シートを開閉"><i></i></div>
+  <div id="sbody"></div>
+</section>
+
+<nav id="tabs">
+  <button data-t="map" class="on"><span id="ic-map"></span>地図</button>
+  <button id="tabadd" class="addtab" aria-label="トイレを追加"><span id="ic-add"></span></button>
+  <button data-t="list"><span id="ic-list"></span>リスト</button>
+</nav>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="data/toilets.js"></script>
+<script src="js/geo.js"></script>
+<script src="js/hours.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/bear.js"></script>
+<script src="js/cloud.js"></script>
+<script src="js/map.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/add.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

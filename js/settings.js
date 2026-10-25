@@ -1,7 +1,7 @@
 /* 設定画面(右上の ⚙)。設定はこの端末の localStorage('loo-settings')に保存する */
 const SETTINGS_KEY='loo-settings';
 const APP_VERSION='1.0';
-const DEFAULT_SETTINGS={theme:'auto',vibrate:true,pace:80,nearConv:true,showUnknown:true};
+const DEFAULT_SETTINGS={theme:'auto',lang:'ja',vibrate:true,pace:80,nearConv:true,showUnknown:true};
 const KIND_LABEL={clean:'きれい','crowded':'混んでた',closed:'使えなかった','loan-yes':'借りられる','loan-ask':'声をかけて借りる','loan-no':'借りられない'};
 
 function loadSettings(){
@@ -24,6 +24,7 @@ function setSetting(k,v){
   st.settings[k]=v; saveSettings();
   if (k==='theme'){ applyTheme(); if (map){ map.setStyle(mapStyle()); map.once('style.load',()=>tidyStyle(map)); } }
   if (k==='pace') applyPace();
+  if (k==='lang'&&map) setLabelLang(map);
   if (map){ resort(); syncPins(); if (!st.adding) renderSheet(); }
 }
 
@@ -43,6 +44,7 @@ function renderSettings(){
   v.innerHTML=`<div class="spanel"><div class="shead"><h3>設定</h3><button class="x" id="sx" aria-label="閉じる">${icon('close',16)}</button></div>
   <div class="sbody2">
     <div class="sg"><div class="sl">テーマ</div>${seg3('theme',[['auto','自動'],['light','ライト'],['dark','ダーク']])}<div class="shint">自動は、端末の設定に合わせます</div></div>
+    <div class="sg"><div class="sl">地図の文字</div>${seg3('lang',[['ja','日本語'],['en','English']])}<div class="shint">地名・通り名の言語です。English でも、英語の名前がない場所は日本語で出ます</div></div>
     <div class="sg"><div class="sl">歩く速さ</div>${seg3('pace',[[60,'ゆっくり'],[80,'ふつう'],[100,'早足']])}<div class="shint">「徒歩○分」の計算に使います</div></div>
     <div class="sg srow"><div><div class="sl">振動</div><div class="shint">ボタンを押したとき(Android のみ)</div></div>${sw('vibrate')}</div>
     <div class="sg srow"><div><div class="sl">最寄りにコンビニも出す</div><div class="shint">「いちばん近いトイレ」とリストに、借りられるコンビニを含めます</div></div>${sw('nearConv')}</div>

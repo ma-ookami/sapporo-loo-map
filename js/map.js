@@ -12,8 +12,15 @@ const buzz=()=>{ try{ st.settings.vibrate&&navigator.vibrate&&navigator.vibrate(
 const routeUrl=t=>`https://www.google.com/maps/dir/?api=1&destination=${t.lat},${t.lng}&travelmode=walking`;
 const floorLabel=n=>n==null?'':n<0?`B${-n}`:`${n}F`;
 
-// 日本語の名前だけ・店や施設のアイコンなし・バス停なし(sakabazu と同じ)
+// 地図の文字は1言語だけ。日本語: name:ja → name / English: name_en → name:latin → name(英語が無ければ元の名前)
+const labelExpr=()=>st.settings.lang==='en'
+  ?['coalesce',['get','name_en'],['get','name:latin'],['get','name']]
+  :['coalesce',['get','name:ja'],['get','name']];
+let labelLayers=[];
+function setLabelLang(m){ for (const id of labelLayers) if (m.getLayer(id)) m.setLayoutProperty(id,'text-field',labelExpr()); }
+// 店や施設のアイコンなし・バス停なし(sakabazu と同じ)。地名・通り名は1言語だけにする
 function tidyStyle(m){
+  labelLayers=[];
   for (const l of m.getStyle().layers){
     if (l.type!=='symbol') continue;
     const sl=l['source-layer']||'', id=l.id;
@@ -21,7 +28,7 @@ function tidyStyle(m){
     const hide=(sl==='poi'&&id!=='poi_transit')||/shield/.test(id)||sl==='housenumber'
       ||(sl==='place'&&/neighbourhood|quarter|suburb|hamlet|other/.test(id));
     if (hide){ m.setLayoutProperty(id,'visibility','none'); continue; }
-    if (m.getLayoutProperty(id,'text-field')) m.setLayoutProperty(id,'text-field',['coalesce',['get','name:ja'],['get','name']]);
+    if (m.getLayoutProperty(id,'text-field')){ labelLayers.push(id); m.setLayoutProperty(id,'text-field',labelExpr()); }
   }
 }
 

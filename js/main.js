@@ -5,7 +5,7 @@ function init(){
     attributionControl:false,dragRotate:false,pitchWithRotate:false,touchPitch:false});
   map.touchZoomRotate.disableRotation();
   map.addControl(new maplibregl.AttributionControl({compact:true}),'top-left');
-  map.on('load',()=>tidyStyle(map));
+  map.once('style.load',()=>tidyStyle(map));
   // 端末の明るさ設定が変わったら地図の色も切り替える
   darkQ.addEventListener('change',()=>{ if (st.settings.theme!=='auto') return; map.setStyle(mapStyle()); map.once('style.load',()=>tidyStyle(map)); });
   const zc=()=>$('map').classList.toggle('lowzoom',map.getZoom()<15);

@@ -21,7 +21,8 @@ iOS ネイティブ版(Expo)は `../sapporo-loo-map`。データとマスコッ�
 - プライバシー・データ出典は `privacy.html`(「使う前に」の下から開く)。App Store に出すときのポリシーにも流用する
 - キャッシュ対策: `node tools/stamp.js` が index.html の `?v=` を各ファイルのハッシュにそろえる。`.git/hooks/pre-commit` で自動実行(別の PC では、`.git/hooks/pre-commit` に `node tools/stamp.js && git add index.html` を置く)
 
-- 設定(右上の スライダーのアイコン): テーマ(自動/ライト/ダーク。`html[data-theme]`)・歩く速さ(60/80/100 m/分)・振動・最寄りにコンビニも出す・借りられるか不明のコンビニを地図に出す・自分が追加したもの/自分の報告(一覧と削除・取り消し)・使う前に/プライバシー/連絡/版/この端末の記録を消す。保存は localStorage `loo-settings`(`js/settings.js`)
+- 地図の文字は1言語だけ(設定の「地図の文字」: 日本語 = name:ja → name / English = name_en → name:latin → name)。スタイルの元は日英併記なので、`style.load` の時点で `tidyStyle` が書き換える(読み込み中に併記が見えないように)
+- 設定(右上の スライダーのアイコン): テーマ(自動/ライト/ダーク。`html[data-theme]`)・地図の文字(日本語/English)・歩く速さ(60/80/100 m/分)・振動・最寄りにコンビニも出す・借りられるか不明のコンビニを地図に出す・自分が追加したもの/自分の報告(一覧と削除・取り消し)・使う前に/プライバシー/連絡/版/この端末の記録を消す。保存は localStorage `loo-settings`(`js/settings.js`)
 
 ## 構成
 - 地図: MapLibre GL 4.7.1 + OpenFreeMap `positron`(淡い地図。キー不要。ラベルの整え方は sakabazu と同じ)

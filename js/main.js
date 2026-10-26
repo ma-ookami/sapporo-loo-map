@@ -10,7 +10,8 @@ function init(){
   darkQ.addEventListener('change',()=>{ if (st.settings.theme!=='auto') return; reloadStyle(); });
   const zc=()=>$('map').classList.toggle('lowzoom',map.getZoom()<15);
   map.on('zoom',zc); zc();
-  map.on('click',()=>{ if(!st.adding) unselect(); });
+  // 地図のタップで、開いている詳細・リストを閉じる(追加中は何もしない)
+  map.on('click',()=>{ if (st.adding) return; if (st.sel) unselect(); else if (st.open) setTab('map'); });
   initUi(); applyChips(); syncMarkers(); syncPins(); renderSheet();
   $('here').onclick=()=>{ buzz(); locateNow(); };
   map.on('dragstart',()=>{ st.moved=true; });

@@ -163,9 +163,9 @@ body.adding #sheet{max-height:86vh}
 .lq{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .lq button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 8px;border-radius:16px;background:var(--tint);border:2px solid transparent}
 .lq .lic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;margin-bottom:2px}
-.lq button[data-k=loan-yes] .lic{background:var(--ok-soft);color:var(--ok)}
-.lq button[data-k=loan-ask] .lic{background:var(--warn-soft);color:#a8601a}
-.lq button[data-k=loan-no] .lic{background:var(--tint);color:var(--sub)}
+.lq button[data-k=loan-yes] .lic{background:var(--ok);color:#fff}
+.lq button[data-k=loan-ask] .lic{background:var(--warn);color:#fff}
+.lq button[data-k=loan-no] .lic{background:#8a847d;color:#fff}
 .lq b{font-size:13px;font-weight:800;letter-spacing:0}
 .lq small{font-size:10.5px;color:var(--sub);line-height:1.2}
 .lq em{font-style:normal;font-size:11px;font-weight:700;color:var(--sub);margin-top:2px}
@@ -225,7 +225,7 @@ body.adding #sheet{max-height:86vh}
     --on-ink:#1a1714;--care-ink:#f0c58f;--toast:rgba(243,239,233,.92);--toast-ink:#1a1714;--rim:rgba(255,255,255,.12);}
 :root:not([data-theme=light]) .cta{box-shadow:0 6px 16px rgba(226,104,58,.3)}
 :root:not([data-theme=light]) .tag.loan-ask,:root:not([data-theme=light]) .reps button[data-k=crowded] i{color:#f0c58f}
-:root:not([data-theme=light]) .lq button[data-k=loan-ask] .lic{color:#f0c58f}
+:root:not([data-theme=light]) .lq button[data-k=loan-ask] .lic{color:#fff}
 :root:not([data-theme=light]) .pi{border-color:#2c2722}
 :root:not([data-theme=light]) .pin.conv .pi{color:var(--ink)}
 :root:not([data-theme=light]) .pin.conv.sel .pi,:root:not([data-theme=light]) .pin.sel .pi{border-color:#2c2722}
@@ -249,7 +249,7 @@ body.adding #sheet{max-height:86vh}
     --on-ink:#1a1714;--care-ink:#f0c58f;--toast:rgba(243,239,233,.92);--toast-ink:#1a1714;--rim:rgba(255,255,255,.12);}
 :root[data-theme=dark] .cta{box-shadow:0 6px 16px rgba(226,104,58,.3)}
 :root[data-theme=dark] .tag.loan-ask,:root[data-theme=dark] .reps button[data-k=crowded] i{color:#f0c58f}
-:root[data-theme=dark] .lq button[data-k=loan-ask] .lic{color:#f0c58f}
+:root[data-theme=dark] .lq button[data-k=loan-ask] .lic{color:#fff}
 :root[data-theme=dark] .pi{border-color:#2c2722}
 :root[data-theme=dark] .pin.conv .pi{color:var(--ink)}
 :root[data-theme=dark] .pin.conv.sel .pi,:root[data-theme=dark] .pin.sel .pi{border-color:#2c2722}
@@ -359,7 +359,9 @@ body.adding .legend-btn,body.adding #legend{display:none}
 .pin.conv.pin.b-other .pi{border-color:#d6d1ca}
 .pin.conv .ld{position:absolute;top:-4px;right:-4px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;background:var(--ok);z-index:1}
 .pin.conv.loan-ask .ld{background:var(--warn)}
-.pin.conv.loan-no .ld{background:#9a948d}
+.pin.conv.loan-no .ld{background:#8a847d;width:15px;height:15px;top:-6px;right:-6px;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:800;line-height:1}
+.pin.conv.loan-no .ld::after{content:"×"}
+.lm .pin.conv.loan-no .ld{width:11px;height:11px;top:-4px;right:-4px;font-size:9px}
 .pin.conv.loan-null .ld{display:none}
 .pin.conv.pin.loan-no .pi{opacity:.85}
 .pin.conv.pin.loan-null .pi{opacity:.8;transform:scale(.78)}

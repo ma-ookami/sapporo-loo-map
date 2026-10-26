@@ -133,11 +133,11 @@ function showGuide(){
 const LEGEND_ROWS=[
   ['pin','wc','トイレ: 公開データ'],
   ['pin user','wc','トイレ: ユーザ追加'],
-  ['pin conv loan-yes','store','コンビニ: 借りられる'],
-  ['pin conv loan-no','store','コンビニ: 借りられない']
+  ['pin conv b-other loan-yes','store','コンビニ: 借りられる'],
+  ['pin conv b-other loan-no','store','コンビニ: 借りられない']
 ];
 function legendHtml(){
-  return LEGEND_ROWS.map(r=>'<div class="lrow2"><span class="lm">'+(r[1]?'<div class="'+r[0]+'"><div class="pi">'+icon(r[1],13)+'</div></div>':'<div class="'+r[0]+'"></div>')+'</span><span>'+r[2]+'</span></div>').join('');
+  return LEGEND_ROWS.map(r=>'<div class="lrow2"><span class="lm">'+(r[1]?'<div class="'+r[0]+'"><div class="pi">'+icon(r[1],13)+(r[0].includes('conv')?'<i class="ld"></i>':'')+'</div></div>':'<div class="'+r[0]+'"></div>')+'</span><span>'+r[2]+'</span></div>').join('');
 }
 const WIDE=()=>matchMedia('(min-width:600px)').matches;   // 広い画面(PC・タブレット)は凡例を出しっぱなし、スマホはボタンで開く
 function placeLegend(){

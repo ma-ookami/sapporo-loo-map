@@ -315,7 +315,7 @@ body.adding #sheet{max-height:86vh}
 :root{--user:#7c4dd8}
 .pin.user:not(.conv) .pi{background:var(--user)}
 .pin.user.sel:not(.conv) .pi{background:var(--ink)}
-.pin.user.conv .pi::before{content:"";position:absolute;top:-4px;right:-4px;width:12px;height:12px;border-radius:50%;background:var(--user);border:2px solid #fff;z-index:1}
+.pin.user.conv .pi::before{content:"";position:absolute;top:-4px;left:-4px;width:12px;height:12px;border-radius:50%;background:var(--user);border:2px solid #fff;z-index:1}
 .ri.user:not(.conv){background:var(--user);color:#fff}
 .tag.user{background:rgba(124,77,216,.14);color:var(--user)}
 
@@ -348,3 +348,23 @@ body.adding .legend-btn,body.adding #legend{display:none}
 /* コンビニ探しのモード: 借りられるか不明の店も、引いた地図で出す */
 .lowzoom.convmode .pin.conv.loan-null{display:block}
 .pin[hidden]{display:none!important}
+
+/* コンビニのピン: 塗り・縁=チェーンの色(薄く)、右上の丸=貸し出し(緑=借りられる/橙=声かけ/灰=借りられない/なし=不明) */
+.pin.conv{--bc:#b9b4ad}
+.pin.conv.b-seven{--bc:#e5484d}
+.pin.conv.b-family{--bc:#2fa65a}
+.pin.conv.b-lawson{--bc:#3a9bdc}
+.pin.conv.b-seico{--bc:#f08a24}
+.pin.conv.pin .pi{background:var(--card);background:color-mix(in srgb,var(--bc) 20%,var(--card));border:2.5px solid var(--card);border-color:color-mix(in srgb,var(--bc) 55%,var(--card));color:var(--ink);opacity:1}
+.pin.conv.pin.b-other .pi{border-color:#d6d1ca}
+.pin.conv .ld{position:absolute;top:-4px;right:-4px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;background:var(--ok);z-index:1}
+.pin.conv.loan-ask .ld{background:var(--warn)}
+.pin.conv.loan-no .ld{background:#9a948d}
+.pin.conv.loan-null .ld{display:none}
+.pin.conv.pin.loan-no .pi{opacity:.85}
+.pin.conv.pin.loan-null .pi{opacity:.8;transform:scale(.78)}
+.pin.conv.sel .pi,.pin.conv.loan-null.sel .pi{background:var(--ink);color:var(--on-ink);border-color:#fff;opacity:1}
+.pin.conv.loan-null.sel .pi{transform:scale(1.3)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .pin.conv .ld{border-color:#2c2722}}
+:root[data-theme=dark] .pin.conv .ld{border-color:#2c2722}
+.lm .pin.conv .ld{width:9px;height:9px;top:-3px;right:-3px;border-width:1.5px}

@@ -3,7 +3,7 @@ const SETTINGS_KEY='loo-settings';
 const APP_VERSION='1.0';
 const DEFAULT_CHIPS={free:false,wheel:false,h24:false,open:true,conv:true};   // 画面に出す絞り込みボタン
 const CHIP_LABEL={free:'無料',wheel:'車いす',open:'いま空いてる',h24:'24時間',conv:'借りられるコンビニ'};
-const DEFAULT_SETTINGS={theme:'auto',lang:'ja',vibrate:true,pace:80,nearConv:true,showUnknown:true,chips:DEFAULT_CHIPS};
+const DEFAULT_SETTINGS={theme:'auto',mapColor:'simple',lang:'ja',vibrate:true,pace:80,nearConv:true,showUnknown:true,chips:DEFAULT_CHIPS};
 const KIND_LABEL={clean:'きれい','crowded':'混んでた',closed:'使えなかった','loan-yes':'借りられる','loan-ask':'声をかけて借りる','loan-no':'借りられない'};
 
 const LOC_TEXT={ok:'取得できています(地図の青い点です)',pending:'取得中…',denied:'許可されていません。端末の設定で、このサイトの位置情報をオンにしてね(iPhone: 設定 → プライバシー → 位置情報サービス → Safari)',unavailable:'いまは取得できません。電波のよいところでためしてね'};
@@ -41,7 +41,8 @@ function setChip(k,v){
 }
 function setSetting(k,v){
   st.settings[k]=v; saveSettings();
-  if (k==='theme'){ applyTheme(); if (map){ map.setStyle(mapStyle()); map.once('style.load',()=>tidyStyle(map)); } }
+  if (k==='theme'){ applyTheme(); if (map) reloadStyle(); }
+  if (k==='mapColor'&&map) reloadStyle();
   if (k==='pace') applyPace();
   if (k==='lang'&&map) setLabelLang(map);
   if (map){ resort(); syncPins(); if (!st.adding) renderSheet(); }
@@ -64,6 +65,7 @@ function renderSettings(){
   <div class="sbody2">
     <div class="sg"><div class="sl">テーマ</div>${seg3('theme',[['auto','自動'],['light','ライト'],['dark','ダーク']])}<div class="shint">自動は、端末の設定に合わせます</div></div>
     <div class="sg srow"><div><div class="sl">現在地</div><div class="shint">${LOC_TEXT[st.locState]||LOC_TEXT.pending}</div></div><button class="sub small" id="slocate">さがす</button></div>
+    <div class="sg"><div class="sl">地図の色</div>${seg3('mapColor',[['simple','シンプル'],['color','カラー']])}<div class="shint">シンプルは淡い地図、カラーは建物や公園に色がつきます。地図の上のボタン(重なった四角のアイコン)でも切り替えられます</div></div>
     <div class="sg"><div class="sl">地図の文字</div>${seg3('lang',[['ja','日本語'],['en','English']])}<div class="shint">地名・通り名の言語です。English でも、英語の名前がない場所は日本語で出ます</div></div>
     <div class="sg"><div class="sl">歩く速さ</div>${seg3('pace',[[60,'ゆっくり'],[80,'ふつう'],[100,'早足']])}<div class="shint">「徒歩○分」の計算に使います</div></div>
     <div class="sg srow"><div><div class="sl">振動</div><div class="shint">ボタンを押したとき(Android のみ)</div></div>${sw('vibrate')}</div>

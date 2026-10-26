@@ -7,7 +7,7 @@ function init(){
   map.addControl(new maplibregl.AttributionControl({compact:true}),'top-left');
   map.once('style.load',()=>tidyStyle(map));
   // 端末の明るさ設定が変わったら地図の色も切り替える
-  darkQ.addEventListener('change',()=>{ if (st.settings.theme!=='auto') return; map.setStyle(mapStyle()); map.once('style.load',()=>tidyStyle(map)); });
+  darkQ.addEventListener('change',()=>{ if (st.settings.theme!=='auto') return; reloadStyle(); });
   const zc=()=>$('map').classList.toggle('lowzoom',map.getZoom()<15);
   map.on('zoom',zc); zc();
   map.on('click',()=>{ if(!st.adding) unselect(); });

@@ -2,7 +2,15 @@
 const MAP_LIGHT='https://tiles.openfreemap.org/styles/positron';
 const MAP_DARK='https://tiles.openfreemap.org/styles/dark';
 const darkQ=window.matchMedia('(prefers-color-scheme: dark)');
-const mapStyle=()=>isDark()?MAP_DARK:MAP_LIGHT;
+// 地図の色: シンプル(淡い・暗い)/ カラー。画面が暗いときのカラーは fiord(青みの暗い地図)
+const MAP_COLOR='https://tiles.openfreemap.org/styles/bright';
+const MAP_COLOR_DARK='https://tiles.openfreemap.org/styles/fiord';
+const mapStyle=()=>{
+  const color=st.settings.mapColor==='color';
+  return isDark()?(color?MAP_COLOR_DARK:MAP_DARK):(color?MAP_COLOR:MAP_LIGHT);
+};
+// スタイルを入れ替える(入れ替えたあとに、文字・アイコンの整理をやり直す)
+function reloadStyle(){ map.setStyle(mapStyle()); map.once('style.load',()=>tidyStyle(map)); }
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const st={toilets:[],added:[],reports:[],adding:false,here:null,sel:null,open:false,tab:'map',

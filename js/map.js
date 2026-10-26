@@ -10,7 +10,8 @@ const mapStyle=()=>{
   return isDark()?(color?MAP_COLOR_DARK:MAP_DARK):(color?MAP_COLOR:MAP_LIGHT);
 };
 // スタイルを入れ替える(入れ替えたあとに、文字・アイコンの整理をやり直す)
-function reloadStyle(){ map.setStyle(mapStyle()); map.once('style.load',()=>tidyStyle(map)); }
+// diff:false で全部読み直す。差分更新だと style.load が来ず、整理(日本語のみ・標識と店アイコンを消す)が戻ってしまう
+function reloadStyle(){ map.setStyle(mapStyle(),{diff:false}); map.once('style.load',()=>tidyStyle(map)); }
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const st={toilets:[],added:[],reports:[],adding:false,here:null,sel:null,open:false,tab:'map',

@@ -22,6 +22,7 @@ iOS ネイティブ版(Expo)は `../sapporo-loo-map`。データとマスコッ�
 - キャッシュ対策: `node tools/stamp.js` が index.html の `?v=` を各ファイルのハッシュにそろえる。`.git/hooks/pre-commit` で自動実行(別の PC では、`.git/hooks/pre-commit` に `node tools/stamp.js && git add index.html` を置く)
 
 - 絞り込みボタン(無料・車いす・いま空いてる・24時間・借りられるコンビニ)は、設定の「画面に出す絞り込みボタン」でオン/オフ。**無料・車いす・24時間は初期はオフ(出さない)**、いま空いてる・借りられるコンビニは初期オン。オフにしたボタンの絞り込みは解除される(`js/settings.js` の `applyChips`)
+- **地図スタイルの入れ替えは `reloadStyle()`(`setStyle(..., {diff:false})`)を使う。** 差分更新だと `style.load` が来ず、`tidyStyle` が動かないため、日英併記・店アイコン・道路標識が戻る(`node tools/test-style-switch.js` で確認)
 - 地図の色: シンプル(淡い。positron / 暗いときは dark)とカラー(bright / 暗いときは fiord)。右上の重なった四角のボタン、または設定の「地図の色」で切り替え。初期はシンプル(`js/map.js` の `mapStyle` / `reloadStyle`)
 - 現在地: 青い点(広がる輪つき)。右上の◎で移動。許可がないときは、ボタンを押すと理由(iPhone の設定の場所)をトーストで出す。設定にも「現在地」の状態と「さがす」。最初に取れたとき、地図を動かしておらずすすきの近く(3km 以内)なら、そこへ寄る(`js/map.js` の onPos / locateNow)
 - 地図の文字は1言語だけ(設定の「地図の文字」: 日本語 = name:ja → name / English = name_en → name:latin → name)。スタイルの元は日英併記なので、`style.load` の時点で `tidyStyle` が書き換える(読み込み中に併記が見えないように)

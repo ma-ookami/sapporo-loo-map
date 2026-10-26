@@ -11,6 +11,6 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   await p.click('#gok'); console.log('2 closed:', !(await p.locator('#guide').isVisible()));
   await p.reload(); await p.waitForTimeout(2000);
   console.log('3 second visit hidden:', !(await p.locator('#guide').isVisible()));
-  await p.click('#info'); console.log('4 info button reopens:', await p.locator('#guide').isVisible());
+  await p.click('#info'); await p.click('#sguide'); console.log('4 settings > guide reopens:', await p.locator('#guide').isVisible());
   await b.close();
 })();

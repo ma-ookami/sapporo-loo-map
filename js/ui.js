@@ -42,10 +42,10 @@ function renderSheet(){
   else{
     if (far) h+=`<div class="bubble"><span>ちょっと遠いよ。まずはすすきの周辺だけ載ってるよ</span><button class="sub small" id="gosus">すすきのへ</button></div>`;
     const t=nearest.t;
-    h+=`<div class="near">${bearSvg(46,far?'worried':'normal')}<div><div class="eyebrow">いちばん近いトイレ</div>
-      <button class="nhead" id="nhead" data-id="${t.id}"><div class="nrow"><div class="nname">${esc(nameOf(t))}</div>
-      <div class="nmeta">${fmtDist(nearest.d)}<i>徒歩${walkMin(nearest.d)}分</i>${t.type==='conv'?`<i class="lo lo-${loanOf(t)}">${loanLabel(loanOf(t))}</i>`:''}</div></div></button></div></div>
-      <button class="cta${far?' far':''}" id="nbtn">ナビを開始${icon('arrow',20)}</button>`;
+    h+=`<div class="near">${bearSvg(40,far?'worried':'normal')}<div class="ntext"><div class="eyebrow">いちばん近いトイレ</div>
+      <button class="nhead" id="nhead" data-id="${t.id}"><div class="nname">${esc(nameOf(t))}</div>
+      <div class="nmeta">${fmtDist(nearest.d)}<i>徒歩${walkMin(nearest.d)}分</i>${t.type==='conv'?`<i class="lo lo-${loanOf(t)}">${loanLabel(loanOf(t))}</i>`:''}</div></button></div>
+      <button class="cta mini${far?' far':''}" id="nbtn">ナビ開始${icon('arrow',16)}</button></div>`;
   }
   if (st.open) h+='<div class="sech"><span class="sec">近い順</span><button class="x" id="lx" aria-label="リストを閉じる">'+icon('close',16)+'</button></div><div class="list">'+st.sorted.slice(0,30).map(({t,d})=>`<button class="row" data-id="${t.id}"><span class="ri${t.type==='conv'?' conv':''}${t.source==='user'?' user':''}">${icon(t.type==='conv'?'store':'wc',20)}</span><span class="rn"><b>${esc(nameOf(t))}</b><span class="tags">${tagsOf(t)}</span></span><span class="rd">${fmtDist(d)}</span>${icon('chevron',16)}</button>`).join('')+'</div>';
   body.innerHTML=h; body.style.animation='none'; void body.offsetWidth; body.style.animation='';
@@ -84,12 +84,12 @@ function renderDetail(body,t){
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.textContent=msg; document.body.appendChild(d); setTimeout(()=>d.remove(),2200); }
 
 function initUi(){
-  document.querySelectorAll('#tabs [data-t]').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+  document.querySelectorAll('#tabs [data-t]').forEach(b=>b.onclick=()=>setTab(b.dataset.t==='list'&&st.open&&!st.sel?'map':b.dataset.t));
   $('tabadd').onclick=startAdd;
   $('brand').innerHTML=bearSvg(30)+'札幌トイレマップ'; $('here').innerHTML=icon('locate',22); $('layers').innerHTML=icon('layers',22); $('layers').onclick=()=>{ buzz(); setSetting('mapColor',st.settings.mapColor==='color'?'simple':'color'); toast(st.settings.mapColor==='color'?'地図: カラー':'地図: シンプル'); if(!$('settings').hidden) renderSettings(); };
   initLegend();
-  $('info').innerHTML=icon('gear',22); $('info').onclick=()=>showSettings();
-  $('ic-map').innerHTML=icon('map',23); $('ic-list').innerHTML=icon('list',23); $('ic-add').innerHTML=icon('plus',28);
+  $('info').onclick=()=>showSettings();
+  $('ic-list').innerHTML=icon('list',23); $('ic-set').innerHTML=icon('gear',23); $('ic-add').innerHTML=icon('plus',28);
   document.querySelectorAll('#filters [data-f]').forEach(b=>b.onclick=()=>{
     buzz(); const k=b.dataset.f; st.filters[k]=!st.filters[k]; b.setAttribute('aria-pressed',String(st.filters[k])); refresh();
   });

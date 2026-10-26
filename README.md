@@ -60,6 +60,7 @@
 ## 6. 保存先(Firebase playground)
 - PaP と同じ `playground-d8897`。コレクション `loo-toilets`(追加されたトイレ。項目: name,lat,lng,fee,wheelchair,floor,ease,find,type,brand,loan,note,uid,createdAt)と `loo-reports`(一言報告。ID=`<toiletId>_<uid>`、kind: clean/crowded/closed/loan-yes/loan-ask/loan-no)。匿名ログインで書く。読むのは誰でも、削除・取り消しは本人だけ。他のアプリと衝突しないよう `loo-` を付けている
 - **ルールの足し方:** Firebase コンソール → Firestore → ルール →「`documents` の中」に `firestore.playground-snippet.rules` の match 2つを足して公開。**他のアプリのルールが入っているなら完全版は貼らない**(消える)。匿名ログインの有効化と承認済みドメイン `ma-ookami.github.io` も確認
+- ルール: `loo-toilets` の ID は英数字 20 文字だけ許可(ID を使った XSS 対策)。**ルールを変えたので、コンソールに貼り直す**
 - 荒らし対策は簡易(項目・長さ・札幌周辺の座標の制限)。連続投稿の制限・App Check は未実装
 
 ## 7. 開発・確認

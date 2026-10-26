@@ -15,7 +15,7 @@ const cloud={
         this.fb.collection('loo-toilets').onSnapshot(s=>onToilets(s.docs.map(d=>this._row(d.id,d.data()))),()=>{});
         this.fb.collection('loo-reports').onSnapshot(s=>onReports(s.docs.map(d=>{ const r=d.data(); return {toiletId:r.toiletId,kind:r.kind,mine:r.uid===this.uid,at:r.createdAt?r.createdAt.toMillis():Date.now()}; })),()=>{});
         return;
-      }catch(e){ console.warn('firebase 失敗。ローカルモードで動きます',e); }
+      }catch(e){ console.warn('firebase 失敗。ローカルモードで動きます',e); setTimeout(()=>{ if (typeof toast==='function') toast('サーバーにつながらないので、この端末にだけ保存します'); },1500); }
     }
     this.uid='local'; this.mode='local';
     onToilets(this._loadT()); onReports(this._loadR());

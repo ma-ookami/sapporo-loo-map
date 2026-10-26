@@ -48,7 +48,7 @@ const sw=(k)=>'<button type="button" class="sw" data-s="'+k+'" aria-pressed="'+!
 function mineRows(){
   const posts=st.added.filter(t=>t.mine);
   const reps=st.reports.filter(r=>r.mine);
-  const p=posts.length?posts.map(t=>`<div class="mrow"><div><b>${esc(nameOf(t))}</b><span>${t.type==='conv'?'コンビニ':'トイレ'}${t.floor!=null?'・'+floorLabel(t.floor):''}</span></div><button class="mdel" data-del="${t.id}">削除</button></div>`).join(''):'<div class="empty">まだありません</div>';
+  const p=posts.length?posts.map(t=>`<div class="mrow"><div><b>${esc(nameOf(t))}</b><span>${t.type==='conv'?'コンビニ':'トイレ'}${t.floor!=null?'・'+floorLabel(t.floor):''}</span></div><button class="mdel" data-del="${esc(t.id)}">削除</button></div>`).join(''):'<div class="empty">まだありません</div>';
   const r=reps.length?reps.map(x=>{ const t=st.toilets.find(y=>y.id===x.toiletId); return `<div class="mrow"><div><b>${esc(t?nameOf(t):'(見つかりません)')}</b><span>${KIND_LABEL[x.kind]||x.kind}</span></div><button class="mdel" data-rep="${esc(x.toiletId)}">取り消し</button></div>`; }).join(''):'<div class="empty">まだありません</div>';
   return {p,r};
 }

@@ -23,3 +23,7 @@ function init(){
   cloud.init(list=>{ st.added=list; st.toilets=TOILETS.concat(list); refresh(); if(!$('settings').hidden) renderSettings(); },rs=>{ st.reports=rs; resort(); syncPins(); if(!st.adding) renderSheet(); if(!$('settings').hidden) renderSettings(); });
 }
 init();
+// オフライン対応(https か localhost のときだけ。file:// や ?local=1 の試しでは登録しない)
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !location.search.includes('local=1')){
+  addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}

@@ -84,7 +84,7 @@ function toast(msg){ const d=document.createElement('div'); d.className='toast';
 function initUi(){
   document.querySelectorAll('#tabs [data-t]').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
   $('tabadd').onclick=startAdd;
-  $('brand').innerHTML=bearSvg(30)+'札幌トイレマップ'; $('here').innerHTML=icon('locate',22); $('info').innerHTML=icon('sliders',22); $('info').onclick=()=>showSettings();
+  $('brand').innerHTML=bearSvg(30)+'札幌トイレマップ'; $('here').innerHTML=icon('locate',22); $('info').innerHTML=icon('gear',22); $('info').onclick=()=>showSettings();
   $('ic-map').innerHTML=icon('map',23); $('ic-list').innerHTML=icon('list',23); $('ic-add').innerHTML=icon('plus',28);
   document.querySelectorAll('#filters [data-f]').forEach(b=>b.onclick=()=>{
     buzz(); const k=b.dataset.f; st.filters[k]=!st.filters[k]; b.setAttribute('aria-pressed',String(st.filters[k])); refresh();

@@ -302,3 +302,10 @@ body.adding #sheet{max-height:86vh}
 /* 現在地の青い点: ゆっくり広がる輪で見つけやすく */
 .herem{position:relative}
 .herem::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid #2f6fed;animation:ring 2.2s ease-out infinite}
+
+/* 設定: 絞り込みボタンの表示切り替え */
+.sg.grp{padding:4px 14px 10px}
+.grow{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;font-weight:600}
+.grow:last-of-type{border:0}
+#filters [hidden]{display:none}
+#filters[hidden]{display:none}

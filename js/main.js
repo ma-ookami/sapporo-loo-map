@@ -11,7 +11,7 @@ function init(){
   const zc=()=>$('map').classList.toggle('lowzoom',map.getZoom()<15);
   map.on('zoom',zc); zc();
   map.on('click',()=>{ if(!st.adding) unselect(); });
-  initUi(); syncMarkers(); syncPins(); renderSheet();
+  initUi(); applyChips(); syncMarkers(); syncPins(); renderSheet();
   $('here').onclick=()=>{ buzz(); locateNow(); };
   map.on('dragstart',()=>{ st.moved=true; });
   watchHere();

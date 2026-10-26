@@ -3,7 +3,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
 (async () => {
   const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
   const ctx = await b.newContext({ viewport: { width: 390, height: 780 }, hasTouch: true, geolocation: { latitude: 43.0545, longitude: 141.3530 }, permissions: ['geolocation'] });
-  await ctx.addInitScript(() => localStorage.setItem('loo-guide','1')); const p = await ctx.newPage();
+  await ctx.addInitScript(() => { localStorage.setItem('loo-guide','1'); localStorage.setItem('loo-settings', JSON.stringify({ chips: { free: true } })); }); const p = await ctx.newPage();
   p.on('pageerror', e => console.log('ERR', e.message));
   const vis = () => p.evaluate(() => [...document.querySelectorAll('.pin')].filter(e => !e.hidden).length);
   const shot = n => p.screenshot({ path: `tools/shot-${n}.png` });

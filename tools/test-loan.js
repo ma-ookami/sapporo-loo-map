@@ -21,7 +21,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   console.log('4 after 〇:', (await p.locator('#sbody .tags').innerText()).replace(/\n/g, ' '), '| pin class:', await p.evaluate(i => markers.get(i).getElement().className, id));
   await p.click('#dx'); await p.waitForTimeout(500);
   console.log('5 nearest now:', await p.locator('.nname').innerText(), '(before:', near0 + ')');
-  await p.click('[data-f=conv]'); await p.waitForTimeout(400);
+  await p.click('[data-k=conly]'); await p.click('[data-f=conv]'); await p.waitForTimeout(400);
   console.log('5b conv filter -> visible pins:', await vis('.pin'), '| nearest:', await p.locator('.nname').innerText());
   await p.click('[data-f=conv]'); await p.waitForTimeout(300);
   await p.evaluate(i => focus(i), id); await p.waitForTimeout(500);

@@ -23,7 +23,8 @@ input{-webkit-user-select:text;user-select:text}
 #sheet{background:var(--glass-sheet)}
 .brand{display:flex;align-items:center;gap:8px;padding:5px 14px 5px 6px;border-radius:24px;font-weight:700;font-size:14px;pointer-events:none;box-shadow:var(--shadow)}
 .round{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;box-shadow:var(--shadow);color:var(--ink)}
-#filters{display:flex;gap:8px;width:100%}
+#filters{display:flex;flex-direction:column;gap:6px;width:100%}
+.frow{display:flex;gap:8px}
 #filters button{padding:7px 14px;border-radius:18px;font-weight:600;font-size:13px;box-shadow:0 2px 10px rgba(29,26,23,.12)}
 #filters button[aria-pressed=true]{background:var(--ink);color:var(--on-ink)}
 body.adding #top{display:none}
@@ -174,8 +175,8 @@ body.adding #sheet{max-height:86vh}
 .nmeta i.lo{font-weight:700}
 .nmeta i.lo-yes{color:var(--ok)}
 .nmeta i.lo-ask{color:#a8601a}
-#filters{overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
-#filters::-webkit-scrollbar{display:none}
+.frow{overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.frow::-webkit-scrollbar{display:none}
 #filters button{flex:none;white-space:nowrap}
 
 /* 星・補足・使う前に */
@@ -307,8 +308,7 @@ body.adding #sheet{max-height:86vh}
 .sg.grp{padding:4px 14px 10px}
 .grow{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;font-weight:600}
 .grow:last-of-type{border:0}
-#filters [hidden]{display:none}
-#filters[hidden]{display:none}
+#filters [hidden],.frow[hidden]{display:none}
 
 /* ユーザーが追加したトイレは紫(データのトイレは青赤)。コンビニは右上に紫の点 */
 :root{--user:#7c4dd8}

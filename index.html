@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="トイレマップ">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
-<link rel="stylesheet" href="css/style.css?v=1044fdc9">
+<link rel="stylesheet" href="css/style.css?v=734ddac0">
 </head>
 <body>
 <div id="map"></div>
@@ -25,17 +25,22 @@
   <div class="brand" id="brand"></div>
   <div class="tr"><button id="layers" class="round" aria-label="地図の色を切り替え"></button><button id="here" class="round" aria-label="現在地へ"></button></div>
   <div id="filters">
-    <button data-f="free" aria-pressed="false">無料</button>
-    <button data-f="wheel" aria-pressed="false">車いす</button>
-    <button data-f="open" aria-pressed="false">いま空いてる</button>
-    <button data-f="h24" aria-pressed="false">24時間</button>
-    <button data-f="conv" aria-pressed="false">借りられるコンビニ</button>
-    <button data-f="conly" aria-pressed="false">コンビニだけ</button>
-    <button data-f="tonly" aria-pressed="false">トイレだけ</button>
-    <button data-f="b_seven" aria-pressed="false">セブン</button>
-    <button data-f="b_family" aria-pressed="false">ファミマ</button>
-    <button data-f="b_lawson" aria-pressed="false">ローソン</button>
-    <button data-f="b_seico" aria-pressed="false">セイコマ</button>
+    <div class="frow">
+      <button data-k="all" aria-pressed="true">すべて</button>
+      <button data-k="tonly" aria-pressed="false">トイレ</button>
+      <button data-k="conly" aria-pressed="false">コンビニ</button>
+      <button data-f="open" aria-pressed="false">いま空いてる</button>
+    </div>
+    <div class="frow" id="subf" hidden>
+      <button data-f="free" data-g="t" aria-pressed="false">無料</button>
+      <button data-f="wheel" data-g="t" aria-pressed="false">車いす</button>
+      <button data-f="h24" data-g="t" aria-pressed="false">24時間</button>
+      <button data-f="conv" data-g="c" aria-pressed="false">借りられる</button>
+      <button data-f="b_seven" data-g="c" aria-pressed="false">セブン</button>
+      <button data-f="b_family" data-g="c" aria-pressed="false">ファミマ</button>
+      <button data-f="b_lawson" data-g="c" aria-pressed="false">ローソン</button>
+      <button data-f="b_seico" data-g="c" aria-pressed="false">セイコマ</button>
+    </div>
   </div>
 </header>
 
@@ -70,9 +75,9 @@
 <script src="js/bear.js?v=cbdea3a8"></script>
 <script src="js/cloud.js?v=1c62d3ac"></script>
 <script src="js/map.js?v=98ed2054"></script>
-<script src="js/settings.js?v=287d9754"></script>
-<script src="js/ui.js?v=d8714508"></script>
+<script src="js/settings.js?v=f64fe4dd"></script>
+<script src="js/ui.js?v=d151fb3e"></script>
 <script src="js/add.js?v=03f4b26a"></script>
-<script src="js/main.js?v=f8ea9ab2"></script>
+<script src="js/main.js?v=3f38dad2"></script>
 </body>
 </html>

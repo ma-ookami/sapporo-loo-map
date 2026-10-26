@@ -1,17 +1,15 @@
 /* 設定画面(右上の ⚙)。設定はこの端末の localStorage('loo-settings')に保存する */
 const SETTINGS_KEY='loo-settings';
 const APP_VERSION='1.0';
-const DEFAULT_CHIPS={free:false,wheel:false,h24:false,open:true,conv:true,conly:true,tonly:false,b_seven:false,b_family:false,b_lawson:false,b_seico:false};   // 画面に出す絞り込みボタン
-const CHIP_LABEL={free:'無料',wheel:'車いす',open:'いま空いてる',h24:'24時間',conv:'借りられるコンビニ',conly:'コンビニだけ',tonly:'トイレだけ',b_seven:'セブン',b_family:'ファミマ',b_lawson:'ローソン',b_seico:'セイコマ'};
-const DEFAULT_SETTINGS={theme:'auto',mapColor:'simple',lang:'ja',vibrate:true,pace:80,nearConv:true,showUnknown:true,chips:DEFAULT_CHIPS};
+const DEFAULT_SETTINGS={theme:'auto',mapColor:'simple',lang:'ja',vibrate:true,pace:80,nearConv:true,showUnknown:true};
 const KIND_LABEL={clean:'きれい','crowded':'混んでた',closed:'使えなかった','loan-yes':'借りられる','loan-ask':'声をかけて借りる','loan-no':'借りられない'};
 
 const LOC_TEXT={ok:'取得できています(地図の青い点です)',pending:'取得中…',denied:'許可されていません。端末の設定で、このサイトの位置情報をオンにしてね(iPhone: 設定 → プライバシー → 位置情報サービス → Safari)',unavailable:'いまは取得できません。電波のよいところでためしてね'};
 function loadSettings(){
   try{
     const saved=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');
-    return Object.assign({},DEFAULT_SETTINGS,saved,{chips:Object.assign({},DEFAULT_CHIPS,saved.chips||{})});
-  }catch(e){ return Object.assign({},DEFAULT_SETTINGS,{chips:Object.assign({},DEFAULT_CHIPS)}); }
+    return Object.assign({},DEFAULT_SETTINGS,saved);
+  }catch(e){ return Object.assign({},DEFAULT_SETTINGS); }
 }
 function saveSettings(){ try{ localStorage.setItem(SETTINGS_KEY,JSON.stringify(st.settings)); }catch(e){} }
 st.settings=loadSettings();
@@ -25,19 +23,15 @@ function applyTheme(){
 function applyPace(){ PACE=st.settings.pace; }
 applyTheme(); applyPace();   // 画面が出る前に反映(ちらつき防止)
 
-function applyChips(){
-  let shown=0, changed=false;
-  document.querySelectorAll('#filters [data-f]').forEach(b=>{
-    const k=b.dataset.f, on=!!st.settings.chips[k];
-    b.hidden=!on; if (on) shown++;
-    if (!on&&st.filters[k]){ st.filters[k]=false; b.setAttribute('aria-pressed','false'); changed=true; }
+// 種類(すべて/トイレ/コンビニ)に合わせて、絞り込みボタンの押し状態と2段目の出し入れを揃える
+function syncFilterUi(){
+  const kind=st.filters.tonly?'tonly':st.filters.conly?'conly':'all';
+  document.querySelectorAll('#filters [data-k]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.k===kind)));
+  document.querySelectorAll('#filters [data-f]').forEach(x=>{
+    x.setAttribute('aria-pressed',String(!!st.filters[x.dataset.f]));
+    if (x.dataset.g) x.hidden=!(x.dataset.g==='t'?kind==='tonly':kind==='conly');
   });
-  $('filters').hidden=!shown;
-  return changed;
-}
-function setChip(k,v){
-  st.settings.chips[k]=v; saveSettings();
-  applyChips(); if (map){ resort(); syncPins(); if (!st.adding) renderSheet(); }
+  $('subf').hidden=kind==='all';
 }
 function setSetting(k,v){
   st.settings[k]=v; saveSettings();
@@ -71,8 +65,6 @@ function renderSettings(){
     <div class="sg srow"><div><div class="sl">振動</div><div class="shint">ボタンを押したとき(Android のみ)</div></div>${sw('vibrate')}</div>
     <div class="sg srow"><div><div class="sl">最寄りにコンビニも出す</div><div class="shint">「いちばん近いトイレ」とリストに、借りられるコンビニを含めます</div></div>${sw('nearConv')}</div>
     <div class="sg srow"><div><div class="sl">借りられるか不明のコンビニを地図に出す</div><div class="shint">オフにすると、教えてもらった店だけが出ます</div></div>${sw('showUnknown')}</div>
-    <div class="ssec">画面に出す絞り込みボタン</div>
-    <div class="sg grp">${Object.keys(CHIP_LABEL).map(k=>`<div class="grow"><span>${CHIP_LABEL[k]}</span><button type="button" class="sw" data-c="${k}" aria-pressed="${!!st.settings.chips[k]}" aria-label="${CHIP_LABEL[k]}"></button></div>`).join('')}<div class="shint">オンにしたボタンだけ、地図の上に出します。オフにしたボタンの絞り込みは解除されます</div></div>
     <div class="ssec">自分が追加したもの</div>${m.p}
     <div class="ssec">自分の報告</div>${m.r}
     <div class="ssec">このアプリについて</div>
@@ -88,7 +80,6 @@ function renderSettings(){
   v.onclick=e=>{ if (e.target===v) hideSettings(); };
   v.querySelectorAll('.seg[data-s] button').forEach(b=>b.onclick=()=>{ buzz(); const k=b.parentNode.dataset.s, val=b.dataset.v; setSetting(k,k==='pace'?Number(val):val); renderSettings(); });
   v.querySelectorAll('.sw[data-s]').forEach(b=>b.onclick=()=>{ buzz(); setSetting(b.dataset.s,!st.settings[b.dataset.s]); renderSettings(); });
-  v.querySelectorAll('.sw[data-c]').forEach(b=>b.onclick=()=>{ buzz(); setChip(b.dataset.c,!st.settings.chips[b.dataset.c]); renderSettings(); });
   v.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{ if(!confirm('削除しますか?')) return; try{ await cloud.remove(b.dataset.del); }catch(e){ toast('削除できませんでした'); } renderSettings(); });
   v.querySelectorAll('[data-rep]').forEach(b=>b.onclick=async()=>{ try{ await cloud.report(b.dataset.rep,null); }catch(e){ toast('取り消せませんでした'); } renderSettings(); });
   $('sguide').onclick=()=>{ hideSettings(); showGuide(); };

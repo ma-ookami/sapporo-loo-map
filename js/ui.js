@@ -90,17 +90,19 @@ function initUi(){
   initLegend();
   $('info').onclick=()=>showSettings();
   $('ic-list').innerHTML=icon('list',23); $('ic-set').innerHTML=icon('gear',23); $('ic-add').innerHTML=icon('plus',28);
-  document.querySelectorAll('#filters [data-f]').forEach(b=>b.onclick=()=>{
-    buzz(); const k=b.dataset.f, on=!st.filters[k]; st.filters[k]=on;
-    if (on){
-      const grp=['tonly','conly','conv'];
-      if (grp.includes(k)) grp.forEach(x=>{ if (x!==k) st.filters[x]=false; });
-      if (k.startsWith('b_')) st.filters.tonly=false;
-      if (k==='tonly') BRAND_KEYS.forEach(x=>{ st.filters['b_'+x]=false; });
-    }
-    document.querySelectorAll('#filters [data-f]').forEach(x=>x.setAttribute('aria-pressed',String(!!st.filters[x.dataset.f])));
-    refresh();
+  document.querySelectorAll('#filters [data-k]').forEach(b=>b.onclick=()=>{
+    buzz(); const k=b.dataset.k;
+    st.filters.tonly=k==='tonly'; st.filters.conly=k==='conly';
+    // 種類を替えたら、その種類専用の絞り込みは外す
+    ['free','wheel','h24'].forEach(x=>{ if (k==='conly') st.filters[x]=false; });
+    ['conv','b_seven','b_family','b_lawson','b_seico'].forEach(x=>{ if (k!=='conly') st.filters[x]=false; });
+    syncFilterUi(); refresh();
   });
+  document.querySelectorAll('#filters [data-f]').forEach(b=>b.onclick=()=>{
+    buzz(); const k=b.dataset.f; st.filters[k]=!st.filters[k];
+    syncFilterUi(); refresh();
+  });
+  syncFilterUi();
   // つまみ: タップで開閉、上下スワイプ
   const g=$('grab'); let y0=null, tAt=0;
   g.addEventListener('touchstart',e=>{ y0=e.touches[0].clientY; },{passive:true});

@@ -10,7 +10,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1'); await p.waitForTimeout(4000);
   console.log('1 pins', await vis(), '| nearest:', await p.locator('.nname').innerText());
   await shot('home');
-  await p.click('[data-f=free]'); console.log('2 free filter ->', await vis()); await p.click('[data-f=free]');
+  await p.click('[data-k=tonly]'); await p.click('[data-f=free]'); console.log('2 free filter ->', await vis()); await p.click('[data-f=free]'); await p.click('[data-k=all]');
   await p.click('[data-t=list]'); await p.waitForTimeout(500); console.log('3 list rows', await p.locator('.row').count()); await shot('list');
   await p.click('#lx'); await p.waitForTimeout(400); console.log('3b list closed by x:', await p.locator('.row').count() === 0);
   await p.click('#tabadd'); await p.waitForTimeout(900); await shot('pick');

@@ -18,11 +18,6 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   console.log('3 pace:', w0, '->', await walk());
   await p.click('.sw[data-s=vibrate]'); console.log('4 vibrate off:', await p.locator('.sw[data-s=vibrate]').getAttribute('aria-pressed'));
   await p.click('.sw[data-s=nearConv]');
-  console.log('4b chips: free hidden by default:', !(await p.locator('[data-f=free]').isVisible()), '| open shown:', await p.locator('[data-f=open]').isVisible());
-  await p.click('.sw[data-c=free]'); console.log('4c free shown after turning on:', await p.locator('[data-f=free]').isVisible());
-  await p.click('#sx'); await p.click('[data-f=free]'); const on = await p.evaluate(() => st.filters.free);
-  await p.click('#info'); await p.click('.sw[data-c=free]');
-  console.log('4d filter on -> turned off in settings: pressed', on, '-> filter', await p.evaluate(() => st.filters.free), '| chip hidden', !(await p.locator('[data-f=free]').isVisible()));
   // 自分が追加したものを1件作る → 一覧に出て削除できる
   await p.click('#sx'); await p.waitForTimeout(300);
   await p.click('#tabadd'); await p.waitForTimeout(700); await p.click('#pok'); await p.waitForTimeout(400);

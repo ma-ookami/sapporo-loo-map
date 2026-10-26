@@ -137,20 +137,14 @@ const LEGEND_ROWS=[
   ['pin conv loan-no','store','コンビニ: 借りられない']
 ];
 function legendHtml(){
-  return '<div class="lhead"><b>凡例</b><button class="x" id="lgx" aria-label="閉じる">'+icon('close',16)+'</button></div>'
-    +LEGEND_ROWS.map(r=>'<div class="lrow2"><span class="lm">'+(r[1]?'<div class="'+r[0]+'"><div class="pi">'+icon(r[1],18)+'</div></div>':'<div class="'+r[0]+'"></div>')+'</span><span>'+r[2]+'</span></div>').join('');
+  return LEGEND_ROWS.map(r=>'<div class="lrow2"><span class="lm">'+(r[1]?'<div class="'+r[0]+'"><div class="pi">'+icon(r[1],13)+'</div></div>':'<div class="'+r[0]+'"></div>')+'</span><span>'+r[2]+'</span></div>').join('');
 }
 function placeLegend(){
-  const b=$('legendBtn'); if (!b) return;
-  const top=$('sheet').getBoundingClientRect().top;
-  b.style.bottom=Math.round(innerHeight-top+10)+'px';
-  const lg=$('legend');
-  lg.style.bottom=Math.round(innerHeight-top+10+44)+'px';
-  lg.style.maxHeight=Math.max(160,Math.round(top-190))+'px';
+  const lg=$('legend'); if (!lg) return;
+  lg.style.bottom=Math.round(innerHeight-$('sheet').getBoundingClientRect().top+10)+'px';
 }
 function initLegend(){
-  $('legendBtn').innerHTML=icon('info',18)+'<span>凡例</span>';
-  $('legendBtn').onclick=()=>{ buzz(); const lg=$('legend'); if (lg.hidden){ lg.innerHTML=legendHtml(); lg.hidden=false; $('lgx').onclick=()=>{ lg.hidden=true; }; placeLegend(); } else lg.hidden=true; };
+  $('legend').innerHTML=legendHtml();
   if (window.ResizeObserver) new ResizeObserver(placeLegend).observe($('sheet'));
   addEventListener('resize',placeLegend);
   placeLegend();

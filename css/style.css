@@ -377,8 +377,8 @@ body.adding .legend-btn,body.adding #legend{display:none}
 
 /* 地下: タグは濃い青、ピンには右下に「B」の印 */
 .tag.ug{background:#1f3a6b;color:#fff}
-.ugb{display:none;position:absolute;right:-6px;bottom:-6px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:#1f3a6b;color:#fff;font:800 10px/15px sans-serif;font-style:normal;text-align:center;border:1.5px solid #fff;z-index:2}
-.pin.ug .ugb{display:block}
+.ugb{display:none;position:absolute;right:-6px;bottom:-6px;width:17px;height:17px;padding:0;border-radius:50%;background:#1f3a6b;color:#fff;font:800 10px/1 -apple-system,BlinkMacSystemFont,Arial,sans-serif;font-style:normal;border:1.5px solid #fff;z-index:2;place-items:center;text-align:center}
+.pin.ug .ugb{display:grid}
 .reps.lv i{background:#8aa0b8}
 
 .gfoot a{margin-left:.35em}

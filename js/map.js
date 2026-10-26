@@ -58,6 +58,17 @@ function loanOf(t){
   const top=Object.keys(c).filter(k=>c[k]===max);
   return top.length===1?top[0]:'ask';
 }
+// 階: データ(floor)があればそれ。無ければ「どの階?」の報告の多数決(地上=1 / 地下=-1 / 2階以上=2)。同数・報告なしは null(不明)
+const LV_FLOOR={'lv-gr':1,'lv-ug':-1,'lv-up':2};
+function floorOf(t){
+  if (t.floor!=null) return t.floor;
+  const c={'lv-gr':0,'lv-ug':0,'lv-up':0};
+  for (const r of st.reports) if (r.toiletId===t.id&&c[r.kind]!==undefined) c[r.kind]++;
+  const max=Math.max(c['lv-gr'],c['lv-ug'],c['lv-up']); if (!max) return null;
+  const top=Object.keys(c).filter(k=>c[k]===max);
+  return top.length===1?LV_FLOOR[top[0]]:null;
+}
+const isUg=t=>{ const f=floorOf(t); return f!=null&&f<0; };
 // 最寄り・リストに出すのは、トイレと、貸し出し〇/声かけ のコンビニだけ
 // 最寄り・リストに出すのは、トイレと、借りられる(声かけ含む)コンビニ。コンビニ探しのモードでは、コンビニはすべて
 const MISS_N=3;   // 「ここにはなかった」がこの人数になった追加情報は、薄くして最寄り・リストから外す
@@ -74,7 +85,7 @@ function syncMarkers(){
   for (const [id,m] of markers) if (!ids.has(id)){ m.remove(); markers.delete(id); }
   for (const t of st.toilets){
     if (markers.has(t.id)) continue;
-    const e=document.createElement('div'); e.className='pin'+(t.type==='conv'?' conv b-'+(BRAND_KEYS.includes(t.brand)?t.brand:'other')+' loan-'+(loanOf(t)||'null'):'')+(t.source==='user'?' user':''); e.innerHTML='<div class="pi">'+icon(t.type==='conv'?'store':'wc',18)+(t.type==='conv'?'<i class="ld"></i>':'')+'</div>';
+    const e=document.createElement('div'); e.className='pin'+(t.type==='conv'?' conv b-'+(BRAND_KEYS.includes(t.brand)?t.brand:'other')+' loan-'+(loanOf(t)||'null'):'')+(t.source==='user'?' user':''); e.innerHTML='<div class="pi">'+icon(t.type==='conv'?'store':'wc',18)+(t.type==='conv'?'<i class="ld"></i>':'')+'<i class="ugb">B</i></div>';
     e.onclick=ev=>{ ev.stopPropagation(); if(!st.adding) focus(t.id); };
     markers.set(t.id,new maplibregl.Marker({element:e,anchor:'center'}).setLngLat([t.lng,t.lat]).addTo(map));
   }
@@ -88,6 +99,7 @@ function syncPins(){
     e.hidden=(!passes(t)||(t.type==='conv'&&!st.settings.showUnknown&&!convMode()&&loanOf(t)===null))&&id!==st.sel;
     if (t.type==='conv'){ e.classList.remove('loan-yes','loan-ask','loan-no','loan-null'); e.classList.add('loan-'+(loanOf(t)||'null')); }
     e.classList.toggle('doubt',doubted(t));
+    e.classList.toggle('ug',isUg(t));
     e.classList.toggle('sel',id===st.sel);
     e.classList.toggle('near',id===near&&id!==st.sel);
   }

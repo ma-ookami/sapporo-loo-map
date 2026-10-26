@@ -8,7 +8,7 @@ function reportCounts(id){
   for (const r of st.reports){ if (r.toiletId!==id||r.at<since||c[r.kind]===undefined) continue; c[r.kind]++; if (r.mine) mine=r.kind; }
   return {c,mine};
 }
-const tagsOf=t=>(t.type==='conv'?`<span class="tag">${esc(brandLabel(t.brand))}</span>${(l=>`<span class="tag loan-${l||'null'}">${l?loanLabel(l):'借りられるか不明'}</span>`)(loanOf(t))}`:'')+(t.floor!=null?`<span class="tag">${floorLabel(t.floor)}</span>`:'')
+const tagsOf=t=>(t.type==='conv'?`<span class="tag">${esc(brandLabel(t.brand))}</span>${(l=>`<span class="tag loan-${l||'null'}">${l?loanLabel(l):'借りられるか不明'}</span>`)(loanOf(t))}`:'')+(fl=>fl==null?'':fl<0?`<span class="tag ug">地下 ${floorLabel(fl)}</span>`:fl===1?'<span class="tag">地上(1F)</span>':`<span class="tag">${floorLabel(fl)}</span>`)(floorOf(t))
   +(t.fee===false?'<span class="tag free">無料</span>':t.fee===true?'<span class="tag">有料</span>':'')
   +(t.wheelchair?'<span class="tag">車いす可</span>':'')+(t.hours==='24/7'?'<span class="tag free">24時間</span>':(o=>o===true?'<span class="tag free">営業中</span>':o===false?'<span class="tag loan-no">営業時間外</span>':t.hours&&t.type!=='conv'?`<span class="tag">${esc(t.hours)}</span>`:'')(openNow(t.hours)));
 
@@ -56,12 +56,24 @@ function renderSheet(){
   placeLegend();
 }
 
+// データに階が無い場所で、「どの階?」を教えてもらう(地上 / 地下 / 2階以上)。みんなの多数決で、地下の印(B)が付く
+const LVK=[['lv-gr','地上(1階)'],['lv-ug','地下'],['lv-up','2階以上']];
+function floorBlock(t){
+  if (t.floor!=null) return '';
+  const c={'lv-gr':0,'lv-ug':0,'lv-up':0}; let mineLv=null;
+  for (const r of st.reports){ if (r.toiletId!==t.id||c[r.kind]===undefined) continue; c[r.kind]++; if (r.mine) mineLv=r.kind; }
+  const n=c['lv-gr']+c['lv-ug']+c['lv-up'], fl=floorOf(t);
+  return '<div class="sec2">どこにある?(地上か地下か)</div><div class="reps lv">'
+    +LVK.map(([k,l])=>'<button data-lv="'+k+'" aria-pressed="'+(mineLv===k)+'"><i></i>'+l+(c[k]?' <b>'+c[k]+'</b>':'')+'</button>').join('')+'</div>'
+    +'<div class="repnote">'+(n?(fl!=null&&fl<0?'みんなの情報では、地下にあります。':'')+n+'人が教えてくれました。行ったことがあれば、教えてね':'まだ分かっていません。行ったことがあれば、教えてね(地下の場所には、地図に「B」の印が付きます)')+'</div>';
+}
 function renderDetail(body,t){
-  const d=distanceM(origin(),t), {c,mine:mine0}=reportCounts(t.id), lc=loanCounts(t.id), mine=(st.reports.find(r=>r.toiletId===t.id&&r.mine)||{}).kind||mine0;
+  const d=distanceM(origin(),t), {c,mine:mine0}=reportCounts(t.id), lc=loanCounts(t.id), mine=(st.reports.find(r=>r.toiletId===t.id&&r.mine&&!r.kind.startsWith('lv-'))||{}).kind||mine0;
   body.innerHTML=`<div class="dhead"><div class="av">${bearSvg(36)}</div><div><h2>${esc(nameOf(t))}</h2>
     <div class="d">${fmtDist(d)}・徒歩${walkMin(d)}分</div></div><button class="x" id="dx" aria-label="閉じる">${icon('close',16)}</button></div>
     <div class="tags">${tagsOf(t)}${t.source==='user'?'<span class="tag user">追加された情報</span>':''}${doubted(t)?'<span class="tag loan-no">「なかった」の報告があります</span>':''}</div>
     ${t.note?`<div class="note">${esc(t.note)}</div>`:''}
+    ${floorBlock(t)}
     ${(t.ease||t.find)?`<div class="rate">${t.ease?`<div><span>使いやすさ</span><span>${starsRow(t.ease)}</span></div>`:''}${t.find?`<div><span>場所のわかりやすさ</span><span>${starsRow(t.find)}</span></div>`:''}</div>`:''}
     ${t.type==='conv'
       ?`<div class="sec2">このコンビニのトイレ、借りられる?</div>
@@ -75,9 +87,13 @@ function renderDetail(body,t){
     ${t.mine?'<button class="del" id="del">この情報を削除</button>':''}`;
   placeLegend();
   $('dx').onclick=unselect;
-  body.querySelectorAll('.reps button,.lq button').forEach(b=>b.onclick=async()=>{
+  body.querySelectorAll('.reps:not(.lv) button,.lq button').forEach(b=>b.onclick=async()=>{
     buzz(); const k=b.dataset.k;
     try{ await cloud.report(t.id,mine===k?null:k); }catch(e){ toast('送れませんでした'); }
+  });
+  body.querySelectorAll('.reps.lv button').forEach(b=>b.onclick=async()=>{
+    buzz(); const k=b.dataset.lv, mineLv=(st.reports.find(r=>r.toiletId===t.id&&r.mine&&r.kind.startsWith('lv-'))||{}).kind;
+    try{ await cloud.reportFloor(t.id,mineLv===k?null:k); }catch(e){ toast('送れませんでした'); }
   });
   const ms=$('miss'); if (ms) ms.onclick=async()=>{ buzz(); try{ await cloud.report(t.id,mine==='missing'?null:'missing'); }catch(e){ toast('送れませんでした'); } };
   const go=$('go'); if (go) go.onclick=e=>{ e.preventDefault(); buzz(); goRoute(t); };
@@ -142,10 +158,11 @@ const LEGEND_ROWS=[
   ['pin','wc','トイレ: 公開データ'],
   ['pin user','wc','トイレ: ユーザ追加'],
   ['pin conv b-other loan-yes','store','コンビニ: 借りられる'],
-  ['pin conv b-other loan-no','store','コンビニ: 借りられない']
+  ['pin conv b-other loan-no','store','コンビニ: 借りられない'],
+  ['pin ug','wc','地下にある(Bの印)']
 ];
 function legendHtml(){
-  return LEGEND_ROWS.map(r=>'<div class="lrow2"><span class="lm">'+(r[1]?'<div class="'+r[0]+'"><div class="pi">'+icon(r[1],13)+(r[0].includes('conv')?'<i class="ld"></i>':'')+'</div></div>':'<div class="'+r[0]+'"></div>')+'</span><span>'+r[2]+'</span></div>').join('');
+  return LEGEND_ROWS.map(r=>'<div class="lrow2"><span class="lm">'+(r[1]?'<div class="'+r[0]+'"><div class="pi">'+icon(r[1],13)+(r[0].includes('conv')?'<i class="ld"></i>':'')+(r[0].includes(' ug')?'<i class="ugb">B</i>':'')+'</div></div>':'<div class="'+r[0]+'"></div>')+'</span><span>'+r[2]+'</span></div>').join('');
 }
 const WIDE=()=>matchMedia('(min-width:600px)').matches;   // 広い画面(PC・タブレット)は凡例を出しっぱなし、スマホはボタンで開く
 function placeLegend(){

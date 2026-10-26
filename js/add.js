@@ -44,9 +44,10 @@ function showForm(loc,keep){
       ?'<div class="lb">どこのコンビニ?</div>'+sg('brand',BRANDS.map(x=>[x[0],x[1]]),true)
         +'<div class="lb">このコンビニのトイレ、借りられた?</div>'+sg('loan',LOANS)
         +'<div class="hint">お店のご厚意で借りるものです。お客さん専用のお店もあります。</div>'
+        +'<div class="lb">階(地下はB1・B2)</div>'+sg('floor',FLOORS.map(x=>[x[0],x[1]]),true)
         +'<input type="text" id="fname" maxlength="40" placeholder="店名・場所(例: ○○店。なくてOK)">'
       :'<input type="text" id="fname" maxlength="40" placeholder="名前・場所(例: ○○ビル)">'
-        +'<div class="lb">階</div>'+sg('floor',FLOORS.map(x=>[x[0],x[1]]),true)
+        +'<div class="lb">階(地下はB1・B2)</div>'+sg('floor',FLOORS.map(x=>[x[0],x[1]]),true)
         +'<div class="lb">料金</div>'+sg('fee',FEES)
         +'<div class="lb">車いす</div>'+sg('wheelchair',WHEELS))
     +'<div class="lb">使いやすさ <span class="hn">広さ・きれいさ・入りやすさ</span></div>'+starPick('ease',f.ease)
@@ -75,7 +76,7 @@ function showForm(loc,keep){
       if (!f.loan){ toast('貸し出しの状況を選んでね'); return; }
       const bl=brandLabel(f.brand); name=f.brand==='other'?(name||'コンビニ'):(name?bl+' '+name:bl);
     } else if (!name){ toast('名前か場所を入れてね'); return; }
-    const t=conv?{name,lat:loc.lat,lng:loc.lng,fee:null,wheelchair:null,floor:null,ease:f.ease,find:f.find,type:'conv',brand:f.brand,loan:f.loan,note:f.note.trim()}
+    const t=conv?{name,lat:loc.lat,lng:loc.lng,fee:null,wheelchair:null,floor:f.floor,ease:f.ease,find:f.find,type:'conv',brand:f.brand,loan:f.loan,note:f.note.trim()}
       :{name,lat:loc.lat,lng:loc.lng,fee:f.fee,wheelchair:f.wheelchair,floor:f.floor,ease:f.ease,find:f.find,type:'toilet',brand:null,loan:null,note:f.note.trim()};
     if (!inArea(loc)){ toast('ここは対象のエリア(すすきの〜札幌駅)の外です'); return; }
     const lim=postLimit(); if (lim){ toast(lim); return; }

@@ -25,7 +25,7 @@ const cloud={
   },
   _get(k){ try{ return JSON.parse(localStorage.getItem(k)||'[]'); }catch(e){ return []; } },
   _loadT(){ return this._get('loo-added').map(d=>this._row(d.id,d)); },
-  _loadR(){ return this._get('loo-reports').map(r=>({toiletId:r.toiletId,kind:r.kind,mine:true,at:r.at})); },
+  _loadR(){ return this._get('loo-reports').concat(this._get('loo-floors')).map(r=>({toiletId:r.toiletId,kind:r.kind,mine:true,at:r.at})); },
   async add(t){
     if (this.mode==='cloud'){
       // 投稿の間隔・回数の記録(loo-users)と同じバッチで書く。ルールが 30 秒に1件・24時間に10件までを見張る
@@ -47,6 +47,17 @@ const cloud={
     localStorage.setItem('loo-added',JSON.stringify(this._get('loo-added').filter(d=>d.id!==raw))); this._ot(this._loadT());
   },
   // kind が null なら取り消し
+  // 「どの階?」(lv-gr 地上 / lv-ug 地下 / lv-up 2階以上)。状態の報告とは別の文書にして、両方出せるようにする。kind が null なら取り消し
+  async reportFloor(toiletId,kind){
+    if (this.mode==='cloud'){
+      const ref=this.fb.collection('loo-reports').doc(toiletId+'_lv_'+this.uid);
+      if (kind) await ref.set({toiletId,kind,uid:this.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); else await ref.delete();
+      return;
+    }
+    const a=this._get('loo-floors').filter(r=>r.toiletId!==toiletId);
+    if (kind) a.push({toiletId,kind,at:Date.now()});
+    localStorage.setItem('loo-floors',JSON.stringify(a)); this._or(this._loadR());
+  },
   async report(toiletId,kind){
     if (this.mode==='cloud'){
       const ref=this.fb.collection('loo-reports').doc(toiletId+'_'+this.uid);

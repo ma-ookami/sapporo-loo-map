@@ -178,10 +178,11 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['toiletId','kind','uid','createdAt'])
         && request.resource.data.keys().hasAll(['toiletId','kind','uid','createdAt'])
         && request.resource.data.toiletId is string && request.resource.data.toiletId.size() <= 60
-        && request.resource.data.kind in ['clean','crowded','closed','loan-yes','loan-ask','loan-no','missing']
+        && request.resource.data.kind in ['clean','crowded','closed','loan-yes','loan-ask','loan-no','missing','lv-gr','lv-ug','lv-up']
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.createdAt == request.time
-        && id == request.resource.data.toiletId + '_' + request.auth.uid;
+        && ((!request.resource.data.kind.matches('lv-.*') && id == request.resource.data.toiletId + '_' + request.auth.uid)
+            || (request.resource.data.kind.matches('lv-.*') && id == request.resource.data.toiletId + '_lv_' + request.auth.uid));
       allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
     }
     // 投稿の間隔と回数(1人あたり 30 秒に1件・24時間に10件)。トイレを追加するとき、同じバッチでここも更新する(lastId = 追加するトイレの ID)

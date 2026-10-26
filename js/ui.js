@@ -38,11 +38,11 @@ function renderSheet(){
   if (sel) return renderDetail(body,sel);
   const nearest=st.sorted[0], far=!nearest||nearest.d>FAR_M;
   let h='';
-  if (!nearest) h+=`<div class="bubble">${bearSvg(36,true)}<span>条件に合うトイレがないよ。絞り込みをゆるめてみてね</span></div>`;
+  if (!nearest) h+=`<div class="bubble">${bearSvg(36,true)}<span>条件に合う場所がないよ。絞り込みをゆるめてみてね</span></div>`;
   else{
     if (far) h+=`<div class="bubble"><span>ちょっと遠いよ。まずはすすきの周辺だけ載ってるよ</span><button class="sub small" id="gosus">すすきのへ</button></div>`;
     const t=nearest.t;
-    h+=`<div class="near">${bearSvg(40,far?'worried':'normal')}<div class="ntext"><div class="eyebrow">いちばん近いトイレ</div>
+    h+=`<div class="near">${bearSvg(40,far?'worried':'normal')}<div class="ntext"><div class="eyebrow">${convMode()?'いちばん近いコンビニ':'いちばん近いトイレ'}</div>
       <button class="nhead" id="nhead" data-id="${t.id}"><div class="nname">${esc(nameOf(t))}</div>
       <div class="nmeta">${fmtDist(nearest.d)}<i>徒歩${walkMin(nearest.d)}分</i>${t.type==='conv'?`<i class="lo lo-${loanOf(t)}">${loanLabel(loanOf(t))}</i>`:''}</div></button></div>
       <button class="cta mini${far?' far':''}" id="nbtn">ナビ開始${icon('arrow',16)}</button></div>`;
@@ -91,7 +91,15 @@ function initUi(){
   $('info').onclick=()=>showSettings();
   $('ic-list').innerHTML=icon('list',23); $('ic-set').innerHTML=icon('gear',23); $('ic-add').innerHTML=icon('plus',28);
   document.querySelectorAll('#filters [data-f]').forEach(b=>b.onclick=()=>{
-    buzz(); const k=b.dataset.f; st.filters[k]=!st.filters[k]; b.setAttribute('aria-pressed',String(st.filters[k])); refresh();
+    buzz(); const k=b.dataset.f, on=!st.filters[k]; st.filters[k]=on;
+    if (on){
+      const grp=['tonly','conly','conv'];
+      if (grp.includes(k)) grp.forEach(x=>{ if (x!==k) st.filters[x]=false; });
+      if (k.startsWith('b_')) st.filters.tonly=false;
+      if (k==='tonly') BRAND_KEYS.forEach(x=>{ st.filters['b_'+x]=false; });
+    }
+    document.querySelectorAll('#filters [data-f]').forEach(x=>x.setAttribute('aria-pressed',String(!!st.filters[x.dataset.f])));
+    refresh();
   });
   // つまみ: タップで開閉、上下スワイプ
   const g=$('grab'); let y0=null, tAt=0;

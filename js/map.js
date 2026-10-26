@@ -15,7 +15,7 @@ function reloadStyle(){ map.setStyle(mapStyle(),{diff:false}); map.once('style.l
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const st={toilets:[],added:[],reports:[],adding:false,here:null,sel:null,open:false,tab:'map',
-  filters:{free:false,wheel:false,open:false,h24:false,conv:false},sorted:[]};
+  filters:{free:false,wheel:false,open:false,h24:false,conv:false,conly:false,tonly:false,b_seven:false,b_family:false,b_lawson:false,b_seico:false},sorted:[]};
 let map, hereMarker; const markers=new Map();
 const buzz=()=>{ try{ st.settings.vibrate&&navigator.vibrate&&navigator.vibrate(10); }catch(e){} };
 const routeUrl=t=>`https://www.google.com/maps/dir/?api=1&destination=${t.lat},${t.lng}&travelmode=walking`;
@@ -43,7 +43,11 @@ function tidyStyle(m){
 
 const origin=()=>st.here||SUSUKINO;
 // 「借りられるコンビニ」: トイレは隠し、貸し出し 借りられる/声をかけて のコンビニだけ出す
-const passes=t=>(!st.filters.conv||(t.type==='conv'&&['yes','ask'].includes(loanOf(t))))&&(!st.filters.free||t.fee===false)&&(!st.filters.wheel||t.wheelchair===true)&&(!st.filters.open||openNow(t.hours)!==false)&&(!st.filters.h24||t.hours==='24/7');
+// コンビニ探しのモード: 「コンビニだけ」か、ブランドを選んでいるとき。借りられるかどうかに関係なく、店を出す
+const BRAND_KEYS=['seven','family','lawson','seico'];
+const activeBrands=()=>BRAND_KEYS.filter(b=>st.filters['b_'+b]);
+const convMode=()=>st.filters.conly||activeBrands().length>0;
+const passes=t=>(!st.filters.tonly||t.type==='toilet')&&(!st.filters.conly||t.type==='conv')&&(!activeBrands().length||(t.type==='conv'&&activeBrands().includes(t.brand)))&&(!st.filters.conv||(t.type==='conv'&&['yes','ask'].includes(loanOf(t))))&&(!st.filters.free||t.fee===false)&&(!st.filters.wheel||t.wheelchair===true)&&(!st.filters.open||openNow(t.hours)!==false)&&(!st.filters.h24||t.hours==='24/7');
 // コンビニの貸し出し: 報告(1人1票)の多数決。同数は「声をかけて」。追加した人の選択も1票。まだ無ければ null(未確認)
 function loanOf(t){
   if (t.type!=='conv') return null;
@@ -55,7 +59,8 @@ function loanOf(t){
   return top.length===1?top[0]:'ask';
 }
 // 最寄り・リストに出すのは、トイレと、貸し出し〇/声かけ のコンビニだけ
-const usable=t=>t.type!=='conv'||((st.settings.nearConv||st.filters.conv)&&['yes','ask'].includes(loanOf(t)));
+// 最寄り・リストに出すのは、トイレと、借りられる(声かけ含む)コンビニ。コンビニ探しのモードでは、コンビニはすべて
+const usable=t=>t.type!=='conv'||convMode()||st.filters.conv||(st.settings.nearConv&&['yes','ask'].includes(loanOf(t)));
 function resort(){
   const o=origin();
   st.sorted=st.toilets.filter(t=>passes(t)&&usable(t)).map(t=>({t,d:distanceM(o,t)})).sort((a,b)=>a.d-b.d);
@@ -72,11 +77,12 @@ function syncMarkers(){
   }
 }
 function syncPins(){
+  $('map').classList.toggle('convmode',convMode());   // コンビニ探しのとき、不明の店も引いた地図で出す
   const near=st.sorted[0]&&st.sorted[0].d<=FAR_M?st.sorted[0].t.id:null;
   const t2=new Map(st.toilets.map(t=>[t.id,t]));
   for (const [id,m] of markers){
     const e=m.getElement(), t=t2.get(id);
-    e.hidden=(!passes(t)||(t.type==='conv'&&!st.settings.showUnknown&&loanOf(t)===null))&&id!==st.sel;
+    e.hidden=(!passes(t)||(t.type==='conv'&&!st.settings.showUnknown&&!convMode()&&loanOf(t)===null))&&id!==st.sel;
     if (t.type==='conv'){ e.classList.remove('loan-yes','loan-ask','loan-no','loan-null'); e.classList.add('loan-'+(loanOf(t)||'null')); }
     e.classList.toggle('sel',id===st.sel);
     e.classList.toggle('near',id===near&&id!==st.sel);

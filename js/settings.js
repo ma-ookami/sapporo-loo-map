@@ -1,8 +1,8 @@
 /* 設定画面(右上の ⚙)。設定はこの端末の localStorage('loo-settings')に保存する */
 const SETTINGS_KEY='loo-settings';
 const APP_VERSION='1.0';
-const DEFAULT_CHIPS={free:false,wheel:false,h24:false,open:true,conv:true};   // 画面に出す絞り込みボタン
-const CHIP_LABEL={free:'無料',wheel:'車いす',open:'いま空いてる',h24:'24時間',conv:'借りられるコンビニ'};
+const DEFAULT_CHIPS={free:false,wheel:false,h24:false,open:true,conv:true,conly:true,tonly:false,b_seven:false,b_family:false,b_lawson:false,b_seico:false};   // 画面に出す絞り込みボタン
+const CHIP_LABEL={free:'無料',wheel:'車いす',open:'いま空いてる',h24:'24時間',conv:'借りられるコンビニ',conly:'コンビニだけ',tonly:'トイレだけ',b_seven:'セブン',b_family:'ファミマ',b_lawson:'ローソン',b_seico:'セイコマ'};
 const DEFAULT_SETTINGS={theme:'auto',mapColor:'simple',lang:'ja',vibrate:true,pace:80,nearConv:true,showUnknown:true,chips:DEFAULT_CHIPS};
 const KIND_LABEL={clean:'きれい','crowded':'混んでた',closed:'使えなかった','loan-yes':'借りられる','loan-ask':'声をかけて借りる','loan-no':'借りられない'};
 

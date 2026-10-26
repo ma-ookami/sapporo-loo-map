@@ -81,7 +81,7 @@ function showForm(loc,keep){
     if (!inArea(loc)){ toast('ここは対象のエリア(すすきの〜札幌駅)の外です'); return; }
     const lim=postLimit(); if (lim){ toast(lim); return; }
     const dup=st.toilets.filter(x=>x.type===t.type&&(t.type==='toilet'||x.brand===t.brand)).map(x=>({x,d:distanceM(loc,x)})).sort((a,b)=>a.d-b.d)[0];
-    if (dup&&dup.d<=20&&!confirm('すぐ近く('+Math.round(dup.d)+'m)に「'+nameOf(dup.x)+'」が登録されています。それでも登録しますか?')) return;
+    if (dup&&dup.d<=20&&!confirm(I18N.t('すぐ近く({d}m)に「{name}」が登録されています。それでも登録しますか?',{d:Math.round(dup.d),name:nameOf(dup.x)}))) return;
     try{ await cloud.add(t); markPosted(); toast('登録しました。ありがとう!'); endAdd(); }
     catch(e){ toast(e&&e.code==='permission-denied'?'登録できませんでした。間をあけるか、今日の上限(10件)かもしれません':'登録できませんでした'); }
   };

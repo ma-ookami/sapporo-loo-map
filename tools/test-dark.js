@@ -3,7 +3,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
 (async () => {
   const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
   // 札幌駅より南の遠い場所(例: 新千歳空港付近)にいる想定
-  const ctx = await b.newContext({ viewport: { width: 390, height: 780 }, hasTouch: true, colorScheme: 'dark', geolocation: { latitude: 42.7752, longitude: 141.6923 }, permissions: ['geolocation'] });
+  const ctx = await b.newContext({ locale: 'ja-JP', viewport: { width: 390, height: 780 }, hasTouch: true, colorScheme: 'dark', geolocation: { latitude: 42.7752, longitude: 141.6923 }, permissions: ['geolocation'] });
   await ctx.addInitScript(() => localStorage.setItem('loo-guide', '1'));
   const p = await ctx.newPage(); p.on('pageerror', e => console.log('ERR', e.message));
   await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1'); await p.waitForTimeout(4500);

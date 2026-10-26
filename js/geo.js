@@ -15,7 +15,12 @@ let PACE=80;   // 徒歩の速さ(m/分)。設定で変わる
 const walkMin=m=>Math.max(1,Math.round(m/PACE));
 
 // 名前のないトイレは、近くの施設や通りの名前(area)で見分けられるようにする
-const nameOf=t=>t.name||(t.area?`トイレ(${t.area} 付近)`:'トイレ');
+// 場所の名前。英語のときは、英語の名前(name_en)があればそれを使う
+const nameOf=t=>{
+  const en=typeof I18N!=='undefined'&&I18N.isEn();
+  if (en&&t.name_en) return t.name_en;
+  return t.name||(t.area?(en?`Toilet (near ${t.area})`:`トイレ(${t.area} 付近)`):(en?'Toilet':'トイレ'));
+};
 
 // 投稿できる範囲(すすきの〜札幌駅。firestore.rules の座標の範囲と合わせる)
 const AREA={south:43.03,north:43.09,west:141.32,east:141.38};

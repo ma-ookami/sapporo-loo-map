@@ -3,6 +3,7 @@ const TOILETS=[
  {
   "id": "osm-n794322520",
   "name": "",
+  "name_en": null,
   "lat": 43.060461,
   "lng": 141.352443,
   "fee": false,
@@ -19,6 +20,7 @@ const TOILETS=[
  {
   "id": "osm-n794322580",
   "name": "",
+  "name_en": null,
   "lat": 43.0559139,
   "lng": 141.3633332,
   "fee": null,
@@ -35,6 +37,7 @@ const TOILETS=[
  {
   "id": "osm-n794415300",
   "name": "",
+  "name_en": null,
   "lat": 43.0486354,
   "lng": 141.35446,
   "fee": null,
@@ -51,6 +54,7 @@ const TOILETS=[
  {
   "id": "osm-n2429775199",
   "name": "",
+  "name_en": null,
   "lat": 43.0612028,
   "lng": 141.3565241,
   "fee": null,
@@ -67,6 +71,7 @@ const TOILETS=[
  {
   "id": "osm-n2903662001",
   "name": "北海道大学植物園",
+  "name_en": null,
   "lat": 43.063191,
   "lng": 141.344589,
   "fee": null,
@@ -82,6 +87,7 @@ const TOILETS=[
  {
   "id": "osm-n2903774601",
   "name": "北海道大学植物園",
+  "name_en": null,
   "lat": 43.062642,
   "lng": 141.344579,
   "fee": null,
@@ -97,6 +103,7 @@ const TOILETS=[
  {
   "id": "osm-n2903784401",
   "name": "",
+  "name_en": null,
   "lat": 43.064597,
   "lng": 141.34675,
   "fee": null,
@@ -113,6 +120,7 @@ const TOILETS=[
  {
   "id": "osm-n2903784701",
   "name": "日本生命ビル トイレ",
+  "name_en": null,
   "lat": 43.064906,
   "lng": 141.350226,
   "fee": null,
@@ -128,6 +136,7 @@ const TOILETS=[
  {
   "id": "osm-n3686450525",
   "name": "第3グリーンビル トイレ",
+  "name_en": null,
   "lat": 43.0554753,
   "lng": 141.3543294,
   "fee": null,
@@ -143,6 +152,7 @@ const TOILETS=[
  {
   "id": "osm-n3746608225",
   "name": "農学部",
+  "name_en": null,
   "lat": 43.070469,
   "lng": 141.340654,
   "fee": null,
@@ -158,6 +168,7 @@ const TOILETS=[
  {
   "id": "osm-n3755296625",
   "name": "東改札北口トイレ",
+  "name_en": "Toilets at Northeast Gate",
   "lat": 43.0690121,
   "lng": 141.3513375,
   "fee": null,
@@ -173,6 +184,7 @@ const TOILETS=[
  {
   "id": "osm-n3755301625",
   "name": "西改札北口トイレ",
+  "name_en": "Toilets at Northwest Gate",
   "lat": 43.0687971,
   "lng": 141.3501789,
   "fee": null,
@@ -188,6 +200,7 @@ const TOILETS=[
  {
   "id": "osm-n3874310775",
   "name": "赤レンガテラス1Fトイレ",
+  "name_en": null,
   "lat": 43.0641309,
   "lng": 141.3505905,
   "fee": false,
@@ -203,6 +216,7 @@ const TOILETS=[
  {
   "id": "osm-n3874322658",
   "name": "地下トイレ",
+  "name_en": null,
   "lat": 43.0615453,
   "lng": 141.351753,
   "fee": null,
@@ -218,6 +232,7 @@ const TOILETS=[
  {
   "id": "osm-n3874338857",
   "name": "4Fトイレ",
+  "name_en": "4F Restrooms",
   "lat": 43.0612065,
   "lng": 141.3525577,
   "fee": null,
@@ -233,6 +248,7 @@ const TOILETS=[
  {
   "id": "osm-n4496895541",
   "name": "",
+  "name_en": null,
   "lat": 43.0759469,
   "lng": 141.3598624,
   "fee": null,
@@ -249,6 +265,7 @@ const TOILETS=[
  {
   "id": "osm-n4967179234",
   "name": "",
+  "name_en": null,
   "lat": 43.0699942,
   "lng": 141.3506732,
   "fee": null,
@@ -265,6 +282,7 @@ const TOILETS=[
  {
   "id": "osm-n4978372444",
   "name": "",
+  "name_en": null,
   "lat": 43.0739965,
   "lng": 141.3504493,
   "fee": null,
@@ -281,6 +299,7 @@ const TOILETS=[
  {
   "id": "osm-n6432534117",
   "name": "",
+  "name_en": null,
   "lat": 43.0575081,
   "lng": 141.3393654,
   "fee": false,
@@ -297,6 +316,7 @@ const TOILETS=[
  {
   "id": "osm-n6432534135",
   "name": "",
+  "name_en": null,
   "lat": 43.0656103,
   "lng": 141.3551311,
   "fee": false,
@@ -313,6 +333,7 @@ const TOILETS=[
  {
   "id": "osm-n6436452258",
   "name": "",
+  "name_en": null,
   "lat": 43.0520922,
   "lng": 141.3519182,
   "fee": false,
@@ -329,6 +350,7 @@ const TOILETS=[
  {
   "id": "osm-n6437880291",
   "name": "",
+  "name_en": null,
   "lat": 43.0485608,
   "lng": 141.3592354,
   "fee": false,
@@ -344,6 +366,7 @@ const TOILETS=[
  {
   "id": "osm-n6437880295",
   "name": "",
+  "name_en": null,
   "lat": 43.0582841,
   "lng": 141.358437,
   "fee": false,
@@ -360,6 +383,7 @@ const TOILETS=[
  {
   "id": "osm-n6911174588",
   "name": "",
+  "name_en": null,
   "lat": 43.060364,
   "lng": 141.3526873,
   "fee": false,
@@ -376,6 +400,7 @@ const TOILETS=[
  {
   "id": "osm-n7259891835",
   "name": "",
+  "name_en": null,
   "lat": 43.0709269,
   "lng": 141.3473651,
   "fee": false,
@@ -392,6 +417,7 @@ const TOILETS=[
  {
   "id": "osm-n12021340181",
   "name": "",
+  "name_en": null,
   "lat": 43.062728,
   "lng": 141.3538163,
   "fee": false,
@@ -408,6 +434,7 @@ const TOILETS=[
  {
   "id": "osm-n12621413410",
   "name": "",
+  "name_en": null,
   "lat": 43.0566587,
   "lng": 141.3528885,
   "fee": false,
@@ -424,6 +451,7 @@ const TOILETS=[
  {
   "id": "osm-n14005978829",
   "name": "",
+  "name_en": null,
   "lat": 43.0599918,
   "lng": 141.3534894,
   "fee": null,
@@ -440,6 +468,7 @@ const TOILETS=[
  {
   "id": "osm-n14022141710",
   "name": "",
+  "name_en": null,
   "lat": 43.0656132,
   "lng": 141.3508886,
   "fee": null,
@@ -456,6 +485,7 @@ const TOILETS=[
  {
   "id": "osm-w302546269",
   "name": "",
+  "name_en": null,
   "lat": 43.0473164,
   "lng": 141.3541644,
   "fee": null,
@@ -471,6 +501,7 @@ const TOILETS=[
  {
   "id": "osm-w382253234",
   "name": "",
+  "name_en": null,
   "lat": 43.0505366,
   "lng": 141.34102,
   "fee": false,
@@ -487,6 +518,7 @@ const TOILETS=[
  {
   "id": "osm-w384391778",
   "name": "",
+  "name_en": null,
   "lat": 43.0480176,
   "lng": 141.342873,
   "fee": null,
@@ -503,6 +535,7 @@ const TOILETS=[
  {
   "id": "osm-w690375402",
   "name": "",
+  "name_en": null,
   "lat": 43.0600013,
   "lng": 141.3500468,
   "fee": false,
@@ -519,6 +552,7 @@ const TOILETS=[
  {
   "id": "osm-w692373953",
   "name": "橋台広場第一公園トイレ",
+  "name_en": null,
   "lat": 43.0559136,
   "lng": 141.3633244,
   "fee": null,
@@ -534,6 +568,7 @@ const TOILETS=[
  {
   "id": "osm-w782403108",
   "name": "",
+  "name_en": null,
   "lat": 43.0596208,
   "lng": 141.3472221,
   "fee": false,
@@ -550,6 +585,7 @@ const TOILETS=[
  {
   "id": "osm-w814132084",
   "name": "左岸No.23",
+  "name_en": "Left River bank No.23",
   "lat": 43.0540005,
   "lng": 141.3614254,
   "fee": false,
@@ -565,6 +601,7 @@ const TOILETS=[
  {
   "id": "osm-w947062258",
   "name": "",
+  "name_en": null,
   "lat": 43.0592001,
   "lng": 141.3441329,
   "fee": false,
@@ -581,6 +618,7 @@ const TOILETS=[
  {
   "id": "osm-w948575902",
   "name": "",
+  "name_en": null,
   "lat": 43.0586243,
   "lng": 141.3398639,
   "fee": false,
@@ -596,6 +634,7 @@ const TOILETS=[
  {
   "id": "osm-w952557575",
   "name": "",
+  "name_en": null,
   "lat": 43.0485707,
   "lng": 141.3592562,
   "fee": false,
@@ -611,6 +650,7 @@ const TOILETS=[
  {
   "id": "osm-w963515977",
   "name": "",
+  "name_en": null,
   "lat": 43.0577411,
   "lng": 141.3577879,
   "fee": false,
@@ -627,6 +667,7 @@ const TOILETS=[
  {
   "id": "osm-n422442779",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0667619,
   "lng": 141.3469752,
   "fee": null,
@@ -642,6 +683,7 @@ const TOILETS=[
  {
   "id": "osm-n465485030",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0658618,
   "lng": 141.3550123,
   "fee": null,
@@ -657,6 +699,7 @@ const TOILETS=[
  {
   "id": "osm-n794322481",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0580311,
   "lng": 141.33783,
   "fee": null,
@@ -672,6 +715,7 @@ const TOILETS=[
  {
   "id": "osm-n1485601040",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.068958,
   "lng": 141.3480548,
   "fee": null,
@@ -687,6 +731,7 @@ const TOILETS=[
  {
   "id": "osm-n1485601041",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0751757,
   "lng": 141.352977,
   "fee": null,
@@ -702,6 +747,7 @@ const TOILETS=[
  {
   "id": "osm-n1485601042",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0755385,
   "lng": 141.3469511,
   "fee": null,
@@ -717,6 +763,7 @@ const TOILETS=[
  {
   "id": "osm-n1508524208",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0691404,
   "lng": 141.3496548,
   "fee": null,
@@ -732,6 +779,7 @@ const TOILETS=[
  {
   "id": "osm-n1669763872",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0579138,
   "lng": 141.336798,
   "fee": null,
@@ -747,6 +795,7 @@ const TOILETS=[
  {
   "id": "osm-n1669763953",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0572593,
   "lng": 141.3410439,
   "fee": null,
@@ -762,6 +811,7 @@ const TOILETS=[
  {
   "id": "osm-n1669790045",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0668169,
   "lng": 141.3459657,
   "fee": null,
@@ -777,6 +827,7 @@ const TOILETS=[
  {
   "id": "osm-n1679095429",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0584557,
   "lng": 141.3414924,
   "fee": null,
@@ -792,6 +843,7 @@ const TOILETS=[
  {
   "id": "osm-n1901667263",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.062475,
   "lng": 141.3604049,
   "fee": null,
@@ -807,6 +859,7 @@ const TOILETS=[
  {
   "id": "osm-n2003860599",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0655092,
   "lng": 141.3518003,
   "fee": null,
@@ -822,6 +875,7 @@ const TOILETS=[
  {
   "id": "osm-n2066532046",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0589209,
   "lng": 141.3442238,
   "fee": null,
@@ -837,6 +891,7 @@ const TOILETS=[
  {
   "id": "osm-n2069231236",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0587393,
   "lng": 141.349091,
   "fee": null,
@@ -852,6 +907,7 @@ const TOILETS=[
  {
   "id": "osm-n2069231238",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.062079,
   "lng": 141.3552148,
   "fee": null,
@@ -867,6 +923,7 @@ const TOILETS=[
  {
   "id": "osm-n2069249452",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0629901,
   "lng": 141.3517762,
   "fee": null,
@@ -882,6 +939,7 @@ const TOILETS=[
  {
   "id": "osm-n2069249453",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.063239,
   "lng": 141.3502178,
   "fee": null,
@@ -897,6 +955,7 @@ const TOILETS=[
  {
   "id": "osm-n2069249454",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.061492,
   "lng": 141.3461572,
   "fee": null,
@@ -912,6 +971,7 @@ const TOILETS=[
  {
   "id": "osm-n2069249455",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0686707,
   "lng": 141.3486325,
   "fee": null,
@@ -927,6 +987,7 @@ const TOILETS=[
  {
   "id": "osm-n2069249456",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0634795,
   "lng": 141.3543894,
   "fee": null,
@@ -942,6 +1003,7 @@ const TOILETS=[
  {
   "id": "osm-n2069249457",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0695878,
   "lng": 141.3463742,
   "fee": null,
@@ -957,6 +1019,7 @@ const TOILETS=[
  {
   "id": "osm-n2069250258",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0709816,
   "lng": 141.3496403,
   "fee": null,
@@ -972,6 +1035,7 @@ const TOILETS=[
  {
   "id": "osm-n2069250259",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0694714,
   "lng": 141.351764,
   "fee": null,
@@ -987,6 +1051,7 @@ const TOILETS=[
  {
   "id": "osm-n2069250260",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0697467,
   "lng": 141.3534928,
   "fee": null,
@@ -1002,6 +1067,7 @@ const TOILETS=[
  {
   "id": "osm-n2069250261",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0704814,
   "lng": 141.3506362,
   "fee": null,
@@ -1017,6 +1083,7 @@ const TOILETS=[
  {
   "id": "osm-n2069252603",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0692848,
   "lng": 141.3533864,
   "fee": null,
@@ -1032,6 +1099,7 @@ const TOILETS=[
  {
   "id": "osm-n2069252604",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0644237,
   "lng": 141.3460314,
   "fee": null,
@@ -1047,6 +1115,7 @@ const TOILETS=[
  {
   "id": "osm-n2069262538",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.062481,
   "lng": 141.35128,
   "fee": null,
@@ -1062,6 +1131,7 @@ const TOILETS=[
  {
   "id": "osm-n2069262539",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0647343,
   "lng": 141.3528839,
   "fee": null,
@@ -1077,6 +1147,7 @@ const TOILETS=[
  {
   "id": "osm-n2069265762",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.059306,
   "lng": 141.347289,
   "fee": null,
@@ -1092,6 +1163,7 @@ const TOILETS=[
  {
   "id": "osm-n2069265763",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0615753,
   "lng": 141.3498852,
   "fee": null,
@@ -1107,6 +1179,7 @@ const TOILETS=[
  {
   "id": "osm-n2069265764",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0597861,
   "lng": 141.3428417,
   "fee": null,
@@ -1122,6 +1195,7 @@ const TOILETS=[
  {
   "id": "osm-n2069266874",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0608071,
   "lng": 141.3413772,
   "fee": null,
@@ -1137,6 +1211,7 @@ const TOILETS=[
  {
   "id": "osm-n2069271165",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0676129,
   "lng": 141.3468993,
   "fee": null,
@@ -1152,6 +1227,7 @@ const TOILETS=[
  {
   "id": "osm-n2069271168",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0659881,
   "lng": 141.3504173,
   "fee": null,
@@ -1167,6 +1243,7 @@ const TOILETS=[
  {
   "id": "osm-n2069272348",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0619473,
   "lng": 141.3482147,
   "fee": null,
@@ -1182,6 +1259,7 @@ const TOILETS=[
  {
   "id": "osm-n2069272349",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.062298,
   "lng": 141.3462377,
   "fee": null,
@@ -1197,6 +1275,7 @@ const TOILETS=[
  {
   "id": "osm-n2069272350",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0602506,
   "lng": 141.345878,
   "fee": null,
@@ -1212,6 +1291,7 @@ const TOILETS=[
  {
   "id": "osm-n2069272352",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0635056,
   "lng": 141.3527015,
   "fee": null,
@@ -1227,6 +1307,7 @@ const TOILETS=[
  {
   "id": "osm-n2080740893",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0594421,
   "lng": 141.3570999,
   "fee": null,
@@ -1242,6 +1323,7 @@ const TOILETS=[
  {
   "id": "osm-n2080769144",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0584297,
   "lng": 141.3540671,
   "fee": null,
@@ -1257,6 +1339,7 @@ const TOILETS=[
  {
   "id": "osm-n2089655579",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0716453,
   "lng": 141.3507115,
   "fee": null,
@@ -1272,6 +1355,7 @@ const TOILETS=[
  {
   "id": "osm-n2089655584",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0700898,
   "lng": 141.3478343,
   "fee": null,
@@ -1287,6 +1371,7 @@ const TOILETS=[
  {
   "id": "osm-n2089676260",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0644919,
   "lng": 141.3466425,
   "fee": null,
@@ -1302,6 +1387,7 @@ const TOILETS=[
  {
   "id": "osm-n2089676265",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0652016,
   "lng": 141.346922,
   "fee": null,
@@ -1317,6 +1403,7 @@ const TOILETS=[
  {
   "id": "osm-n2089686841",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0646385,
   "lng": 141.3497592,
   "fee": null,
@@ -1332,6 +1419,7 @@ const TOILETS=[
  {
   "id": "osm-n2089686856",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0646933,
   "lng": 141.3553874,
   "fee": null,
@@ -1347,6 +1435,7 @@ const TOILETS=[
  {
   "id": "osm-n2089696554",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0616387,
   "lng": 141.3524414,
   "fee": null,
@@ -1362,6 +1451,7 @@ const TOILETS=[
  {
   "id": "osm-n2089696555",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0580407,
   "lng": 141.3441828,
   "fee": null,
@@ -1377,6 +1467,7 @@ const TOILETS=[
  {
   "id": "osm-n2089781715",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0569084,
   "lng": 141.3446553,
   "fee": null,
@@ -1392,6 +1483,7 @@ const TOILETS=[
  {
   "id": "osm-n2158530945",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0725607,
   "lng": 141.3508859,
   "fee": null,
@@ -1407,6 +1499,7 @@ const TOILETS=[
  {
   "id": "osm-n2158530957",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0731229,
   "lng": 141.3523229,
   "fee": null,
@@ -1422,6 +1515,7 @@ const TOILETS=[
  {
   "id": "osm-n2176980117",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0578072,
   "lng": 141.356242,
   "fee": null,
@@ -1437,6 +1531,7 @@ const TOILETS=[
  {
   "id": "osm-n2180716788",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0573655,
   "lng": 141.3543664,
   "fee": null,
@@ -1452,6 +1547,7 @@ const TOILETS=[
  {
   "id": "osm-n2180741800",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0569105,
   "lng": 141.3494918,
   "fee": null,
@@ -1467,6 +1563,7 @@ const TOILETS=[
  {
   "id": "osm-n2180773274",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0564505,
   "lng": 141.3496925,
   "fee": null,
@@ -1482,6 +1579,7 @@ const TOILETS=[
  {
   "id": "osm-n2180779589",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0569865,
   "lng": 141.3475212,
   "fee": null,
@@ -1497,6 +1595,7 @@ const TOILETS=[
  {
   "id": "osm-n2186532338",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0557871,
   "lng": 141.3522918,
   "fee": null,
@@ -1512,6 +1611,7 @@ const TOILETS=[
  {
   "id": "osm-n2186533288",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0556846,
   "lng": 141.3515012,
   "fee": null,
@@ -1527,6 +1627,7 @@ const TOILETS=[
  {
   "id": "osm-n2216385903",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0605514,
   "lng": 141.3576188,
   "fee": null,
@@ -1542,6 +1643,7 @@ const TOILETS=[
  {
   "id": "osm-n2243169950",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0597426,
   "lng": 141.359608,
   "fee": null,
@@ -1557,6 +1659,7 @@ const TOILETS=[
  {
   "id": "osm-n2243358172",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.058709,
   "lng": 141.360601,
   "fee": null,
@@ -1572,6 +1675,7 @@ const TOILETS=[
  {
   "id": "osm-n2266990756",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0566362,
   "lng": 141.3587114,
   "fee": null,
@@ -1587,6 +1691,7 @@ const TOILETS=[
  {
   "id": "osm-n2267007347",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0574815,
   "lng": 141.3600594,
   "fee": null,
@@ -1602,6 +1707,7 @@ const TOILETS=[
  {
   "id": "osm-n2267020935",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0578181,
   "lng": 141.3623468,
   "fee": null,
@@ -1617,6 +1723,7 @@ const TOILETS=[
  {
   "id": "osm-n2369945515",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0549847,
   "lng": 141.3391355,
   "fee": null,
@@ -1632,6 +1739,7 @@ const TOILETS=[
  {
   "id": "osm-n2376830343",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0508558,
   "lng": 141.3418843,
   "fee": null,
@@ -1647,6 +1755,7 @@ const TOILETS=[
  {
   "id": "osm-n2376831094",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.050293,
   "lng": 141.338807,
   "fee": null,
@@ -1662,6 +1771,7 @@ const TOILETS=[
  {
   "id": "osm-n2377553547",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0488981,
   "lng": 141.3521192,
   "fee": null,
@@ -1677,6 +1787,7 @@ const TOILETS=[
  {
   "id": "osm-n2377553548",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0484318,
   "lng": 141.3501356,
   "fee": null,
@@ -1692,6 +1803,7 @@ const TOILETS=[
  {
   "id": "osm-n2377555608",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0490334,
   "lng": 141.3551957,
   "fee": null,
@@ -1707,6 +1819,7 @@ const TOILETS=[
  {
   "id": "osm-n2378579684",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0743177,
   "lng": 141.3472726,
   "fee": null,
@@ -1722,6 +1835,7 @@ const TOILETS=[
  {
   "id": "osm-n2458947184",
   "name": "にれ",
+  "name_en": null,
   "lat": 43.0567118,
   "lng": 141.349161,
   "fee": null,
@@ -1737,6 +1851,7 @@ const TOILETS=[
  {
   "id": "osm-n3086088780",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0519913,
   "lng": 141.3556741,
   "fee": null,
@@ -1752,6 +1867,7 @@ const TOILETS=[
  {
   "id": "osm-n3086088785",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.05109,
   "lng": 141.3542604,
   "fee": null,
@@ -1767,6 +1883,7 @@ const TOILETS=[
  {
   "id": "osm-n3086088797",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.048415,
   "lng": 141.3462692,
   "fee": null,
@@ -1782,6 +1899,7 @@ const TOILETS=[
  {
   "id": "osm-n3093940029",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0752097,
   "lng": 141.3482015,
   "fee": null,
@@ -1797,6 +1915,7 @@ const TOILETS=[
  {
   "id": "osm-n3382304613",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0500959,
   "lng": 141.3549312,
   "fee": null,
@@ -1812,6 +1931,7 @@ const TOILETS=[
  {
   "id": "osm-n3382312084",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0499591,
   "lng": 141.3561264,
   "fee": null,
@@ -1827,6 +1947,7 @@ const TOILETS=[
  {
   "id": "osm-n3382313293",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0488449,
   "lng": 141.3535102,
   "fee": null,
@@ -1842,6 +1963,7 @@ const TOILETS=[
  {
   "id": "osm-n3382318744",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0499893,
   "lng": 141.3512873,
   "fee": null,
@@ -1857,6 +1979,7 @@ const TOILETS=[
  {
   "id": "osm-n3494533260",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0772763,
   "lng": 141.356721,
   "fee": null,
@@ -1872,6 +1995,7 @@ const TOILETS=[
  {
   "id": "osm-n3655294031",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.053533,
   "lng": 141.353627,
   "fee": null,
@@ -1887,6 +2011,7 @@ const TOILETS=[
  {
   "id": "osm-n3708879125",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0564226,
   "lng": 141.341253,
   "fee": null,
@@ -1902,6 +2027,7 @@ const TOILETS=[
  {
   "id": "osm-n3812315421",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.053141,
   "lng": 141.3418034,
   "fee": null,
@@ -1917,6 +2043,7 @@ const TOILETS=[
  {
   "id": "osm-n3814757359",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0535472,
   "lng": 141.3459779,
   "fee": null,
@@ -1932,6 +2059,7 @@ const TOILETS=[
  {
   "id": "osm-n3814765406",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0544932,
   "lng": 141.3468724,
   "fee": null,
@@ -1947,6 +2075,7 @@ const TOILETS=[
  {
   "id": "osm-n3814789004",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0543854,
   "lng": 141.3484724,
   "fee": null,
@@ -1962,6 +2091,7 @@ const TOILETS=[
  {
   "id": "osm-n3814789043",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0526819,
   "lng": 141.347894,
   "fee": null,
@@ -1977,6 +2107,7 @@ const TOILETS=[
  {
   "id": "osm-n3814791063",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0535778,
   "lng": 141.3492813,
   "fee": null,
@@ -1992,6 +2123,7 @@ const TOILETS=[
  {
   "id": "osm-n3814791095",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0537949,
   "lng": 141.3503328,
   "fee": null,
@@ -2007,6 +2139,7 @@ const TOILETS=[
  {
   "id": "osm-n3814802817",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0542686,
   "lng": 141.3502409,
   "fee": null,
@@ -2022,6 +2155,7 @@ const TOILETS=[
  {
   "id": "osm-n3814809602",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.055007,
   "lng": 141.3504333,
   "fee": null,
@@ -2037,6 +2171,7 @@ const TOILETS=[
  {
   "id": "osm-n3818800311",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0546743,
   "lng": 141.3524304,
   "fee": null,
@@ -2052,6 +2187,7 @@ const TOILETS=[
  {
   "id": "osm-n3818800314",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0541287,
   "lng": 141.3527101,
   "fee": null,
@@ -2067,6 +2203,7 @@ const TOILETS=[
  {
   "id": "osm-n3818800315",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.053963,
   "lng": 141.353171,
   "fee": null,
@@ -2082,6 +2219,7 @@ const TOILETS=[
  {
   "id": "osm-n3818800316",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0539568,
   "lng": 141.3535431,
   "fee": null,
@@ -2097,6 +2235,7 @@ const TOILETS=[
  {
   "id": "osm-n3822085913",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0552891,
   "lng": 141.3536215,
   "fee": null,
@@ -2112,6 +2251,7 @@ const TOILETS=[
  {
   "id": "osm-n3822094368",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0554651,
   "lng": 141.3539556,
   "fee": null,
@@ -2127,6 +2267,7 @@ const TOILETS=[
  {
   "id": "osm-n3822094369",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0552255,
   "lng": 141.3547946,
   "fee": null,
@@ -2142,6 +2283,7 @@ const TOILETS=[
  {
   "id": "osm-n3822119046",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0541677,
   "lng": 141.3550704,
   "fee": null,
@@ -2157,6 +2299,7 @@ const TOILETS=[
  {
   "id": "osm-n3822125461",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0558146,
   "lng": 141.3561663,
   "fee": null,
@@ -2172,6 +2315,7 @@ const TOILETS=[
  {
   "id": "osm-n3822126750",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0558902,
   "lng": 141.3567849,
   "fee": null,
@@ -2187,6 +2331,7 @@ const TOILETS=[
  {
   "id": "osm-n3822141770",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0545726,
   "lng": 141.3558742,
   "fee": null,
@@ -2202,6 +2347,7 @@ const TOILETS=[
  {
   "id": "osm-n3822141771",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0536202,
   "lng": 141.355671,
   "fee": null,
@@ -2217,6 +2363,7 @@ const TOILETS=[
  {
   "id": "osm-n3834357608",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0530004,
   "lng": 141.3531744,
   "fee": null,
@@ -2232,6 +2379,7 @@ const TOILETS=[
  {
   "id": "osm-n3836664919",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0521884,
   "lng": 141.3524733,
   "fee": null,
@@ -2247,6 +2395,7 @@ const TOILETS=[
  {
   "id": "osm-n3836672145",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0515809,
   "lng": 141.351196,
   "fee": null,
@@ -2262,6 +2411,7 @@ const TOILETS=[
  {
   "id": "osm-n3836707823",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0526828,
   "lng": 141.3506532,
   "fee": null,
@@ -2277,6 +2427,7 @@ const TOILETS=[
  {
   "id": "osm-n3836832255",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0497665,
   "lng": 141.3511301,
   "fee": null,
@@ -2292,6 +2443,7 @@ const TOILETS=[
  {
   "id": "osm-n3836844529",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0494909,
   "lng": 141.3500466,
   "fee": null,
@@ -2307,6 +2459,7 @@ const TOILETS=[
  {
   "id": "osm-n3836945863",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0492102,
   "lng": 141.3462144,
   "fee": null,
@@ -2322,6 +2475,7 @@ const TOILETS=[
  {
   "id": "osm-n3836947347",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0517449,
   "lng": 141.3440667,
   "fee": null,
@@ -2337,6 +2491,7 @@ const TOILETS=[
  {
   "id": "osm-n3842692078",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0541645,
   "lng": 141.3359997,
   "fee": null,
@@ -2352,6 +2507,7 @@ const TOILETS=[
  {
   "id": "osm-n3856604321",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0483991,
   "lng": 141.3395374,
   "fee": null,
@@ -2367,6 +2523,7 @@ const TOILETS=[
  {
   "id": "osm-n3891893477",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0477413,
   "lng": 141.3495192,
   "fee": null,
@@ -2382,6 +2539,7 @@ const TOILETS=[
  {
   "id": "osm-n3910076038",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0461111,
   "lng": 141.3397051,
   "fee": null,
@@ -2397,6 +2555,7 @@ const TOILETS=[
  {
   "id": "osm-n4029289229",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0716254,
   "lng": 141.3561104,
   "fee": null,
@@ -2412,6 +2571,7 @@ const TOILETS=[
  {
   "id": "osm-n4496371873",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0737575,
   "lng": 141.3559759,
   "fee": null,
@@ -2427,6 +2587,7 @@ const TOILETS=[
  {
   "id": "osm-n4497846074",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0769857,
   "lng": 141.3537067,
   "fee": null,
@@ -2442,6 +2603,7 @@ const TOILETS=[
  {
   "id": "osm-n4497846075",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.075523,
   "lng": 141.3573253,
   "fee": null,
@@ -2457,6 +2619,7 @@ const TOILETS=[
  {
   "id": "osm-n4535136057",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0599385,
   "lng": 141.3619843,
   "fee": null,
@@ -2472,6 +2635,7 @@ const TOILETS=[
  {
   "id": "osm-n4690525388",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0555203,
   "lng": 141.354336,
   "fee": null,
@@ -2487,6 +2651,7 @@ const TOILETS=[
  {
   "id": "osm-n4690525989",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0545668,
   "lng": 141.3538142,
   "fee": null,
@@ -2502,6 +2667,7 @@ const TOILETS=[
  {
   "id": "osm-n4888648499",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0674522,
   "lng": 141.3570936,
   "fee": null,
@@ -2517,6 +2683,7 @@ const TOILETS=[
  {
   "id": "osm-n4902975855",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.063694,
   "lng": 141.3499102,
   "fee": null,
@@ -2532,6 +2699,7 @@ const TOILETS=[
  {
   "id": "osm-n4927780710",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0585911,
   "lng": 141.3507808,
   "fee": null,
@@ -2547,6 +2715,7 @@ const TOILETS=[
  {
   "id": "osm-n4927781725",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0577496,
   "lng": 141.3510012,
   "fee": null,
@@ -2562,6 +2731,7 @@ const TOILETS=[
  {
   "id": "osm-n4940578373",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0629781,
   "lng": 141.3372459,
   "fee": null,
@@ -2577,6 +2747,7 @@ const TOILETS=[
  {
   "id": "osm-n4941353778",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0583111,
   "lng": 141.3572974,
   "fee": null,
@@ -2592,6 +2763,7 @@ const TOILETS=[
  {
   "id": "osm-n4941357022",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0570748,
   "lng": 141.3522522,
   "fee": null,
@@ -2607,6 +2779,7 @@ const TOILETS=[
  {
   "id": "osm-n4964974720",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.065546,
   "lng": 141.3624755,
   "fee": null,
@@ -2622,6 +2795,7 @@ const TOILETS=[
  {
   "id": "osm-n4965008024",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0618378,
   "lng": 141.3621496,
   "fee": null,
@@ -2637,6 +2811,7 @@ const TOILETS=[
  {
   "id": "osm-n4976395210",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.072652,
   "lng": 141.348761,
   "fee": null,
@@ -2652,6 +2827,7 @@ const TOILETS=[
  {
   "id": "osm-n4978473065",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0768918,
   "lng": 141.3481196,
   "fee": null,
@@ -2667,6 +2843,7 @@ const TOILETS=[
  {
   "id": "osm-n5422615621",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0669621,
   "lng": 141.3532341,
   "fee": null,
@@ -2682,6 +2859,7 @@ const TOILETS=[
  {
   "id": "osm-n5896471781",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0567714,
   "lng": 141.3544707,
   "fee": null,
@@ -2697,6 +2875,7 @@ const TOILETS=[
  {
   "id": "osm-n5939883351",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0632084,
   "lng": 141.3553522,
   "fee": null,
@@ -2712,6 +2891,7 @@ const TOILETS=[
  {
   "id": "osm-n5987250083",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0520635,
   "lng": 141.3582504,
   "fee": null,
@@ -2727,6 +2907,7 @@ const TOILETS=[
  {
   "id": "osm-n6015295872",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0622359,
   "lng": 141.3588232,
   "fee": null,
@@ -2742,6 +2923,7 @@ const TOILETS=[
  {
   "id": "osm-n6044109940",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0626369,
   "lng": 141.3529483,
   "fee": null,
@@ -2757,6 +2939,7 @@ const TOILETS=[
  {
   "id": "osm-n6044109941",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0590598,
   "lng": 141.3517319,
   "fee": null,
@@ -2772,6 +2955,7 @@ const TOILETS=[
  {
   "id": "osm-n6097034458",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0564775,
   "lng": 141.3356494,
   "fee": null,
@@ -2787,6 +2971,7 @@ const TOILETS=[
  {
   "id": "osm-n6115774047",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0657967,
   "lng": 141.3537639,
   "fee": null,
@@ -2802,6 +2987,7 @@ const TOILETS=[
  {
   "id": "osm-n6639019004",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0611879,
   "lng": 141.3611536,
   "fee": null,
@@ -2817,6 +3003,7 @@ const TOILETS=[
  {
   "id": "osm-n7134409785",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0587516,
   "lng": 141.3519036,
   "fee": null,
@@ -2832,6 +3019,7 @@ const TOILETS=[
  {
   "id": "osm-n7707701213",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0583041,
   "lng": 141.3552198,
   "fee": null,
@@ -2847,6 +3035,7 @@ const TOILETS=[
  {
   "id": "osm-n8269526117",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.077185,
   "lng": 141.3444375,
   "fee": null,
@@ -2862,6 +3051,7 @@ const TOILETS=[
  {
   "id": "osm-n8977000520",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0738708,
   "lng": 141.3425608,
   "fee": null,
@@ -2877,6 +3067,7 @@ const TOILETS=[
  {
   "id": "osm-n9755837711",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0701004,
   "lng": 141.3600753,
   "fee": null,
@@ -2892,6 +3083,7 @@ const TOILETS=[
  {
   "id": "osm-n10010420037",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0671781,
   "lng": 141.3501827,
   "fee": null,
@@ -2907,6 +3099,7 @@ const TOILETS=[
  {
   "id": "osm-n10029051624",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0655806,
   "lng": 141.3570576,
   "fee": null,
@@ -2922,6 +3115,7 @@ const TOILETS=[
  {
   "id": "osm-n10081400701",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0673992,
   "lng": 141.3453465,
   "fee": null,
@@ -2937,6 +3131,7 @@ const TOILETS=[
  {
   "id": "osm-n10314365159",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0577275,
   "lng": 141.3554153,
   "fee": null,
@@ -2952,6 +3147,7 @@ const TOILETS=[
  {
   "id": "osm-n10591554906",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0650696,
   "lng": 141.3576815,
   "fee": null,
@@ -2967,6 +3163,7 @@ const TOILETS=[
  {
   "id": "osm-n10629336242",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0705044,
   "lng": 141.3504516,
   "fee": null,
@@ -2982,6 +3179,7 @@ const TOILETS=[
  {
   "id": "osm-n11389935399",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0551709,
   "lng": 141.3520545,
   "fee": null,
@@ -2997,6 +3195,7 @@ const TOILETS=[
  {
   "id": "osm-n11966073403",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0508674,
   "lng": 141.345944,
   "fee": null,
@@ -3012,6 +3211,7 @@ const TOILETS=[
  {
   "id": "osm-n12022513025",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0565488,
   "lng": 141.3484665,
   "fee": null,
@@ -3027,6 +3227,7 @@ const TOILETS=[
  {
   "id": "osm-n12335291415",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0702708,
   "lng": 141.3526323,
   "fee": null,
@@ -3042,6 +3243,7 @@ const TOILETS=[
  {
   "id": "osm-n12587238868",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0497774,
   "lng": 141.3534467,
   "fee": null,
@@ -3057,6 +3259,7 @@ const TOILETS=[
  {
   "id": "osm-n12591833105",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0567372,
   "lng": 141.3565634,
   "fee": null,
@@ -3072,6 +3275,7 @@ const TOILETS=[
  {
   "id": "osm-n12620497313",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0560026,
   "lng": 141.3530769,
   "fee": null,
@@ -3087,6 +3291,7 @@ const TOILETS=[
  {
   "id": "osm-n12761922502",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.056948,
   "lng": 141.3532726,
   "fee": null,
@@ -3102,6 +3307,7 @@ const TOILETS=[
  {
   "id": "osm-n12827749932",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.060065,
   "lng": 141.3356975,
   "fee": null,
@@ -3117,6 +3323,7 @@ const TOILETS=[
  {
   "id": "osm-n12874634946",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0553438,
   "lng": 141.341498,
   "fee": null,
@@ -3132,6 +3339,7 @@ const TOILETS=[
  {
   "id": "osm-n13095456808",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0778407,
   "lng": 141.3408108,
   "fee": null,
@@ -3147,6 +3355,7 @@ const TOILETS=[
  {
   "id": "osm-n13172554597",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0727719,
   "lng": 141.3501896,
   "fee": null,
@@ -3162,6 +3371,7 @@ const TOILETS=[
  {
   "id": "osm-n13172576501",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0709772,
   "lng": 141.3538566,
   "fee": null,
@@ -3177,6 +3387,7 @@ const TOILETS=[
  {
   "id": "osm-n13172576503",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0699631,
   "lng": 141.3579808,
   "fee": null,
@@ -3192,6 +3403,7 @@ const TOILETS=[
  {
   "id": "osm-n13172576507",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0696104,
   "lng": 141.3595803,
   "fee": null,
@@ -3207,6 +3419,7 @@ const TOILETS=[
  {
   "id": "osm-n13439253483",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.052537,
   "lng": 141.3456837,
   "fee": null,
@@ -3222,6 +3435,7 @@ const TOILETS=[
  {
   "id": "osm-n13479221659",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0602426,
   "lng": 141.3540846,
   "fee": null,
@@ -3237,6 +3451,7 @@ const TOILETS=[
  {
   "id": "osm-n13479221660",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0671764,
   "lng": 141.3609007,
   "fee": null,
@@ -3252,6 +3467,7 @@ const TOILETS=[
  {
   "id": "osm-n13509433738",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0630921,
   "lng": 141.3582445,
   "fee": null,
@@ -3267,6 +3483,7 @@ const TOILETS=[
  {
   "id": "osm-n13524036478",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0665727,
   "lng": 141.3563319,
   "fee": null,
@@ -3282,6 +3499,7 @@ const TOILETS=[
  {
   "id": "osm-n13524193423",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0715842,
   "lng": 141.3527835,
   "fee": null,
@@ -3297,6 +3515,7 @@ const TOILETS=[
  {
   "id": "osm-n13566563187",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0652599,
   "lng": 141.3501836,
   "fee": null,
@@ -3312,6 +3531,7 @@ const TOILETS=[
  {
   "id": "osm-n13572726249",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0564055,
   "lng": 141.3519582,
   "fee": null,
@@ -3327,6 +3547,7 @@ const TOILETS=[
  {
   "id": "osm-n13572794306",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0596473,
   "lng": 141.3495315,
   "fee": null,
@@ -3342,6 +3563,7 @@ const TOILETS=[
  {
   "id": "osm-n13608917728",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0604396,
   "lng": 141.3475352,
   "fee": null,
@@ -3357,6 +3579,7 @@ const TOILETS=[
  {
   "id": "osm-n13620257076",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0582288,
   "lng": 141.3480841,
   "fee": null,
@@ -3372,6 +3595,7 @@ const TOILETS=[
  {
   "id": "osm-n13620318618",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0560661,
   "lng": 141.3460368,
   "fee": null,
@@ -3387,6 +3611,7 @@ const TOILETS=[
  {
   "id": "osm-n13623264539",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0554015,
   "lng": 141.3600789,
   "fee": null,
@@ -3402,6 +3627,7 @@ const TOILETS=[
  {
   "id": "osm-n13623264540",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.055666,
   "lng": 141.3614044,
   "fee": null,
@@ -3417,6 +3643,7 @@ const TOILETS=[
  {
   "id": "osm-n13683796020",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0544451,
   "lng": 141.3548218,
   "fee": null,
@@ -3432,6 +3659,7 @@ const TOILETS=[
  {
   "id": "osm-n13713943547",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0683753,
   "lng": 141.3573993,
   "fee": null,
@@ -3447,6 +3675,7 @@ const TOILETS=[
  {
   "id": "osm-n13725362457",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0650813,
   "lng": 141.3452433,
   "fee": null,
@@ -3462,6 +3691,7 @@ const TOILETS=[
  {
   "id": "osm-n13971959085",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0596796,
   "lng": 141.3523356,
   "fee": null,
@@ -3477,6 +3707,7 @@ const TOILETS=[
  {
   "id": "osm-n14051481485",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0603973,
   "lng": 141.3538739,
   "fee": null,
@@ -3492,6 +3723,7 @@ const TOILETS=[
  {
   "id": "osm-n14051481489",
   "name": "ローソン",
+  "name_en": "Lawson",
   "lat": 43.0607071,
   "lng": 141.3534824,
   "fee": null,
@@ -3507,6 +3739,7 @@ const TOILETS=[
  {
   "id": "osm-n14255040849",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0627186,
   "lng": 141.349235,
   "fee": null,
@@ -3522,6 +3755,7 @@ const TOILETS=[
  {
   "id": "osm-n14272118127",
   "name": "セイコーマート",
+  "name_en": "Seicomart",
   "lat": 43.0612828,
   "lng": 141.3522931,
   "fee": null,
@@ -3537,6 +3771,7 @@ const TOILETS=[
  {
   "id": "osm-w271908951",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0531841,
   "lng": 141.3517962,
   "fee": null,
@@ -3552,6 +3787,7 @@ const TOILETS=[
  {
   "id": "osm-w352315773",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0522113,
   "lng": 141.3428735,
   "fee": null,
@@ -3567,6 +3803,7 @@ const TOILETS=[
  {
   "id": "osm-w379434481",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0757304,
   "lng": 141.363104,
   "fee": null,
@@ -3582,6 +3819,7 @@ const TOILETS=[
  {
   "id": "osm-w724508065",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0721109,
   "lng": 141.3615494,
   "fee": null,
@@ -3597,6 +3835,7 @@ const TOILETS=[
  {
   "id": "osm-w1090413915",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0675847,
   "lng": 141.3360889,
   "fee": null,
@@ -3612,6 +3851,7 @@ const TOILETS=[
  {
   "id": "osm-w1091128376",
   "name": "セブン-イレブン",
+  "name_en": "7-Eleven",
   "lat": 43.0621649,
   "lng": 141.3368633,
   "fee": null,
@@ -3627,6 +3867,7 @@ const TOILETS=[
  {
   "id": "osm-w1157435955",
   "name": "ファミリーマート",
+  "name_en": "FamilyMart",
   "lat": 43.0512128,
   "lng": 141.3490183,
   "fee": null,

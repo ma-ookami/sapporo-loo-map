@@ -2,7 +2,7 @@
 const { chromium } = require('../../taskline/node_modules/playwright-core');
 (async () => {
   const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
-  const ctx = await b.newContext({ viewport: { width: 390, height: 780 }, hasTouch: true, colorScheme: 'light', geolocation: { latitude: 43.0545, longitude: 141.3530 }, permissions: ['geolocation'] });
+  const ctx = await b.newContext({ locale: 'ja-JP', viewport: { width: 390, height: 780 }, hasTouch: true, colorScheme: 'light', geolocation: { latitude: 43.0545, longitude: 141.3530 }, permissions: ['geolocation'] });
   await ctx.addInitScript(() => localStorage.setItem('loo-guide', '1'));
   const p = await ctx.newPage(); p.on('dialog', d => d.accept()); p.on('pageerror', e => console.log('ERR', e.message));
   const url = 'file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1';

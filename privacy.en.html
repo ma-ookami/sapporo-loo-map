@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy and data - Sapporo Toilet &amp; Convenience Store Map</title>
+<meta name="color-scheme" content="light dark">
+<style>
+:root{--ink:#1d1a17;--sub:#7b746c;--bg:#f6f4f1;--card:#fff;--accent:#c4521f;--line:rgba(29,26,23,.1)}
+@media (prefers-color-scheme: dark){:root{--ink:#f3efe9;--sub:#a49e96;--bg:#1a1714;--card:#2c2722;--accent:#e2683a;--line:rgba(255,255,255,.12)}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.75 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif}
+main{max-width:640px;margin:0 auto;padding:28px 18px 56px}
+h1{font-size:22px;margin:0 0 4px}
+.date{color:var(--sub);font-size:13px;margin:0 0 22px}
+section{background:var(--card);border-radius:18px;padding:16px 18px;margin:0 0 14px;border:1px solid var(--line)}
+h2{font-size:16px;margin:0 0 6px}
+p,li{margin:0 0 6px;color:var(--ink)}
+ul{margin:0;padding-left:20px}
+a{color:var(--accent)}
+.back{display:inline-block;margin-bottom:14px;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<a class="back" href="./">&larr; Back to the map</a>
+<h1>Privacy and data</h1>
+<p class="date">Sapporo Toilet &amp; Convenience Store Map ・ October 25, 2026 ・ <a href="privacy.html">日本語</a></p>
+
+<section>
+<h2>Your location</h2>
+<p>Your location is used only on your device, to work out the distance to the nearest toilet. It is not sent to any server and is not stored.</p>
+</section>
+
+<section>
+<h2>What is saved when you add or report something</h2>
+<ul>
+<li>When you add a toilet or a convenience store, its <strong>location, name, floor, fee, wheelchair access, star ratings and note</strong> are saved and <strong>visible to other people</strong>.</li>
+<li>Reports such as "Can borrow" or "Clean" save only which place the report is about.</li>
+<li>Both are saved together with an <strong>anonymous ID</strong> created by anonymous sign-in (Firebase Authentication). We do not handle names, email addresses or phone numbers. The anonymous ID is used only so that you, and nobody else, can delete what you added.</li>
+<li>You can delete what you added at any time, using "Delete this entry" on the detail screen.</li>
+</ul>
+</section>
+
+<section>
+<h2>What is kept on your device</h2>
+<p>Your browser remembers whether you have read "Before you use this" and your settings. While no online storage is configured, what you add or report is also kept only on this device. We do not use ads or track your behavior.</p>
+</section>
+
+<section>
+<h2>External services</h2>
+<ul>
+<li>Map images: OpenFreeMap (openfreemap.org)</li>
+<li>Map library: MapLibre GL JS (unpkg.com)</li>
+<li>Storage: Google Firebase (Firestore and anonymous sign-in)</li>
+</ul>
+<p>As is the nature of the internet, your IP address is visible to each of these services when you connect to them.</p>
+</section>
+
+<section>
+<h2>Data sources</h2>
+<p>The map, the locations of toilets and convenience stores, and opening hours are based on data from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a> (ODbL). The map design is by OpenFreeMap and OpenMapTiles.</p>
+<p>Some information comes from users and may be out of date or wrong. Some toilets are for customers only. When you borrow a store's toilet as a favor, please buy something if you can, and avoid busy times.</p>
+</section>
+
+<section>
+<h2>Corrections and removal requests</h2>
+<p>If you find wrong information or a post you would like removed, please tell us <a href="https://github.com/ma-ookami/sapporo-loo-map/issues" target="_blank" rel="noopener">here</a>.</p>
+</section>
+</main>
+</body>
+</html>

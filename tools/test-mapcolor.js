@@ -2,7 +2,7 @@
 const { chromium } = require('../../taskline/node_modules/playwright-core');
 (async () => {
   const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
-  const mk = async scheme => { const c = await b.newContext({ viewport: { width: 390, height: 780 }, colorScheme: scheme }); await c.addInitScript(() => localStorage.setItem('loo-guide', '1')); const p = await c.newPage(); p.on('pageerror', e => console.log('ERR', e.message)); await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1'); await p.waitForTimeout(5000); return p; };
+  const mk = async scheme => { const c = await b.newContext({ locale: 'ja-JP', viewport: { width: 390, height: 780 }, colorScheme: scheme }); await c.addInitScript(() => localStorage.setItem('loo-guide', '1')); const p = await c.newPage(); p.on('pageerror', e => console.log('ERR', e.message)); await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1'); await p.waitForTimeout(5000); return p; };
   const state = async p => { for (let i = 0; i < 40; i++) { if (await p.evaluate(() => map.isStyleLoaded())) break; await p.waitForTimeout(500); } await p.waitForTimeout(800); return p.evaluate(() => { const l = map.getStyle().layers; return { n: l.length, bg: (l.find(x => x.type === 'background') || { paint: {} }).paint['background-color'], labels: labelLayers.length }; }); };
   let p = await mk('light');
   const s0 = await state(p); console.log('1 simple (light):', JSON.stringify(s0));

@@ -1,5 +1,6 @@
 /* 起動 */
 function init(){
+  I18N.start();   // 英語のときは、画面の文言を英語にする(js/i18n.js)
   st.toilets=TOILETS.slice(); resort();
   map=new maplibregl.Map({container:'map',style:mapStyle(),center:[SUSUKINO.lng,SUSUKINO.lat],zoom:15.5,
     attributionControl:false,dragRotate:false,pitchWithRotate:false,touchPitch:false});

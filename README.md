@@ -5,9 +5,9 @@
 英語名 Sapporo Loo Map / 日本語名 札幌トイレ・コンビニマップ。iOS ネイティブ版(Expo)は `../sapporo-loo-map`(下の「Expo 版」)。
 
 ## 0. いまの状態(最初に読む)
-- **Git:** `origin/main` は `2b98526`。手元の `main` は **12 コミット先行(未 push)**、先頭は `c54494c`。**push はユーザーが「送って」と言ったときだけ**。
-- **GitHub Pages:** 有効化したかは未確認(Settings → Pages → `main` / root)。公開 URL 想定: `https://ma-ookami.github.io/sapporo-loo-map/`
-- **Firebase(playground)にルールを足したか未確認。** 足すまでは、公開サイトで追加・報告が保存に失敗する(手順は §6)。
+- **Git:** 手元と `origin/main` の差は `git status -sb` で確認する。**push はユーザーが「送って」と言ったときだけ**。
+- **公開:** GitHub Pages(`main` / root)。独自ドメインは `CNAME`(`sapporo-pitstop.rokunanabox.com`)。
+- **Firebase(playground)のルールは、ルールファイルを変えるたびに、ユーザーがコンソールに貼り直す必要がある。** 直近では、`loo-reports` に `lv-gr`/`lv-ug`/`lv-up`(どの階?の報告。文書 ID は `<toiletId>_lv_<uid>`)を足した。貼っていないと、「どこにある?」の報告だけが保存できない(手順は §6)。
 - **未確認:** iPhone 実機(位置情報・ホーム画面追加・すりガラス・ダーク・スワイプ)、Firestore につないだ状態の動作(Java が無くエミュレータが使えない)。
 - 自動テストは全部ローカルモード(`?local=1`)で通っている(§7)。
 - 反映されないときは強制再読み込み(iPhone のホーム画面アイコンは削除して追加し直す)。`?v=` スタンプ(§8)導入前の古い `index.html` が残っていると混ざる。
@@ -31,6 +31,9 @@
 - 実装前に、この節をユーザーと確認すること
 
 ## 2. 機能(画面)
+- **英語表示(Language: English):** 設定の「言語 / Language」で切り替え(読み込み直して反映)。**初めての人は端末の言語で決まる**(日本語以外は英語)。画面の日本語を辞書(`js/i18n-en.js`)で英語に置き換える仕組み(`js/i18n.js`)。地図の文字も同じ設定。場所の名前は、英語の名前(OSM の `name:en`)があれば英語で出し、無ければ日本語のまま。プライバシーのページは `privacy.en.html`(§8 に、文言を足すときの決まり)
+- **地下の表示:** OSM の階(`addr:floor` → `level`、日本の「1階」=1・地下1階=-1)を `floor` として取り込む。地下(floor<0)は、タグ「地下 B1」と、ピン右下の「B」の印、凡例の1行。**階が不明な場所は、詳細の「どこにある?」で 地上 / 地下 / 2階以上 を1タップで教えられる**(みんなの多数決。同数は不明のまま)。コンビニの追加にも階を選べる。地下道との距離で地下を推測する方法は、精度が低かったので採らなかった(地下の12件のうち当たったのは3〜7件)
+- 階の情報がある場所は、OSM で トイレ 6/40・コンビニ 34/201 件のみ(地下は 12 件)。残りは利用者に教えてもらうしかない
 - **下のシート:** 最寄りカード(1行: くま・名前と距離・「ナビ開始」)→ リスト(広がる)/ 詳細。つまみのタップ・上下スワイプで開閉。地図の何もない所をタップで詳細・リストが閉じる(追加中は無効)
 - **フッター:** リスト(押すと開閉)・＋追加・設定。「地図」タブは無い(リストを閉じれば地図)
 - **上部:** ブランド名、地図の色の切り替え(重なった四角)、現在地(◎)、絞り込みチップ(横スクロール)
@@ -49,7 +52,8 @@
 - **名前のないトイレ:** 「トイレ(○○ 付近)」(近くの施設・通りの名前)。26 件中 20 件が名前なし、16 件に目印が付く
 
 ## 3. ファイル構成
-- `index.html`(スクリプトは順に読み込み: firebase-config, data/toilets.js, geo, hours, icons, bear, cloud, map, settings, ui, add, main)
+- `index.html`(スクリプトは順に読み込み: firebase-config, data/toilets.js, geo, hours, icons, bear, cloud, map, settings, **i18n, i18n-en**, ui, add, main)
+- `js/i18n.js` 英語表示の仕組み(辞書で日本語→英語、数字は {n} で差し込み、`translate="no"` の部分は触らない)/ `js/i18n-en.js` 辞書(**自動生成**: `tools/i18n-build-dict.js`)/ `privacy.en.html`
 - `js/geo.js` 距離・整形・ブランド/貸し出しの名前、`PACE`(徒歩速度)/ `hours.js` 営業時間の判定 / `icons.js` 細線アイコンと星 / `bear.js` くまトイ SVG(4表情・ゆれ・まばたき)/ `cloud.js` 保存(Firestore か localStorage)/ `map.js` 状態 `st`・地図・ピン・現在地・絞り込み(`passes`/`usable`/`convMode`)/ `settings.js` 設定画面 / `ui.js` シート・詳細・フッター・チップ・凡例・案内 / `add.js` 追加 / `main.js` 起動
 - `css/style.css` 全部(CSS 変数 → ダーク。ダークは `@media` と `html[data-theme=dark]` の2か所に同じ規則がある。設定追加時に `data-theme` 版も忘れない)
 - `data/toilets.js` 生成物(§4)/ `privacy.html` / `manifest.webmanifest` / アイコン `icon-192/512.png`・`apple-touch-icon.png`(`node tools/make-icons.js` で bear.js から生成)
@@ -57,6 +61,7 @@
 - `tools/`: `stamp.js`、`to-js.js`、`make-icons.js`、`shot.js`、`test-*.js`
 
 ## 4. データ(パイプラインは `../sapporo-loo-map/` にある)
+- **階と英語名:** `build-data.js` の `floorFrom()` が `addr:floor`/`level`/`location=underground` から `floor` を作る。`name_en` は OSM の `name:en`(コンビニはほぼ全件あり。トイレは 4/12 件)。名前のないトイレの目印(`area`)は日本語のみ
 - 取得(OSM / Overpass、範囲 `43.046,141.335,43.078,141.364`(すすきの〜札幌駅。`../sapporo-loo-map/tools/fetch-osm.js` で取得)): トイレ `amenity=toilets` → `data/osm-raw.json`、コンビニ `shop=convenience` → `data/osm-conv-raw.json`。**User-Agent 必須(無いと 406)。502/429 が出るので、サーバーを替えて再試行**
 - 名前なしトイレの目印: `tools/fetch-areas.js` → `data/areas.json`。手入力: `data/manual.json`
 - `node tools/build-data.js`(`../sapporo-loo-map`)→ `data/toilets.json` → このリポジトリで `node tools/to-js.js` → `data/toilets.js`(`<script>` で読むので `index.html` を直接開いても動く)
@@ -68,12 +73,14 @@
 - くまトイ: 丸い体 + 頭の寝ぐせ風の毛(向きと長さがばらばらな3本)+ クリーム色のお腹。**お腹のトイレマークは不要(消した)**。卵型からすらっとした形に変えたこともあるが、丸いほうに戻した
 
 ## 6. 保存先(Firebase playground)
+- `loo-reports` の kind: `clean`/`crowded`/`closed`/`missing`(状態。文書 ID `<toiletId>_<uid>`)、`loan-yes`/`loan-ask`/`loan-no`(貸し出し。同上)、`lv-gr`/`lv-ug`/`lv-up`(どの階?。文書 ID `<toiletId>_lv_<uid>`。状態の報告と別の文書なので、両方出せる)
 - PaP と同じ `playground-d8897`。コレクション `loo-toilets`(追加されたトイレ。項目: name,lat,lng,fee,wheelchair,floor,ease,find,type,brand,loan,note,uid,createdAt)と `loo-reports`(一言報告。ID=`<toiletId>_<uid>`、kind: clean/crowded/closed/loan-yes/loan-ask/loan-no)。匿名ログインで書く。読むのは誰でも、削除・取り消しは本人だけ。他のアプリと衝突しないよう `loo-` を付けている
 - **ルールの足し方:** Firebase コンソール → Firestore → ルール →「`documents` の中」に `firestore.playground-snippet.rules` の match 2つを足して公開。**他のアプリのルールが入っているなら完全版は貼らない**(消える)。匿名ログインの有効化と承認済みドメイン `ma-ookami.github.io` も確認
 - ルール: `loo-toilets` の ID は英数字 20 文字だけ許可(ID を使った XSS 対策)。**ルールを変えたので、コンソールに貼り直す**
 - 荒らし対策: ルールで項目・長さ・ID の形式・座標(すすきの〜札幌駅、緯度 43.03〜43.09・経度 141.32〜141.38。画面の `AREA`/`inArea` と同じ)を制限。**投稿の間隔(30 秒に1件・24時間に10件)はルールが見張る**: `loo-users/{uid}`(lastAt,n,windowStart,lastId)をトイレ追加と同じバッチで更新し、`loo-toilets` の create が `getAfter` で照合(`cloud.add`)。画面側にも同じ制限と、20m 以内の重複確認。**「ここにはなかった」(kind: missing)が 3 人(`MISS_N`)集まった追加情報は、薄く表示して最寄り・リストから外す(消さない)**。App Check・通報は未実装
 
 ## 7. 開発・確認
+- 追加のテスト: `test-floor`(地下の表示・階の報告)/ `test-i18n`(英語: 端末の言語で初期表示、主な画面に日本語が残っていない、言語の切り替え。写真 `tools/shot-en-*.png` も撮る)。**どのテストも、端末の言語を日本語にして動かす(`locale: 'ja-JP'`)。** 英語の端末だと自動で英語になるため
 - 動かす: `index.html` を直接開く(`file://` では位置情報は取れない。公開 URL か localhost で)
 - テスト: `node tools/test-xxx.js`。playwright-core は `../taskline/node_modules` を借りる。Edge(`C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`)を GPU 無しで動かすため **1本が 1〜5 分かかる**。バックグラウンドで実行して完了を待つ。**Edge を全部終了させるコマンドは使わない**(ユーザーのブラウザが落ちる)
   - `test-legend`(凡例の開閉)/ `test-doubt`(ここにはなかった・範囲)/ `test-route`(ここへ行く・ナビ開始の確認)/ `test-add`(絞り込み・リスト・追加・詳細・報告・削除)/ `test-conv` / `test-loan`(コンビニの取り込みと貸し出し報告)/ `test-convmode`(コンビニ探し)/ `test-settings` / `test-filters`(種類の切替・2段目、速い)/ `test-guide` / `test-hours`(営業時間・単体)/ `test-dark` / `test-lang` / `test-mapcolor` / `test-style-switch`(スタイル入れ替え後も日本語のみ)/ `test-mapclose` / `test-locate`
@@ -81,6 +88,9 @@
 - 各テストは `localStorage` の `loo-guide` を立てて案内を飛ばし、`?local=1` でローカルモードにする
 
 ## 8. はまりどころ(同じ失敗をしないように)
+- **画面の文言を足す・変えるとき(英語表示):** 日本語で書けば、画面に出るときに辞書で英語になる。辞書に無い文言は日本語のまま出る。**(1)** `node tools/i18n-capture.js`(英語で画面をひととおり操作して、辞書に無い文言を `tools/_missing.json` に書く。数分かかる)**(2)** `tools/i18n-build-dict.js` に `D('日本語の先頭', '英語')` を足して `node tools/i18n-build-dict.js` で `js/i18n-en.js` を作り直す(キーは `_keys.json`/`_missing.json`/`_strings.json` に実在するものだけ。一覧に無い新しい文言は `ADD`)**(3)** `node tools/test-i18n.js` で、日本語が残っていないか確認
+- **場所の名前・メモなど利用者やデータの文字には `translate="no"` を付ける**(辞書で訳さない。付け忘れると、たまたま辞書と同じ文字の名前が英語になる)。名前を文章に埋め込むときは `I18N.t('…{name}…',{name})`(辞書のキーは、その文字列のまま)。場所の名前は `nameOf(t)`(英語のときは `name_en`)を使う
+- 辞書の英語では、数字を `{n}`(順番どおり)か `{1}` `{2}`(順番を入れ替え)で戻す。数字が文の中に混ざる文言は、数字の部分が `{n}` になって辞書を引かれる
 - **地図スタイルの入れ替えは `reloadStyle()`(`setStyle(url,{diff:false})`)。** 差分更新だと `style.load` が来ず `tidyStyle` が動かず、日英併記・店アイコン・標識が戻る
 - **MapLibre のマーカー外側の要素に CSS の `transform` を付けない**(位置指定に使われる)。動きは内側の `.pi` に付ける
 - **`index.html` の `?v=` スタンプ:** `node tools/stamp.js` が各ファイルのハッシュを付ける。`.git/hooks/pre-commit` で自動実行(**フックは git に入らない**。別 PC は `node tools/stamp.js && git add index.html` を置く)。パッチで `<script src="js/ui.js"></script>` のように完全一致で探すと外れる(先頭だけで探す)

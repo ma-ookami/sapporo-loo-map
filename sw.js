@@ -6,7 +6,7 @@
 const VER = 'loo-sw-1';
 const APP = VER + '-app', LIB = VER + '-lib', MAP = VER + '-map';
 const MAP_LIMIT = 600;
-const CORE = ['./', 'index.html', 'privacy.html', 'manifest.webmanifest', 'icon-192.png', 'apple-touch-icon.png'];
+const CORE = ['./', 'index.html', 'privacy.html', 'privacy.en.html', 'manifest.webmanifest', 'icon-192.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(APP).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

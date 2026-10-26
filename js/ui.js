@@ -43,11 +43,11 @@ function renderSheet(){
     if (far) h+=`<div class="bubble"><span>ちょっと遠いよ。まずはすすきの周辺だけ載ってるよ</span><button class="sub small" id="gosus">すすきのへ</button></div>`;
     const t=nearest.t;
     h+=`<div class="near">${bearSvg(40,far?'worried':'normal')}<div class="ntext"><div class="eyebrow">${convMode()?'いちばん近いコンビニ':'いちばん近いトイレ'}</div>
-      <button class="nhead" id="nhead" data-id="${esc(t.id)}"><div class="nname">${esc(nameOf(t))}</div>
+      <button class="nhead" id="nhead" data-id="${esc(t.id)}"><div class="nname" translate="no">${esc(nameOf(t))}</div>
       <div class="nmeta">${fmtDist(nearest.d)}<i>徒歩${walkMin(nearest.d)}分</i>${t.type==='conv'?`<i class="lo lo-${loanOf(t)}">${loanLabel(loanOf(t))}</i>`:''}</div></button></div>
       <button class="cta mini${far?' far':''}" id="nbtn">ナビ開始${icon('arrow',16)}</button></div>`;
   }
-  if (st.open) h+='<div class="sech"><span class="sec">近い順</span><button class="x" id="lx" aria-label="リストを閉じる">'+icon('close',16)+'</button></div><div class="list">'+st.sorted.slice(0,30).map(({t,d})=>`<button class="row" data-id="${esc(t.id)}"><span class="ri${t.type==='conv'?' conv':''}${t.source==='user'?' user':''}">${icon(t.type==='conv'?'store':'wc',20)}</span><span class="rn"><b>${esc(nameOf(t))}</b><span class="tags">${tagsOf(t)}</span></span><span class="rd">${fmtDist(d)}</span>${icon('chevron',16)}</button>`).join('')+'</div>';
+  if (st.open) h+='<div class="sech"><span class="sec">近い順</span><button class="x" id="lx" aria-label="リストを閉じる">'+icon('close',16)+'</button></div><div class="list">'+st.sorted.slice(0,30).map(({t,d})=>`<button class="row" data-id="${esc(t.id)}"><span class="ri${t.type==='conv'?' conv':''}${t.source==='user'?' user':''}">${icon(t.type==='conv'?'store':'wc',20)}</span><span class="rn"><b translate="no">${esc(nameOf(t))}</b><span class="tags">${tagsOf(t)}</span></span><span class="rd">${fmtDist(d)}</span>${icon('chevron',16)}</button>`).join('')+'</div>';
   body.innerHTML=h; body.style.animation='none'; void body.offsetWidth; body.style.animation='';
   const gs=$('gosus'); if (gs) gs.onclick=()=>{ buzz(); map.flyTo({center:[SUSUKINO.lng,SUSUKINO.lat],zoom:15.5}); };
   const lx=$('lx'); if (lx) lx.onclick=()=>setTab('map');
@@ -69,10 +69,10 @@ function floorBlock(t){
 }
 function renderDetail(body,t){
   const d=distanceM(origin(),t), {c,mine:mine0}=reportCounts(t.id), lc=loanCounts(t.id), mine=(st.reports.find(r=>r.toiletId===t.id&&r.mine&&!r.kind.startsWith('lv-'))||{}).kind||mine0;
-  body.innerHTML=`<div class="dhead"><div class="av">${bearSvg(36)}</div><div><h2>${esc(nameOf(t))}</h2>
+  body.innerHTML=`<div class="dhead"><div class="av">${bearSvg(36)}</div><div><h2 translate="no">${esc(nameOf(t))}</h2>
     <div class="d">${fmtDist(d)}・徒歩${walkMin(d)}分</div></div><button class="x" id="dx" aria-label="閉じる">${icon('close',16)}</button></div>
     <div class="tags">${tagsOf(t)}${t.source==='user'?'<span class="tag user">追加された情報</span>':''}${doubted(t)?'<span class="tag loan-no">「なかった」の報告があります</span>':''}</div>
-    ${t.note?`<div class="note">${esc(t.note)}</div>`:''}
+    ${t.note?`<div class="note" translate="no">${esc(t.note)}</div>`:''}
     ${floorBlock(t)}
     ${(t.ease||t.find)?`<div class="rate">${t.ease?`<div><span>使いやすさ</span><span>${starsRow(t.ease)}</span></div>`:''}${t.find?`<div><span>場所のわかりやすさ</span><span>${starsRow(t.find)}</span></div>`:''}</div>`:''}
     ${t.type==='conv'
@@ -102,7 +102,7 @@ function renderDetail(body,t){
 
 // 外のアプリ(Google マップ)を開く前に確認する。キャンセルすれば、そのまま
 function goRoute(t){
-  if (!confirm('Google マップを開いて、「'+nameOf(t)+'」までの徒歩ルートを表示します。よろしいですか?')) return;
+  if (!confirm(I18N.t('Google マップを開いて、「{name}」までの徒歩ルートを表示します。よろしいですか?',{name:nameOf(t)}))) return;
   window.open(routeUrl(t),'_blank','noopener');
 }
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.textContent=msg; d.style.bottom=(innerHeight-$('sheet').getBoundingClientRect().top+12)+'px'; document.body.appendChild(d); setTimeout(()=>d.remove(),Math.max(2200,msg.length*90)); }

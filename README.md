@@ -24,7 +24,7 @@
 - **下のシート:** 最寄りカード(1行: くま・名前と距離・「ナビ開始」)→ リスト(広がる)/ 詳細。つまみのタップ・上下スワイプで開閉。地図の何もない所をタップで詳細・リストが閉じる(追加中は無効)
 - **フッター:** リスト(押すと開閉)・＋追加・設定。「地図」タブは無い(リストを閉じれば地図)
 - **上部:** ブランド名、地図の色の切り替え(重なった四角)、現在地(◎)、絞り込みチップ(横スクロール)
-- **左下:** 凡例(4行・小さく半透明で常時表示。トイレ=データ/ユーザー追加、コンビニ=借りられる/借りられない)。下のシートに追従、リスト表示中・追加中は隠す
+- **左下:** 凡例(4行・小さく半透明。幅 600px 以上は常時表示、スマホは「凡例」ボタンで開閉。トイレ=データ/ユーザー追加、コンビニ=借りられる/借りられない)。下のシートに追従、リスト表示中・追加中は隠す
 - **絞り込み**(`st.filters`): 上段=種類の切替(すべて / トイレ / コンビニ。`tonly`/`conly`)+「いま空いてる」。2段目は種類に応じて出る: トイレ=無料・車いす・24時間 / コンビニ=借りられる(`conv`)・ブランド(セブン/ファミマ/ローソン/セーコマ)。種類を替えると、前の種類専用の絞り込みは外れる(`syncFilterUi` in settings.js)。初期は「すべて」
   - **コンビニ探しのモード**(コンビニ選択中 / ブランド選択中): 最寄りが「いちばん近いコンビニ」。借りられるか不明・借りられないの店も最寄り/リストに出し、引いた地図(zoom<15)でも不明の店を出す
   - 設定の「画面に出す絞り込みボタン」は廃止(`chips` 設定も無し)
@@ -65,7 +65,7 @@
 ## 7. 開発・確認
 - 動かす: `index.html` を直接開く(`file://` では位置情報は取れない。公開 URL か localhost で)
 - テスト: `node tools/test-xxx.js`。playwright-core は `../taskline/node_modules` を借りる。Edge(`C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`)を GPU 無しで動かすため **1本が 1〜5 分かかる**。バックグラウンドで実行して完了を待つ。**Edge を全部終了させるコマンドは使わない**(ユーザーのブラウザが落ちる)
-  - `test-add`(絞り込み・リスト・追加・詳細・報告・削除)/ `test-conv` / `test-loan`(コンビニの取り込みと貸し出し報告)/ `test-convmode`(コンビニ探し)/ `test-settings` / `test-filters`(種類の切替・2段目、速い)/ `test-guide` / `test-hours`(営業時間・単体)/ `test-dark` / `test-lang` / `test-mapcolor` / `test-style-switch`(スタイル入れ替え後も日本語のみ)/ `test-mapclose` / `test-locate`
+  - `test-legend`(凡例の開閉)/ `test-add`(絞り込み・リスト・追加・詳細・報告・削除)/ `test-conv` / `test-loan`(コンビニの取り込みと貸し出し報告)/ `test-convmode`(コンビニ探し)/ `test-settings` / `test-filters`(種類の切替・2段目、速い)/ `test-guide` / `test-hours`(営業時間・単体)/ `test-dark` / `test-lang` / `test-mapcolor` / `test-style-switch`(スタイル入れ替え後も日本語のみ)/ `test-mapclose` / `test-locate`
   - 見た目の確認: `node tools/shot.js out.png`。画像は確認後に消す
 - 各テストは `localStorage` の `loo-guide` を立てて案内を飛ばし、`?local=1` でローカルモードにする
 

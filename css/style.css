@@ -327,8 +327,12 @@ body.adding #sheet{max-height:86vh}
 .lm .pin{width:22px;height:22px;cursor:default}
 .lm .pi{animation:none;width:22px;height:22px}
 .lm .pin.near .pi::after{animation:none;opacity:.5}
-#sheet.open ~ #legend{display:none}
-body.adding #legend{display:none}
+.legend-btn{position:fixed;left:12px;bottom:200px;z-index:3;display:flex;align-items:center;gap:5px;padding:8px 13px 8px 10px;border-radius:20px;font-size:13px;font-weight:700;background:var(--glass);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);box-shadow:var(--shadow);color:var(--ink)}
+.legend-btn .ic{color:var(--sub)}
+#legend:not(.on){display:none}
+@media (min-width:600px){#legend:not(.on){display:block}.legend-btn{display:none}}
+#sheet.open ~ .legend-btn,#sheet.open ~ #legend{display:none}
+body.adding .legend-btn,body.adding #legend{display:none}
 
 /* 最寄りのカード: 1行にまとめる(スマホで大きすぎないように) */
 .near{display:flex;align-items:center;gap:10px}

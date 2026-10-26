@@ -139,12 +139,16 @@ const LEGEND_ROWS=[
 function legendHtml(){
   return LEGEND_ROWS.map(r=>'<div class="lrow2"><span class="lm">'+(r[1]?'<div class="'+r[0]+'"><div class="pi">'+icon(r[1],13)+'</div></div>':'<div class="'+r[0]+'"></div>')+'</span><span>'+r[2]+'</span></div>').join('');
 }
+const WIDE=()=>matchMedia('(min-width:600px)').matches;   // 広い画面(PC・タブレット)は凡例を出しっぱなし、スマホはボタンで開く
 function placeLegend(){
   const lg=$('legend'); if (!lg) return;
-  lg.style.bottom=Math.round(innerHeight-$('sheet').getBoundingClientRect().top+10)+'px';
+  lg.style.bottom=Math.round(innerHeight-$('sheet').getBoundingClientRect().top+10+(WIDE()?0:44))+'px';
+  $('legendBtn').style.bottom=Math.round(innerHeight-$('sheet').getBoundingClientRect().top+10)+'px';
 }
 function initLegend(){
   $('legend').innerHTML=legendHtml();
+  $('legendBtn').innerHTML=icon('info',18)+'<span>凡例</span>';
+  $('legendBtn').onclick=()=>{ buzz(); $('legend').classList.toggle('on'); };
   if (window.ResizeObserver) new ResizeObserver(placeLegend).observe($('sheet'));
   addEventListener('resize',placeLegend);
   placeLegend();

@@ -309,3 +309,25 @@ body.adding #sheet{max-height:86vh}
 .grow:last-of-type{border:0}
 #filters [hidden]{display:none}
 #filters[hidden]{display:none}
+
+/* ユーザーが追加したトイレは紫(データのトイレは青赤)。コンビニは右上に紫の点 */
+:root{--user:#7c4dd8}
+.pin.user:not(.conv) .pi{background:var(--user)}
+.pin.user.sel:not(.conv) .pi{background:var(--ink)}
+.pin.user.conv .pi::before{content:"";position:absolute;top:-4px;right:-4px;width:12px;height:12px;border-radius:50%;background:var(--user);border:2px solid #fff;z-index:1}
+.ri.user:not(.conv){background:var(--user);color:#fff}
+.tag.user{background:rgba(124,77,216,.14);color:var(--user)}
+
+/* 凡例 */
+.legend-btn{position:fixed;left:12px;bottom:200px;z-index:3;display:flex;align-items:center;gap:5px;padding:8px 13px 8px 10px;border-radius:20px;font-size:13px;font-weight:700;background:var(--glass);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);box-shadow:var(--shadow);color:var(--ink)}
+.legend-btn .ic{color:var(--sub)}
+#legend{position:fixed;left:12px;bottom:250px;z-index:3;width:min(310px,calc(100vw - 24px));overflow:auto;padding:12px 14px 10px;border-radius:20px;background:var(--glass);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);box-shadow:var(--shadow);animation:up .2s ease both}
+#legend[hidden]{display:none}
+.lhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:14px}
+.lrow2{display:flex;align-items:center;gap:12px;padding:3px 0;font-size:12.5px;font-weight:600}
+.lm{width:42px;display:flex;justify-content:center;flex:none}
+.lm .pin{width:30px;height:30px;cursor:default}
+.lm .pi{animation:none;width:30px;height:30px}
+.lm .pin.near .pi::after{animation:none;opacity:.5}
+#sheet.open ~ .legend-btn,#sheet.open ~ #legend{display:none}
+body.adding .legend-btn,body.adding #legend{display:none}

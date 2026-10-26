@@ -47,12 +47,13 @@ function renderSheet(){
       <div class="nmeta">${fmtDist(nearest.d)}<i>徒歩${walkMin(nearest.d)}分</i>${t.type==='conv'?`<i class="lo lo-${loanOf(t)}">${loanLabel(loanOf(t))}</i>`:''}</div></div></button></div></div>
       <button class="cta${far?' far':''}" id="nbtn">ナビを開始${icon('arrow',20)}</button>`;
   }
-  if (st.open) h+='<div class="sech"><span class="sec">近い順</span><button class="x" id="lx" aria-label="リストを閉じる">'+icon('close',16)+'</button></div><div class="list">'+st.sorted.slice(0,30).map(({t,d})=>`<button class="row" data-id="${t.id}"><span class="ri${t.type==='conv'?' conv':''}">${icon(t.type==='conv'?'store':'wc',20)}</span><span class="rn"><b>${esc(nameOf(t))}</b><span class="tags">${tagsOf(t)}</span></span><span class="rd">${fmtDist(d)}</span>${icon('chevron',16)}</button>`).join('')+'</div>';
+  if (st.open) h+='<div class="sech"><span class="sec">近い順</span><button class="x" id="lx" aria-label="リストを閉じる">'+icon('close',16)+'</button></div><div class="list">'+st.sorted.slice(0,30).map(({t,d})=>`<button class="row" data-id="${t.id}"><span class="ri${t.type==='conv'?' conv':''}${t.source==='user'?' user':''}">${icon(t.type==='conv'?'store':'wc',20)}</span><span class="rn"><b>${esc(nameOf(t))}</b><span class="tags">${tagsOf(t)}</span></span><span class="rd">${fmtDist(d)}</span>${icon('chevron',16)}</button>`).join('')+'</div>';
   body.innerHTML=h; body.style.animation='none'; void body.offsetWidth; body.style.animation='';
   const gs=$('gosus'); if (gs) gs.onclick=()=>{ buzz(); map.flyTo({center:[SUSUKINO.lng,SUSUKINO.lat],zoom:15.5}); };
   const lx=$('lx'); if (lx) lx.onclick=()=>setTab('map');
   const nb=$('nbtn'); if (nb) nb.onclick=()=>{ buzz(); window.open(routeUrl(nearest.t),'_blank','noopener'); };
   body.querySelectorAll('.row,#nhead').forEach(r=>r.onclick=()=>focus(r.dataset.id));
+  placeLegend();
 }
 
 function renderDetail(body,t){
@@ -71,6 +72,7 @@ function renderDetail(body,t){
     <div class="care">${icon('info',16)}<span>${t.type==='conv'?'お店のご厚意で借りるトイレです。できればお買い物を。混んでいるときは遠慮して、きれいに使いましょう。お客さん専用のお店もあります。':'ビルやお店のトイレは、お客さん専用のこともあります。使えなかったときは、無理せず別の場所へ。'}</span></div>
     <a class="cta" href="${routeUrl(t)}" target="_blank" rel="noopener">ここへ行く${icon('arrow',20)}</a>
     ${t.mine?'<button class="del" id="del">この情報を削除</button>':''}`;
+  placeLegend();
   $('dx').onclick=unselect;
   body.querySelectorAll('.reps button,.lq button').forEach(b=>b.onclick=async()=>{
     buzz(); const k=b.dataset.k;
@@ -85,6 +87,7 @@ function initUi(){
   document.querySelectorAll('#tabs [data-t]').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
   $('tabadd').onclick=startAdd;
   $('brand').innerHTML=bearSvg(30)+'札幌トイレマップ'; $('here').innerHTML=icon('locate',22); $('layers').innerHTML=icon('layers',22); $('layers').onclick=()=>{ buzz(); setSetting('mapColor',st.settings.mapColor==='color'?'simple':'color'); toast(st.settings.mapColor==='color'?'地図: カラー':'地図: シンプル'); if(!$('settings').hidden) renderSettings(); };
+  initLegend();
   $('info').innerHTML=icon('gear',22); $('info').onclick=()=>showSettings();
   $('ic-map').innerHTML=icon('map',23); $('ic-list').innerHTML=icon('list',23); $('ic-add').innerHTML=icon('plus',28);
   document.querySelectorAll('#filters [data-f]').forEach(b=>b.onclick=()=>{
@@ -114,4 +117,37 @@ function showGuide(){
     <p class="gfoot">地図とトイレ・コンビニの位置は © OpenStreetMap contributors のデータです。現在地は端末の中だけで使い、送りません。<a href="privacy.html" target="_blank" rel="noopener">くわしく</a></p>
     <button class="cta" id="gok">わかった</button></div>`;
   g.hidden=false; $('gok').onclick=()=>{ g.hidden=true; try{ localStorage.setItem('loo-guide','1'); }catch(e){} };
+}
+
+// ---- 凡例(左下)。下のシートの上に並べて、シートが伸び縮みしても重ならないよう追従する ----
+const LEGEND_ROWS=[
+  ['pin','wc','トイレ(データから)'],
+  ['pin user','wc','ユーザーが追加したトイレ'],
+  ['pin conv loan-yes','store','コンビニ: 借りられる'],
+  ['pin conv loan-ask','store','コンビニ: 声をかけて借りる'],
+  ['pin conv loan-no','store','コンビニ: 借りられない'],
+  ['pin conv loan-null','store','コンビニ: 借りられるか不明'],
+  ['pin conv user loan-null','store','ユーザーが追加したコンビニ(紫の点)'],
+  ['pin near','wc','いちばん近い場所(まわりに輪)'],
+  ['pin sel','wc','選んでいる場所(黒)'],
+  ['herem lg','','いまいる場所']
+];
+function legendHtml(){
+  return '<div class="lhead"><b>凡例</b><button class="x" id="lgx" aria-label="閉じる">'+icon('close',16)+'</button></div>'
+    +LEGEND_ROWS.map(r=>'<div class="lrow2"><span class="lm">'+(r[1]?'<div class="'+r[0]+'"><div class="pi">'+icon(r[1],18)+'</div></div>':'<div class="'+r[0]+'"></div>')+'</span><span>'+r[2]+'</span></div>').join('');
+}
+function placeLegend(){
+  const b=$('legendBtn'); if (!b) return;
+  const top=$('sheet').getBoundingClientRect().top;
+  b.style.bottom=Math.round(innerHeight-top+10)+'px';
+  const lg=$('legend');
+  lg.style.bottom=Math.round(innerHeight-top+10+44)+'px';
+  lg.style.maxHeight=Math.max(160,Math.round(top-190))+'px';
+}
+function initLegend(){
+  $('legendBtn').innerHTML=icon('info',18)+'<span>凡例</span>';
+  $('legendBtn').onclick=()=>{ buzz(); const lg=$('legend'); if (lg.hidden){ lg.innerHTML=legendHtml(); lg.hidden=false; $('lgx').onclick=()=>{ lg.hidden=true; }; placeLegend(); } else lg.hidden=true; };
+  if (window.ResizeObserver) new ResizeObserver(placeLegend).observe($('sheet'));
+  addEventListener('resize',placeLegend);
+  placeLegend();
 }

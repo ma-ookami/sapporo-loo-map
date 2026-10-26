@@ -66,7 +66,7 @@ function syncMarkers(){
   for (const [id,m] of markers) if (!ids.has(id)){ m.remove(); markers.delete(id); }
   for (const t of st.toilets){
     if (markers.has(t.id)) continue;
-    const e=document.createElement('div'); e.className='pin'+(t.type==='conv'?' conv loan-'+(loanOf(t)||'null'):''); e.innerHTML='<div class="pi">'+icon(t.type==='conv'?'store':'wc',18)+'</div>';
+    const e=document.createElement('div'); e.className='pin'+(t.type==='conv'?' conv loan-'+(loanOf(t)||'null'):'')+(t.source==='user'?' user':''); e.innerHTML='<div class="pi">'+icon(t.type==='conv'?'store':'wc',18)+'</div>';
     e.onclick=ev=>{ ev.stopPropagation(); if(!st.adding) focus(t.id); };
     markers.set(t.id,new maplibregl.Marker({element:e,anchor:'center'}).setLngLat([t.lng,t.lat]).addTo(map));
   }

@@ -77,10 +77,23 @@ function showForm(loc,keep){
     } else if (!name){ toast('名前か場所を入れてね'); return; }
     const t=conv?{name,lat:loc.lat,lng:loc.lng,fee:null,wheelchair:null,floor:null,ease:f.ease,find:f.find,type:'conv',brand:f.brand,loan:f.loan,note:f.note.trim()}
       :{name,lat:loc.lat,lng:loc.lng,fee:f.fee,wheelchair:f.wheelchair,floor:f.floor,ease:f.ease,find:f.find,type:'toilet',brand:null,loan:null,note:f.note.trim()};
-    try{ await cloud.add(t); toast('登録しました。ありがとう!'); endAdd(); }
+    const lim=postLimit(); if (lim){ toast(lim); return; }
+    const dup=st.toilets.filter(x=>x.type===t.type&&(t.type==='toilet'||x.brand===t.brand)).map(x=>({x,d:distanceM(loc,x)})).sort((a,b)=>a.d-b.d)[0];
+    if (dup&&dup.d<=20&&!confirm('すぐ近く('+Math.round(dup.d)+'m)に「'+nameOf(dup.x)+'」が登録されています。それでも登録しますか?')) return;
+    try{ await cloud.add(t); markPosted(); toast('登録しました。ありがとう!'); endAdd(); }
     catch(e){ toast('登録できませんでした'); }
   };
 }
+// 連続投稿の制限(この端末だけの簡易なもの。荒らし対策の本体は firestore.rules)
+const POST_KEY='loo-postlog', POST_GAP=30000, POST_DAY=10;
+function postLog(){ try{ return JSON.parse(localStorage.getItem(POST_KEY)||'[]').filter(x=>Date.now()-x<86400000); }catch(e){ return []; } }
+function postLimit(){
+  const a=postLog(); if (!a.length) return null;
+  if (Date.now()-a[a.length-1]<POST_GAP) return 'すこし間をあけてから、もう一度登録してね';
+  if (a.length>=POST_DAY) return '今日はたくさん登録してくれてありがとう。続きはまた明日お願いします';
+  return null;
+}
+function markPosted(){ try{ const a=postLog(); a.push(Date.now()); localStorage.setItem(POST_KEY,JSON.stringify(a)); }catch(e){} }
 function endAdd(){
   st.adding=false; document.body.classList.remove('adding'); $('cross').hidden=true;
   map.setPadding({top:0,left:0,right:0,bottom:0}); renderSheet();

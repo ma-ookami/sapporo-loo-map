@@ -1,8 +1,8 @@
-# 札幌トイレマップ(Web 版)— 引き継ぎ README
+# 札幌トイレ・コンビニマップ(Web 版)— 引き継ぎ README
 
 すすきの周辺の **トイレとコンビニ** を地図で探す PWA(スマホ向け)。マスコットはヒグマの「くまトイ」。
 ビルドなし(HTML + CSS + JS)、GitHub Pages 向け。リポジトリ: `ma-ookami/sapporo-loo-map`(`main`)。
-英語名 Sapporo Loo Map / 日本語名 札幌トイレマップ。iOS ネイティブ版(Expo)は `../sapporo-loo-map`(下の「Expo 版」)。
+英語名 Sapporo Loo Map / 日本語名 札幌トイレ・コンビニマップ。iOS ネイティブ版(Expo)は `../sapporo-loo-map`(下の「Expo 版」)。
 
 ## 0. いまの状態(最初に読む)
 - **Git:** `origin/main` は `2b98526`。手元の `main` は **12 コミット先行(未 push)**、先頭は `c54494c`。**push はユーザーが「送って」と言ったときだけ**。

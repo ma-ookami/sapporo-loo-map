@@ -81,12 +81,12 @@ function renderDetail(body,t){
   const dl=$('del'); if(dl) dl.onclick=async()=>{ if(!confirm('削除しますか?')) return; try{ await cloud.remove(t.id); st.sel=null; renderSheet(); padMap(); }catch(e){ toast('削除できませんでした'); } };
 }
 
-function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.textContent=msg; document.body.appendChild(d); setTimeout(()=>d.remove(),2200); }
+function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.textContent=msg; d.style.bottom=(innerHeight-$('sheet').getBoundingClientRect().top+12)+'px'; document.body.appendChild(d); setTimeout(()=>d.remove(),2200); }
 
 function initUi(){
   document.querySelectorAll('#tabs [data-t]').forEach(b=>b.onclick=()=>setTab(b.dataset.t==='list'&&st.open&&!st.sel?'map':b.dataset.t));
   $('tabadd').onclick=startAdd;
-  $('brand').innerHTML=bearSvg(30)+'札幌トイレマップ'; $('here').innerHTML=icon('locate',22); $('layers').innerHTML=icon('layers',22); $('layers').onclick=()=>{ buzz(); setSetting('mapColor',st.settings.mapColor==='color'?'simple':'color'); toast(st.settings.mapColor==='color'?'地図: カラー':'地図: シンプル'); if(!$('settings').hidden) renderSettings(); };
+  $('brand').innerHTML=bearSvg(30)+'札幌トイレ・コンビニマップ'; $('here').innerHTML=icon('locate',22); $('layers').innerHTML=icon('layers',22); $('layers').onclick=()=>{ buzz(); setSetting('mapColor',st.settings.mapColor==='color'?'simple':'color'); toast(st.settings.mapColor==='color'?'地図: カラー':'地図: シンプル'); if(!$('settings').hidden) renderSettings(); };
   initLegend();
   $('info').onclick=()=>showSettings();
   $('ic-list').innerHTML=icon('list',23); $('ic-set').innerHTML=icon('gear',23); $('ic-add').innerHTML=icon('plus',28);

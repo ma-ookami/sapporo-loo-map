@@ -122,15 +122,9 @@ function showGuide(){
 // ---- 凡例(左下)。下のシートの上に並べて、シートが伸び縮みしても重ならないよう追従する ----
 const LEGEND_ROWS=[
   ['pin','wc','トイレ(データから)'],
-  ['pin user','wc','ユーザーが追加したトイレ'],
+  ['pin user','wc','トイレ(ユーザーが追加)'],
   ['pin conv loan-yes','store','コンビニ: 借りられる'],
-  ['pin conv loan-ask','store','コンビニ: 声をかけて借りる'],
-  ['pin conv loan-no','store','コンビニ: 借りられない'],
-  ['pin conv loan-null','store','コンビニ: 借りられるか不明'],
-  ['pin conv user loan-null','store','ユーザーが追加したコンビニ(紫の点)'],
-  ['pin near','wc','いちばん近い場所(まわりに輪)'],
-  ['pin sel','wc','選んでいる場所(黒)'],
-  ['herem lg','','いまいる場所']
+  ['pin conv loan-no','store','コンビニ: 借りられない']
 ];
 function legendHtml(){
   return '<div class="lhead"><b>凡例</b><button class="x" id="lgx" aria-label="閉じる">'+icon('close',16)+'</button></div>'

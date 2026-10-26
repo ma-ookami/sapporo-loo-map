@@ -10,7 +10,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   const sh = await rect('#sheet'), bt = await rect('#legendBtn');
   console.log('1 凡例ボタン: 左', bt.left, '| シートの上にある:', bt.bottom <= sh.top, `(ボタン下端 ${bt.bottom} / シート上端 ${sh.top})`);
   await p.click('#legendBtn'); await p.waitForTimeout(400);
-  console.log('2 凡例の行数:', await p.locator('.lrow2').count(), '| 表示:', await p.locator('#legend').isVisible());
+  console.log('2 凡例の行数(4):', await p.locator('.lrow2').count(), '| 表示:', await p.locator('#legend').isVisible());
   await p.screenshot({ path: 'tools/shot-legend.png' });
   await p.click('#lgx'); console.log('3 閉じる:', !(await p.locator('#legend').isVisible()));
   // ユーザー追加のトイレ: 紫

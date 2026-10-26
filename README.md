@@ -47,10 +47,10 @@
 - `tools/`: `stamp.js`、`to-js.js`、`make-icons.js`、`shot.js`、`test-*.js`
 
 ## 4. データ(パイプラインは `../sapporo-loo-map/` にある)
-- 取得(OSM / Overpass、範囲 `43.046,141.338,43.064,141.364`): トイレ `amenity=toilets` → `data/osm-raw.json`、コンビニ `shop=convenience` → `data/osm-conv-raw.json`。**User-Agent 必須(無いと 406)。502/429 が出るので、サーバーを替えて再試行**
+- 取得(OSM / Overpass、範囲 `43.046,141.335,43.078,141.364`(すすきの〜札幌駅。`../sapporo-loo-map/tools/fetch-osm.js` で取得)): トイレ `amenity=toilets` → `data/osm-raw.json`、コンビニ `shop=convenience` → `data/osm-conv-raw.json`。**User-Agent 必須(無いと 406)。502/429 が出るので、サーバーを替えて再試行**
 - 名前なしトイレの目印: `tools/fetch-areas.js` → `data/areas.json`。手入力: `data/manual.json`
 - `node tools/build-data.js`(`../sapporo-loo-map`)→ `data/toilets.json` → このリポジトリで `node tools/to-js.js` → `data/toilets.js`(`<script>` で読むので `index.html` を直接開いても動く)
-- 件数: トイレ 26(名前あり 6)/ コンビニ 131(ローソン 46・セブン 34・セイコマ 26・ファミマ 24・その他 1)。型は `{id,name,lat,lng,fee,wheelchair,floor,hours,note,type:'toilet'|'conv',brand,loan,area?,source}`
+- 件数: トイレ 40/ コンビニ 201。型は `{id,name,lat,lng,fee,wheelchair,floor,hours,note,type:'toilet'|'conv',brand,loan,area?,source}`
 - いずれこのパイプラインを Web 版のリポジトリに移したほうがよい(Expo 版を止めるなら)
 
 ## 5. 色・デザインの決まり(ユーザーの方針)

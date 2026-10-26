@@ -345,3 +345,4 @@ body.adding .legend-btn,body.adding #legend{display:none}
 
 /* コンビニ探しのモード: 借りられるか不明の店も、引いた地図で出す */
 .lowzoom.convmode .pin.conv.loan-null{display:block}
+.pin[hidden]{display:none!important}

@@ -73,9 +73,10 @@ function renderSettings(){
     <a class="lrow" href="https://github.com/ma-ookami/sapporo-loo-map/issues" target="_blank" rel="noopener">間違い・ご意見を送る${icon('chevron',16)}</a>
     <div class="lrow plain"><span>版</span><span class="shint" style="margin:0">${APP_VERSION}</span></div>
     <button class="lrow danger" id="sreset">この端末の設定と記録を消す</button>
+    <button class="lrow close" id="sclose">閉じる</button>
   </div></div>`;
   const nb=v.querySelector('.sbody2'); nb.scrollTop=top;
-  $('sx').onclick=hideSettings;
+  $('sx').onclick=hideSettings; $('sclose').onclick=hideSettings;   // 上の×と、親指で届く下の「閉じる」
   $('slocate').onclick=()=>{ hideSettings(); locateNow(); };
   v.onclick=e=>{ if (e.target===v) hideSettings(); };
   v.querySelectorAll('.seg[data-s] button').forEach(b=>b.onclick=()=>{ buzz(); const k=b.parentNode.dataset.s, val=b.dataset.v; setSetting(k,k==='pace'?Number(val):val); renderSettings(); });

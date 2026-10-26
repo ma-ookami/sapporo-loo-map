@@ -97,6 +97,7 @@
 - **シェルのヒアドキュメントはバックスラッシュを壊す。** 長いコードはファイルツール(Write)で書く。改行は `String.fromCharCode(10)`、正規表現のエスケープは避ける
 - **Node の `/tmp` と bash の `/tmp` は別の場所**(Node は `C:\tmp`)。一時ファイルはプロジェクト内に置くか、プロジェクト外のスクラッチパッドを使う
 - ヘッドレスでは、地図を拡大(zoom 16 以上)すると描画が数十秒かかる。テストは zoom 15.5 前後で
+- **高さに `vh` を直接使わない。** iPhone の Safari は、アドレスバーがあるあいだ `vh` が見えている高さより大きく、下に寄せたパネル(設定・シート)の上の端が画面の外に出て、閉じるボタンが押せなくなる。`js/main.js` が `--vh`(= innerHeight/100)を作るので、css では `calc(var(--vh,1vh)*92)` のように使う(`node tools/test-settings-close.js`。Edge が起動しないときは Chrome の `executablePath` に替える)
 - iOS Safari は `navigator.vibrate` 非対応(振動は Android のみ)。位置情報は https 必須、`file://` 不可
 - git の「LF will be replaced by CRLF」の警告は無害
 - `st.filters` のキーを増やすときは、`index.html` のボタン(2段目は `data-g=t|c`)と `map.js` の `st.filters`・`passes` をそろえる

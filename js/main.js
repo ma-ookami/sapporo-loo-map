@@ -1,5 +1,8 @@
 /* 起動 */
 function init(){
+  // 見えている高さ(スマホのアドレスバーの出し入れで変わる)を --vh に入れる。css の高さの指定に使う
+  const setVh=()=>document.documentElement.style.setProperty('--vh',(window.innerHeight/100)+'px');
+  setVh(); addEventListener('resize',setVh);
   I18N.start();   // 英語のときは、画面の文言を英語にする(js/i18n.js)
   st.toilets=TOILETS.slice(); resort();
   map=new maplibregl.Map({container:'map',style:mapStyle(),center:[SUSUKINO.lng,SUSUKINO.lat],zoom:15.5,

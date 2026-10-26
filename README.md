@@ -31,7 +31,7 @@ iOS ネイティブ版(Expo)は `../sapporo-loo-map`。データとマスコッ�
 ## 構成
 - 地図: MapLibre GL 4.7.1 + OpenFreeMap `positron`(淡い地図。キー不要。ラベルの整え方は sakabazu と同じ)
 - デザイン: ミニマル・フロスト(すりガラス・アクセント1色 #c4521f・細線アイコン `js/icons.js`)。色の意味は 橙=トイレ / 緑=借りられる・無料 / 橙黄=声かけ / 黒=選択中
-- マスコット `js/bear.js`(少しシュッとした縦長の体・頭のとさか風の毛(3本)・クリーム色のお腹・4表情・ゆれ/まばたき)。アイコン生成は `node tools/make-icons.js`
+- マスコット `js/bear.js`(すらっとした体(頭と細い胴を分けたシルエット)・頭のとさか風の毛(3本)・クリーム色のお腹・4表情・ゆれ/まばたき)。アイコン生成は `node tools/make-icons.js`
 - `js/settings.js` 設定 / `js/geo.js` 距離 / `icons.js` アイコン / `icons.js` アイコン / `bear.js` マスコット SVG / `cloud.js` 保存 / `map.js` 地図・ピン・現在地 / `ui.js` シート・タブ・チップ / `add.js` 追加 / `main.js` 起動
 - データ: `data/toilets.js`(`node tools/to-js.js` で `../sapporo-loo-map/data/toilets.json` から生成)。`index.html` は直接開いて確認できる
 - 確認: `node tools/test-hours.js`(営業時間の判定)/ `test-dark.js` / `test-add.js` / `node tools/test-conv.js`(ローカルモードで 絞り込み・リスト・追加・詳細・報告・削除 を通す。playwright-core は taskline のを借用)

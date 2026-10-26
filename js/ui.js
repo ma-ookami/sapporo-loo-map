@@ -51,7 +51,7 @@ function renderSheet(){
   body.innerHTML=h; body.style.animation='none'; void body.offsetWidth; body.style.animation='';
   const gs=$('gosus'); if (gs) gs.onclick=()=>{ buzz(); map.flyTo({center:[SUSUKINO.lng,SUSUKINO.lat],zoom:15.5}); };
   const lx=$('lx'); if (lx) lx.onclick=()=>setTab('map');
-  const nb=$('nbtn'); if (nb) nb.onclick=()=>{ buzz(); window.open(routeUrl(nearest.t),'_blank','noopener'); };
+  const nb=$('nbtn'); if (nb) nb.onclick=()=>{ buzz(); goRoute(nearest.t); };
   body.querySelectorAll('.row,#nhead').forEach(r=>r.onclick=()=>focus(r.dataset.id));
   placeLegend();
 }
@@ -70,7 +70,7 @@ function renderDetail(body,t){
       :`<div class="sec2">いまの様子(24時間だけ表示)</div>
     <div class="reps">${KINDS.map(([k,l])=>`<button data-k="${k}" aria-pressed="${mine===k}"><i></i>${l}${c[k]?` <b>${c[k]}</b>`:''}</button>`).join('')}</div>`}
     <div class="care">${icon('info',16)}<span>${t.type==='conv'?'お店のご厚意で借りるトイレです。できればお買い物を。混んでいるときは遠慮して、きれいに使いましょう。お客さん専用のお店もあります。':'ビルやお店のトイレは、お客さん専用のこともあります。使えなかったときは、無理せず別の場所へ。'}</span></div>
-    <a class="cta" href="${routeUrl(t)}" target="_blank" rel="noopener">ここへ行く${icon('arrow',20)}</a>
+    <a class="cta" id="go" href="${routeUrl(t)}" target="_blank" rel="noopener">ここへ行く${icon('arrow',20)}</a>
     ${t.mine?'<button class="del" id="del">この情報を削除</button>':''}`;
   placeLegend();
   $('dx').onclick=unselect;
@@ -78,9 +78,15 @@ function renderDetail(body,t){
     buzz(); const k=b.dataset.k;
     try{ await cloud.report(t.id,mine===k?null:k); }catch(e){ toast('送れませんでした'); }
   });
+  const go=$('go'); if (go) go.onclick=e=>{ e.preventDefault(); buzz(); goRoute(t); };
   const dl=$('del'); if(dl) dl.onclick=async()=>{ if(!confirm('削除しますか?')) return; try{ await cloud.remove(t.id); st.sel=null; renderSheet(); padMap(); }catch(e){ toast('削除できませんでした'); } };
 }
 
+// 外のアプリ(Google マップ)を開く前に確認する。キャンセルすれば、そのまま
+function goRoute(t){
+  if (!confirm('Google マップを開いて、「'+nameOf(t)+'」までの徒歩ルートを表示します。よろしいですか?')) return;
+  window.open(routeUrl(t),'_blank','noopener');
+}
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.textContent=msg; d.style.bottom=(innerHeight-$('sheet').getBoundingClientRect().top+12)+'px'; document.body.appendChild(d); setTimeout(()=>d.remove(),Math.max(2200,msg.length*90)); }
 
 function initUi(){

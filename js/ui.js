@@ -131,8 +131,8 @@ function showGuide(){
 
 // ---- 凡例(左下)。下のシートの上に並べて、シートが伸び縮みしても重ならないよう追従する ----
 const LEGEND_ROWS=[
-  ['pin','wc','トイレ(データから)'],
-  ['pin user','wc','トイレ(ユーザーが追加)'],
+  ['pin','wc','トイレ: 公開データ'],
+  ['pin user','wc','トイレ: ユーザ追加'],
   ['pin conv loan-yes','store','コンビニ: 借りられる'],
   ['pin conv loan-no','store','コンビニ: 借りられない']
 ];

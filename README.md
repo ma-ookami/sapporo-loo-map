@@ -61,12 +61,12 @@
 - PaP と同じ `playground-d8897`。コレクション `loo-toilets`(追加されたトイレ。項目: name,lat,lng,fee,wheelchair,floor,ease,find,type,brand,loan,note,uid,createdAt)と `loo-reports`(一言報告。ID=`<toiletId>_<uid>`、kind: clean/crowded/closed/loan-yes/loan-ask/loan-no)。匿名ログインで書く。読むのは誰でも、削除・取り消しは本人だけ。他のアプリと衝突しないよう `loo-` を付けている
 - **ルールの足し方:** Firebase コンソール → Firestore → ルール →「`documents` の中」に `firestore.playground-snippet.rules` の match 2つを足して公開。**他のアプリのルールが入っているなら完全版は貼らない**(消える)。匿名ログインの有効化と承認済みドメイン `ma-ookami.github.io` も確認
 - ルール: `loo-toilets` の ID は英数字 20 文字だけ許可(ID を使った XSS 対策)。**ルールを変えたので、コンソールに貼り直す**
-- 荒らし対策は簡易: ルールで項目・長さ・座標・ID の形式を制限。画面側(この端末だけの簡易)で、投稿は 30 秒あけて 1 日 10 件まで、20m 以内に同じ種類の登録があれば確認ダイアログ。App Check・通報は未実装
+- 荒らし対策: ルールで項目・長さ・ID の形式・座標(すすきの〜札幌駅、緯度 43.03〜43.09・経度 141.32〜141.38。画面の `AREA`/`inArea` と同じ)を制限。**投稿の間隔(30 秒に1件・24時間に10件)はルールが見張る**: `loo-users/{uid}`(lastAt,n,windowStart,lastId)をトイレ追加と同じバッチで更新し、`loo-toilets` の create が `getAfter` で照合(`cloud.add`)。画面側にも同じ制限と、20m 以内の重複確認。**「ここにはなかった」(kind: missing)が 3 人(`MISS_N`)集まった追加情報は、薄く表示して最寄り・リストから外す(消さない)**。App Check・通報は未実装
 
 ## 7. 開発・確認
 - 動かす: `index.html` を直接開く(`file://` では位置情報は取れない。公開 URL か localhost で)
 - テスト: `node tools/test-xxx.js`。playwright-core は `../taskline/node_modules` を借りる。Edge(`C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`)を GPU 無しで動かすため **1本が 1〜5 分かかる**。バックグラウンドで実行して完了を待つ。**Edge を全部終了させるコマンドは使わない**(ユーザーのブラウザが落ちる)
-  - `test-legend`(凡例の開閉)/ `test-route`(ここへ行く・ナビ開始の確認)/ `test-add`(絞り込み・リスト・追加・詳細・報告・削除)/ `test-conv` / `test-loan`(コンビニの取り込みと貸し出し報告)/ `test-convmode`(コンビニ探し)/ `test-settings` / `test-filters`(種類の切替・2段目、速い)/ `test-guide` / `test-hours`(営業時間・単体)/ `test-dark` / `test-lang` / `test-mapcolor` / `test-style-switch`(スタイル入れ替え後も日本語のみ)/ `test-mapclose` / `test-locate`
+  - `test-legend`(凡例の開閉)/ `test-doubt`(ここにはなかった・範囲)/ `test-route`(ここへ行く・ナビ開始の確認)/ `test-add`(絞り込み・リスト・追加・詳細・報告・削除)/ `test-conv` / `test-loan`(コンビニの取り込みと貸し出し報告)/ `test-convmode`(コンビニ探し)/ `test-settings` / `test-filters`(種類の切替・2段目、速い)/ `test-guide` / `test-hours`(営業時間・単体)/ `test-dark` / `test-lang` / `test-mapcolor` / `test-style-switch`(スタイル入れ替え後も日本語のみ)/ `test-mapclose` / `test-locate`
   - 見た目の確認: `node tools/shot.js out.png`。画像は確認後に消す
 - 各テストは `localStorage` の `loo-guide` を立てて案内を飛ばし、`?local=1` でローカルモードにする
 

@@ -60,7 +60,10 @@ function loanOf(t){
 }
 // 最寄り・リストに出すのは、トイレと、貸し出し〇/声かけ のコンビニだけ
 // 最寄り・リストに出すのは、トイレと、借りられる(声かけ含む)コンビニ。コンビニ探しのモードでは、コンビニはすべて
-const usable=t=>t.type!=='conv'||convMode()||st.filters.conv||(st.settings.nearConv&&['yes','ask'].includes(loanOf(t)));
+const MISS_N=3;   // 「ここにはなかった」がこの人数になった追加情報は、薄くして最寄り・リストから外す
+const missCount=id=>st.reports.filter(r=>r.toiletId===id&&r.kind==='missing').length;
+const doubted=t=>t.source==='user'&&missCount(t.id)>=MISS_N;
+const usable=t=>!doubted(t)&&(t.type!=='conv'||convMode()||st.filters.conv||(st.settings.nearConv&&['yes','ask'].includes(loanOf(t))));
 function resort(){
   const o=origin();
   st.sorted=st.toilets.filter(t=>passes(t)&&usable(t)).map(t=>({t,d:distanceM(o,t)})).sort((a,b)=>a.d-b.d);
@@ -84,6 +87,7 @@ function syncPins(){
     const e=m.getElement(), t=t2.get(id);
     e.hidden=(!passes(t)||(t.type==='conv'&&!st.settings.showUnknown&&!convMode()&&loanOf(t)===null))&&id!==st.sel;
     if (t.type==='conv'){ e.classList.remove('loan-yes','loan-ask','loan-no','loan-null'); e.classList.add('loan-'+(loanOf(t)||'null')); }
+    e.classList.toggle('doubt',doubted(t));
     e.classList.toggle('sel',id===st.sel);
     e.classList.toggle('near',id===near&&id!==st.sel);
   }

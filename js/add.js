@@ -77,11 +77,12 @@ function showForm(loc,keep){
     } else if (!name){ toast('名前か場所を入れてね'); return; }
     const t=conv?{name,lat:loc.lat,lng:loc.lng,fee:null,wheelchair:null,floor:null,ease:f.ease,find:f.find,type:'conv',brand:f.brand,loan:f.loan,note:f.note.trim()}
       :{name,lat:loc.lat,lng:loc.lng,fee:f.fee,wheelchair:f.wheelchair,floor:f.floor,ease:f.ease,find:f.find,type:'toilet',brand:null,loan:null,note:f.note.trim()};
+    if (!inArea(loc)){ toast('ここは対象のエリア(すすきの〜札幌駅)の外です'); return; }
     const lim=postLimit(); if (lim){ toast(lim); return; }
     const dup=st.toilets.filter(x=>x.type===t.type&&(t.type==='toilet'||x.brand===t.brand)).map(x=>({x,d:distanceM(loc,x)})).sort((a,b)=>a.d-b.d)[0];
     if (dup&&dup.d<=20&&!confirm('すぐ近く('+Math.round(dup.d)+'m)に「'+nameOf(dup.x)+'」が登録されています。それでも登録しますか?')) return;
     try{ await cloud.add(t); markPosted(); toast('登録しました。ありがとう!'); endAdd(); }
-    catch(e){ toast('登録できませんでした'); }
+    catch(e){ toast(e&&e.code==='permission-denied'?'登録できませんでした。間をあけるか、今日の上限(10件)かもしれません':'登録できませんでした'); }
   };
 }
 // 連続投稿の制限(この端末だけの簡易なもの。荒らし対策の本体は firestore.rules)

@@ -4,6 +4,8 @@
       allow read: if true;
       allow create: if request.auth != null
         && id.matches('[A-Za-z0-9]{20}')
+        && getAfter(/databases/$(database)/documents/loo-users/$(request.auth.uid)).data.lastId == id
+        && getAfter(/databases/$(database)/documents/loo-users/$(request.auth.uid)).data.lastAt == request.time
         && request.resource.data.keys().hasOnly(['name','lat','lng','fee','wheelchair','floor','ease','find','type','brand','loan','note','uid','createdAt'])
         && request.resource.data.keys().hasAll(['name','lat','lng','fee','wheelchair','floor','ease','find','type','brand','loan','note','uid','createdAt'])
         && (request.resource.data.ease == null || (request.resource.data.ease is int && request.resource.data.ease >= 1 && request.resource.data.ease <= 5))
@@ -13,8 +15,8 @@
         && (request.resource.data.loan == null || request.resource.data.loan in ['yes','ask','no'])
         && request.resource.data.name is string && request.resource.data.name.size() <= 40
         && request.resource.data.note is string && request.resource.data.note.size() <= 200
-        && request.resource.data.lat is number && request.resource.data.lat > 42.9 && request.resource.data.lat < 43.2
-        && request.resource.data.lng is number && request.resource.data.lng > 141.2 && request.resource.data.lng < 141.5
+        && request.resource.data.lat is number && request.resource.data.lat > 43.03 && request.resource.data.lat < 43.09
+        && request.resource.data.lng is number && request.resource.data.lng > 141.32 && request.resource.data.lng < 141.38
         && (request.resource.data.fee == null || request.resource.data.fee is bool)
         && (request.resource.data.wheelchair == null || request.resource.data.wheelchair is bool)
         && (request.resource.data.floor == null || (request.resource.data.floor is int && request.resource.data.floor >= -3 && request.resource.data.floor <= 30))
@@ -31,10 +33,35 @@
         && request.resource.data.keys().hasOnly(['toiletId','kind','uid','createdAt'])
         && request.resource.data.keys().hasAll(['toiletId','kind','uid','createdAt'])
         && request.resource.data.toiletId is string && request.resource.data.toiletId.size() <= 60
-        && request.resource.data.kind in ['clean','crowded','closed','loan-yes','loan-ask','loan-no']
+        && request.resource.data.kind in ['clean','crowded','closed','loan-yes','loan-ask','loan-no','missing']
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.createdAt == request.time
         && id == request.resource.data.toiletId + '_' + request.auth.uid;
       allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+    // 投稿の間隔と回数(1人あたり 30 秒に1件・24時間に10件)。トイレを追加するとき、同じバッチでここも更新する(lastId = 追加するトイレの ID)
+    match /loo-users/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['lastAt','n','windowStart','lastId'])
+        && request.resource.data.keys().hasAll(['lastAt','n','windowStart','lastId'])
+        && request.resource.data.lastId is string
+        && request.resource.data.lastAt == request.time
+        && request.resource.data.windowStart == request.time
+        && request.resource.data.n == 1;
+      allow update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['lastAt','n','windowStart','lastId'])
+        && request.resource.data.keys().hasAll(['lastAt','n','windowStart','lastId'])
+        && request.resource.data.lastId is string
+        && request.resource.data.lastAt == request.time
+        && request.time > resource.data.lastAt + duration.value(30, 's')
+        && (
+          (request.time < resource.data.windowStart + duration.value(24, 'h')
+            && request.resource.data.windowStart == resource.data.windowStart
+            && request.resource.data.n == resource.data.n + 1
+            && request.resource.data.n <= 10)
+          || (request.time >= resource.data.windowStart + duration.value(24, 'h')
+            && request.resource.data.windowStart == request.time
+            && request.resource.data.n == 1));
     }
     // ===== 札幌トイレマップ(loo-) ここまで =====

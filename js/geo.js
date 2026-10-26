@@ -16,3 +16,7 @@ const walkMin=m=>Math.max(1,Math.round(m/PACE));
 
 // 名前のないトイレは、近くの施設や通りの名前(area)で見分けられるようにする
 const nameOf=t=>t.name||(t.area?`トイレ(${t.area} 付近)`:'トイレ');
+
+// 投稿できる範囲(すすきの〜札幌駅。firestore.rules の座標の範囲と合わせる)
+const AREA={south:43.03,north:43.09,west:141.32,east:141.38};
+const inArea=p=>p.lat>AREA.south&&p.lat<AREA.north&&p.lng>AREA.west&&p.lng<AREA.east;

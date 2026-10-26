@@ -370,3 +370,7 @@ body.adding .legend-btn,body.adding #legend{display:none}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]) .pin.conv .ld{border-color:#2c2722}}
 :root[data-theme=dark] .pin.conv .ld{border-color:#2c2722}
 .lm .pin.conv .ld{width:9px;height:9px;top:-3px;right:-3px;border-width:1.5px}
+/* 「ここにはなかった」の報告がたまった追加情報は薄く出す */
+.pin.doubt .pi{opacity:.4;filter:grayscale(.7)}
+.miss{display:block;margin:12px auto 0;padding:7px 14px;border-radius:16px;background:var(--tint);color:var(--sub);font-size:12.5px;font-weight:600}
+.miss[aria-pressed=true]{background:var(--ink);color:var(--on-ink)}

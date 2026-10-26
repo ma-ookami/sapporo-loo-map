@@ -60,7 +60,7 @@ function renderDetail(body,t){
   const d=distanceM(origin(),t), {c,mine:mine0}=reportCounts(t.id), lc=loanCounts(t.id), mine=(st.reports.find(r=>r.toiletId===t.id&&r.mine)||{}).kind||mine0;
   body.innerHTML=`<div class="dhead"><div class="av">${bearSvg(36)}</div><div><h2>${esc(nameOf(t))}</h2>
     <div class="d">${fmtDist(d)}・徒歩${walkMin(d)}分</div></div><button class="x" id="dx" aria-label="閉じる">${icon('close',16)}</button></div>
-    <div class="tags">${tagsOf(t)}${t.source==='user'?'<span class="tag user">追加された情報</span>':''}</div>
+    <div class="tags">${tagsOf(t)}${t.source==='user'?'<span class="tag user">追加された情報</span>':''}${doubted(t)?'<span class="tag loan-no">「なかった」の報告があります</span>':''}</div>
     ${t.note?`<div class="note">${esc(t.note)}</div>`:''}
     ${(t.ease||t.find)?`<div class="rate">${t.ease?`<div><span>使いやすさ</span><span>${starsRow(t.ease)}</span></div>`:''}${t.find?`<div><span>場所のわかりやすさ</span><span>${starsRow(t.find)}</span></div>`:''}</div>`:''}
     ${t.type==='conv'
@@ -70,6 +70,7 @@ function renderDetail(body,t){
       :`<div class="sec2">いまの様子(24時間だけ表示)</div>
     <div class="reps">${KINDS.map(([k,l])=>`<button data-k="${k}" aria-pressed="${mine===k}"><i></i>${l}${c[k]?` <b>${c[k]}</b>`:''}</button>`).join('')}</div>`}
     <div class="care">${icon('info',16)}<span>${t.type==='conv'?'お店のご厚意で借りるトイレです。できればお買い物を。混んでいるときは遠慮して、きれいに使いましょう。お客さん専用のお店もあります。':'ビルやお店のトイレは、お客さん専用のこともあります。使えなかったときは、無理せず別の場所へ。'}</span></div>
+    ${t.source==='user'&&!t.mine?`<button class="miss" id="miss" aria-pressed="${mine==='missing'}">${mine==='missing'?'「ここにはなかった」と報告済み(押すと取り消し)':'ここには、なかった'}</button>`:''}
     <a class="cta" id="go" href="${routeUrl(t)}" target="_blank" rel="noopener">ここへ行く${icon('arrow',20)}</a>
     ${t.mine?'<button class="del" id="del">この情報を削除</button>':''}`;
   placeLegend();
@@ -78,6 +79,7 @@ function renderDetail(body,t){
     buzz(); const k=b.dataset.k;
     try{ await cloud.report(t.id,mine===k?null:k); }catch(e){ toast('送れませんでした'); }
   });
+  const ms=$('miss'); if (ms) ms.onclick=async()=>{ buzz(); try{ await cloud.report(t.id,mine==='missing'?null:'missing'); }catch(e){ toast('送れませんでした'); } };
   const go=$('go'); if (go) go.onclick=e=>{ e.preventDefault(); buzz(); goRoute(t); };
   const dl=$('del'); if(dl) dl.onclick=async()=>{ if(!confirm('削除しますか?')) return; try{ await cloud.remove(t.id); st.sel=null; renderSheet(); padMap(); }catch(e){ toast('削除できませんでした'); } };
 }

@@ -28,7 +28,14 @@ const cloud={
   _loadR(){ return this._get('loo-reports').map(r=>({toiletId:r.toiletId,kind:r.kind,mine:true,at:r.at})); },
   async add(t){
     if (this.mode==='cloud'){
-      await this.fb.collection('loo-toilets').add({name:t.name,lat:t.lat,lng:t.lng,fee:t.fee,wheelchair:t.wheelchair,floor:t.floor,ease:t.ease??null,find:t.find??null,type:t.type,brand:t.brand,loan:t.loan,note:t.note,uid:this.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      // 投稿の間隔・回数の記録(loo-users)と同じバッチで書く。ルールが 30 秒に1件・24時間に10件までを見張る
+      const ref=this.fb.collection('loo-toilets').doc(), uref=this.fb.collection('loo-users').doc(this.uid), ts=firebase.firestore.FieldValue.serverTimestamp();
+      const snap=await uref.get(), d=snap.exists?snap.data():null;
+      const inWin=d&&d.windowStart&&Date.now()<d.windowStart.toMillis()+24*3600*1000;
+      const b=this.fb.batch();
+      b.set(ref,{name:t.name,lat:t.lat,lng:t.lng,fee:t.fee,wheelchair:t.wheelchair,floor:t.floor,ease:t.ease??null,find:t.find??null,type:t.type,brand:t.brand,loan:t.loan,note:t.note,uid:this.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      b.set(uref,inWin?{lastAt:ts,n:d.n+1,windowStart:d.windowStart,lastId:ref.id}:{lastAt:ts,n:1,windowStart:ts,lastId:ref.id});
+      await b.commit();
       return;
     }
     const a=this._get('loo-added'); a.push({...t,id:String(Date.now()),uid:'local'});

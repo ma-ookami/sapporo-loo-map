@@ -68,7 +68,8 @@ function floorOf(t){
   const top=Object.keys(c).filter(k=>c[k]===max);
   return top.length===1?LV_FLOOR[top[0]]:null;
 }
-const isUg=t=>{ const f=floorOf(t); return f!=null&&f<0; };
+// コンビニは、ほとんどが地上なので、地下か地上かは扱わない(印も質問も出さない)
+const isUg=t=>{ if (t.type==='conv') return false; const f=floorOf(t); return f!=null&&f<0; };
 // 最寄り・リストに出すのは、トイレと、貸し出し〇/声かけ のコンビニだけ
 // 最寄り・リストに出すのは、トイレと、借りられる(声かけ含む)コンビニ。コンビニ探しのモードでは、コンビニはすべて
 const MISS_N=3;   // 「ここにはなかった」がこの人数になった追加情報は、薄くして最寄り・リストから外す

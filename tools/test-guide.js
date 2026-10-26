@@ -1,7 +1,7 @@
 // 「使う前に」の確認: node tools/test-guide.js
 const { chromium } = require('../../taskline/node_modules/playwright-core');
 (async () => {
-  const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
+  const b = await chromium.launch({ executablePath: require('./browser.js'), args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
   const ctx = await b.newContext({ locale: 'ja-JP', viewport: { width: 390, height: 780 } });
   const p = await ctx.newPage(); p.on('pageerror', e => console.log('ERR', e.message));
   const url = 'file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1';

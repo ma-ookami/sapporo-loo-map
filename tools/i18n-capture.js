@@ -3,7 +3,7 @@
 const fs = require('fs'), path = require('path');
 const { chromium } = require('../../taskline/node_modules/playwright-core');
 (async () => {
-  const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const b = await chromium.launch({ executablePath: require('./browser.js'), args: ['--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const url = 'file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1';
   const all = new Set();
   const mk = async (opts, seen) => {

@@ -1,7 +1,7 @@
 // スマホで設定を閉じられるか(×と下の「閉じる」、パネルの上端が画面内): node tools/test-settings-close.js
 const { chromium } = require('../../taskline/node_modules/playwright-core');
 (async () => {
-  const b = await chromium.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', args: ['--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const b = await chromium.launch({ executablePath: require('./browser.js'), args: ['--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const ctx = await b.newContext({ locale: 'ja-JP', viewport: { width: 390, height: 664 }, hasTouch: true, isMobile: true, geolocation: { latitude: 43.0545, longitude: 141.3530 }, permissions: ['geolocation'] });
   await ctx.addInitScript(() => localStorage.setItem('loo-guide', '1'));
   const p = await ctx.newPage(); p.on('pageerror', e => console.log('ERR', e.message));

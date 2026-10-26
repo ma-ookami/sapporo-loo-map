@@ -1,7 +1,7 @@
 // 現在地の確認: node tools/test-locate.js
 const { chromium } = require('../../taskline/node_modules/playwright-core');
 (async () => {
-  const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
+  const b = await chromium.launch({ executablePath: require('./browser.js'), args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
   const url = 'file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1';
   // 許可あり(すすきの近く) → 青い点が出て、地図がそこへ寄る。設定に「取得できています」
   let ctx = await b.newContext({ locale: 'ja-JP', viewport: { width: 390, height: 780 }, geolocation: { latitude: 43.0545, longitude: 141.3530 }, permissions: ['geolocation'] });

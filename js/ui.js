@@ -8,7 +8,7 @@ function reportCounts(id){
   for (const r of st.reports){ if (r.toiletId!==id||r.at<since||c[r.kind]===undefined) continue; c[r.kind]++; if (r.mine) mine=r.kind; }
   return {c,mine};
 }
-const tagsOf=t=>(t.type==='conv'?`<span class="tag">${esc(brandLabel(t.brand))}</span>${(l=>`<span class="tag loan-${l||'null'}">${l?loanLabel(l):'借りられるか不明'}</span>`)(loanOf(t))}`:'')+(fl=>fl==null?'':fl<0?`<span class="tag ug">地下 ${floorLabel(fl)}</span>`:fl===1?'<span class="tag">地上(1F)</span>':`<span class="tag">${floorLabel(fl)}</span>`)(floorOf(t))
+const tagsOf=t=>(t.type==='conv'?`<span class="tag">${esc(brandLabel(t.brand))}</span>${(l=>`<span class="tag loan-${l||'null'}">${l?loanLabel(l):'借りられるか不明'}</span>`)(loanOf(t))}`:'')+(fl=>fl==null||t.type==='conv'?'':fl<0?`<span class="tag ug">地下 ${floorLabel(fl)}</span>`:fl===1?'<span class="tag">地上(1F)</span>':`<span class="tag">${floorLabel(fl)}</span>`)(floorOf(t))
   +(t.fee===false?'<span class="tag free">無料</span>':t.fee===true?'<span class="tag">有料</span>':'')
   +(t.wheelchair?'<span class="tag">車いす可</span>':'')+(t.hours==='24/7'?'<span class="tag free">24時間</span>':(o=>o===true?'<span class="tag free">営業中</span>':o===false?'<span class="tag loan-no">営業時間外</span>':t.hours&&t.type!=='conv'?`<span class="tag">${esc(t.hours)}</span>`:'')(openNow(t.hours)));
 
@@ -59,7 +59,7 @@ function renderSheet(){
 // データに階が無い場所で、「どの階?」を教えてもらう(地上 / 地下 / 2階以上)。みんなの多数決で、地下の印(B)が付く
 const LVK=[['lv-gr','地上(1階)'],['lv-ug','地下'],['lv-up','2階以上']];
 function floorBlock(t){
-  if (t.floor!=null) return '';
+  if (t.floor!=null||t.type==='conv') return '';   // コンビニには、地下か地上かを聞かない
   const c={'lv-gr':0,'lv-ug':0,'lv-up':0}; let mineLv=null;
   for (const r of st.reports){ if (r.toiletId!==t.id||c[r.kind]===undefined) continue; c[r.kind]++; if (r.mine) mineLv=r.kind; }
   const n=c['lv-gr']+c['lv-ug']+c['lv-up'], fl=floorOf(t);

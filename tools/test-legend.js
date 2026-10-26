@@ -1,7 +1,7 @@
 // 凡例: スマホはボタンで開閉、広い画面は出しっぱなし: node tools/test-legend.js
 const { chromium } = require('../../taskline/node_modules/playwright-core');
 (async () => {
-  const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
+  const b = await chromium.launch({ executablePath: require('./browser.js'), args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
   for (const [name, w] of [['スマホ', 390], ['広い画面', 1000]]) {
     const ctx = await b.newContext({ locale: 'ja-JP', viewport: { width: w, height: 780 } });
     await ctx.addInitScript(() => { localStorage.setItem('loo-guide', '1'); });

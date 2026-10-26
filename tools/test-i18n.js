@@ -5,7 +5,7 @@
 //   画面の写真(tools/shot-en-*.png)も撮る
 const { chromium } = require('../../taskline/node_modules/playwright-core');
 (async () => {
-  const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const b = await chromium.launch({ executablePath: require('./browser.js'), args: ['--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const url = 'file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1';
   const near = { geolocation: { latitude: 43.0545, longitude: 141.3530 }, permissions: ['geolocation'] };
   const mk = async (locale, guideSeen, extra) => {

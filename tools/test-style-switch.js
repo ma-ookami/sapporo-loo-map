@@ -1,7 +1,7 @@
 // 地図スタイルを入れ替えたあとも、日本語のみ・標識なしが保たれるかの確認: node tools/test-style-switch.js
 const { chromium } = require('../../taskline/node_modules/playwright-core');
 (async () => {
-  const b = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
+  const b = await chromium.launch({ executablePath: require('./browser.js'), args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
   const c = await b.newContext({ locale: 'ja-JP', viewport: { width: 390, height: 780 }, colorScheme: 'light' });
   await c.addInitScript(() => localStorage.setItem('loo-guide', '1'));
   const p = await c.newPage(); p.on('pageerror', e => console.log('ERR', e.message));

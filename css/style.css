@@ -133,7 +133,7 @@ body.adding #tabs{display:none}
 #tabs button{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10.5px;font-weight:600;color:var(--sub)}
 #tabs button.on{color:var(--accent)}
 #tabs .addtab{flex:none;width:54px;height:54px;border-radius:50%;background:var(--accent);color:#fff;box-shadow:0 6px 16px rgba(196,82,31,.4)}
-.toast{position:fixed;left:50%;bottom:calc(var(--tabh) + 120px);transform:translateX(-50%);background:var(--toast);color:var(--toast-ink);padding:11px 18px;border-radius:22px;z-index:9;font-size:14px;font-weight:600;animation:toastin .25s ease both;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:calc(var(--tabh) + 120px);transform:translateX(-50%);background:var(--toast);color:var(--toast-ink);padding:11px 18px;border-radius:22px;z-index:9;font-size:14px;font-weight:600;animation:toastin .25s ease both;width:max-content;max-width:calc(100vw - 32px);text-align:center;line-height:1.45}
 @keyframes toastin{from{transform:translate(-50%,8px);opacity:0}to{transform:translateX(-50%);opacity:1}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 body.adding #sheet{max-height:86vh}

@@ -81,7 +81,7 @@ function renderDetail(body,t){
   const dl=$('del'); if(dl) dl.onclick=async()=>{ if(!confirm('削除しますか?')) return; try{ await cloud.remove(t.id); st.sel=null; renderSheet(); padMap(); }catch(e){ toast('削除できませんでした'); } };
 }
 
-function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.textContent=msg; d.style.bottom=(innerHeight-$('sheet').getBoundingClientRect().top+12)+'px'; document.body.appendChild(d); setTimeout(()=>d.remove(),2200); }
+function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.textContent=msg; d.style.bottom=(innerHeight-$('sheet').getBoundingClientRect().top+12)+'px'; document.body.appendChild(d); setTimeout(()=>d.remove(),Math.max(2200,msg.length*90)); }
 
 function initUi(){
   document.querySelectorAll('#tabs [data-t]').forEach(b=>b.onclick=()=>setTab(b.dataset.t==='list'&&st.open&&!st.sel?'map':b.dataset.t));

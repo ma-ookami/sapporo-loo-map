@@ -65,7 +65,7 @@
 ## 7. 開発・確認
 - 動かす: `index.html` を直接開く(`file://` では位置情報は取れない。公開 URL か localhost で)
 - テスト: `node tools/test-xxx.js`。playwright-core は `../taskline/node_modules` を借りる。Edge(`C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`)を GPU 無しで動かすため **1本が 1〜5 分かかる**。バックグラウンドで実行して完了を待つ。**Edge を全部終了させるコマンドは使わない**(ユーザーのブラウザが落ちる)
-  - `test-add`(絞り込み・リスト・追加・詳細・報告・削除)/ `test-conv` / `test-loan`(コンビニの取り込みと貸し出し報告)/ `test-convmode`(コンビニ探し)/ `test-settings` / `test-filters`(種類の切替・2段目、速い)/ `test-legend` / `test-guide` / `test-hours`(営業時間・単体)/ `test-dark` / `test-lang` / `test-mapcolor` / `test-style-switch`(スタイル入れ替え後も日本語のみ)/ `test-mapclose` / `test-locate`
+  - `test-add`(絞り込み・リスト・追加・詳細・報告・削除)/ `test-conv` / `test-loan`(コンビニの取り込みと貸し出し報告)/ `test-convmode`(コンビニ探し)/ `test-settings` / `test-filters`(種類の切替・2段目、速い)/ `test-guide` / `test-hours`(営業時間・単体)/ `test-dark` / `test-lang` / `test-mapcolor` / `test-style-switch`(スタイル入れ替え後も日本語のみ)/ `test-mapclose` / `test-locate`
   - 見た目の確認: `node tools/shot.js out.png`。画像は確認後に消す
 - 各テストは `localStorage` の `loo-guide` を立てて案内を飛ばし、`?local=1` でローカルモードにする
 

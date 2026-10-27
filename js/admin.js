@@ -8,51 +8,83 @@ const LOANS={yes:'借りられる',ask:'声をかけて',no:'借りられない'
 const dist=(a,b)=>{ const R=6371000,r=Math.PI/180,dl=(b.lat-a.lat)*r,dg=(b.lng-a.lng)*r,h=Math.sin(dl/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dg/2)**2; return 2*R*Math.asin(Math.sqrt(h)); };
 const when=t=>{ try{ const d=t&&t.toDate?t.toDate():null; return d?d.toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):''; }catch(e){ return ''; } };
 
-let db=null, map=null, markers=[], pend=[], added=[], miss=[], sel=null, unsubs=[];
+let db=null, map=null, markers=[], pend=[], added=[], miss=[], admins=[], adminsLoaded=false, me=null, sel=null, unsubs=[], beat=null, adminsErr=false;
+const ONLINE_MS=10*60*1000;   // 最終アクセスがこの時間以内なら「いま入っている」
 
 function start(){
   const cfg=window.FIREBASE_CONFIG;
-  if (!(cfg&&cfg.projectId&&window.firebase)){ $('msg').textContent='Firebase の設定がありません'; return; }
+  if (!(cfg&&cfg.projectId&&window.firebase)){ showLogin(null,'Firebase の設定がありません'); return; }
   firebase.initializeApp(cfg); db=firebase.firestore();
   // アプリと同じ匿名ログイン(同じブラウザならアプリと同じ uid)。運営かどうかは loo-admins/<uid> があるかどうか
-  firebase.auth().onAuthStateChanged(u=>{ if (u) onUser(u); else firebase.auth().signInAnonymously().catch(e=>{ $('msg').textContent='ログインできませんでした: '+(e.code||e.message); }); });
+  firebase.auth().onAuthStateChanged(u=>{ if (u) onUser(u); else firebase.auth().signInAnonymously().catch(e=>showLogin(null,'ログインできませんでした: '+(e.code||e.message))); });
+}
+function stop(){ unsubs.forEach(f=>f()); unsubs=[]; if (beat){ clearInterval(beat); beat=null; } }
+function showLogin(u,msg){
+  stop(); $('main').hidden=true; $('login').hidden=false;
+  if (!$('lbear').firstChild) $('lbear').innerHTML=bearSvg(92,'normal');
+  $('msg').textContent=msg||'';
+  if (!u) return;
+  const go=async()=>{
+    const code=$('code').value; if (!code) return;
+    try{ await db.collection('loo-admins').doc(u.uid).set({code,createdAt:ts()}); $('code').value=''; onUser(u); }
+    catch(e){ $('msg').textContent='入れませんでした(合言葉が違うか、まだ設定されていません)'; }
+  };
+  $('lform').onsubmit=ev=>{ ev.preventDefault(); go(); };
+  $('code').focus();
 }
 async function onUser(u){
-  unsubs.forEach(f=>f()); unsubs=[]; $('main').hidden=true; $('msg').textContent='';
+  stop(); me=u.uid; adminsLoaded=false;
   let ok=false;
   try{ ok=(await db.collection('loo-admins').doc(u.uid).get()).exists; }catch(e){ ok=false; }
-  const a=$('auth');
-  if (!ok){
-    a.innerHTML='<label style="flex-direction:column;display:flex;font-size:12px;color:var(--sub);gap:2px">合言葉<input id="code" type="password" autocomplete="off" style="font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;width:260px;background:var(--card);color:var(--ink)"></label><button class="cta" id="enter" style="align-self:flex-end">入る</button>';
-    const go=async()=>{
-      const code=$('code').value; if (!code) return;
-      try{ await db.collection('loo-admins').doc(u.uid).set({code,createdAt:ts()}); onUser(u); }
-      catch(e){ $('msg').textContent='入れませんでした(合言葉が違うか、まだ設定されていません)'; }
-    };
-    $('enter').onclick=go; $('code').onkeydown=e=>{ if (e.key==='Enter') go(); };
-    return;
-  }
-  a.innerHTML='<span class="sub">運営として入っています</span><button id="logout">この端末を運営から外す</button>';
+  if (!ok){ showLogin(u); return; }
+  $('login').hidden=true; $('main').hidden=false; $('msg').textContent='';
+  $('tbear').innerHTML=bearSvg(34,'happy');
   $('logout').onclick=async()=>{ try{ await db.collection('loo-admins').doc(u.uid).delete(); }catch(e){} onUser(u); };
-  const denied=e=>{ $('main').hidden=true; $('msg').textContent='読めませんでした: '+(e.code||e.message); console.warn(e); };
-  $('main').hidden=false; initMap();
+  initMap();
+  // 最終アクセスを残す(管理者の端末の一覧で、いま入っているか・知らない端末がないかを見る)
+  const ping=()=>db.collection('loo-admins').doc(u.uid).update({lastSeen:ts()}).catch(()=>{});
+  ping(); beat=setInterval(ping,5*60*1000);
+  const denied=e=>{ console.warn(e); $('main').hidden=true; showLogin(null,'読めませんでした: '+(e.code||e.message)); };
   unsubs.push(db.collection('loo-requests').onSnapshot(s=>{ pend=s.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?x.createdAt.toMillis():0)-(y.createdAt?y.createdAt.toMillis():0)); render(); },denied));
   unsubs.push(db.collection('loo-reports').where('kind','==','missing').onSnapshot(s=>{ miss=s.docs.map(d=>d.data()); render(); },denied));
   unsubs.push(db.collection('loo-toilets').onSnapshot(s=>{ added=s.docs.map(d=>({id:d.id,...d.data()})); render(); },denied));
+  unsubs.push(db.collection('loo-admins').onSnapshot(s=>{ adminsErr=false; adminsLoaded=true; admins=s.docs.map(d=>({id:d.id,...d.data()})); render(); },e=>{ adminsErr=true; render(); }));
 }
 
+// 地図は、サイトと同じ(OpenFreeMap の淡い地図・暗いときは dark。地名は日本語だけ、店アイコン・標識は消す)
+function tidyStyle(m){
+  for (const l of m.getStyle().layers){
+    if (l.type!=='symbol') continue;
+    const sl=l['source-layer']||'', id=l.id;
+    if (id==='poi_transit') m.setFilter(id,['==',['get','class'],'rail']);
+    const hide=(sl==='poi'&&id!=='poi_transit')||/shield/.test(id)||sl==='housenumber'||(sl==='place'&&/neighbourhood|quarter|suburb|hamlet|other/.test(id));
+    if (hide){ m.setLayoutProperty(id,'visibility','none'); continue; }
+    if (m.getLayoutProperty(id,'text-field')) m.setLayoutProperty(id,'text-field',['coalesce',['get','name:ja'],['get','name']]);
+  }
+}
 function initMap(){
   if (map) return;
-  map=new maplibregl.Map({container:'map',style:'https://tiles.openfreemap.org/styles/positron',center:[141.353,43.0545],zoom:14.5,attributionControl:{compact:true}});
+  const dark=matchMedia('(prefers-color-scheme: dark)').matches;
+  map=new maplibregl.Map({container:'map',style:'https://tiles.openfreemap.org/styles/'+(dark?'dark':'positron'),center:[141.353,43.0545],zoom:14.5,attributionControl:false,dragRotate:false,pitchWithRotate:false,touchPitch:false});
+  map.touchZoomRotate.disableRotation();
+  map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');
+  map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
+  map.once('style.load',()=>tidyStyle(map));
 }
-function dot(color,txt){ const e=document.createElement('div'); e.style.cssText='width:'+(txt?22:10)+'px;height:'+(txt?22:10)+'px;border-radius:50%;background:'+color+';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);color:#fff;font:800 11px/18px sans-serif;text-align:center'; if (txt) e.textContent=txt; return e; }
+// ピン: 公開中のトイレ=青赤の半々(サイトと同じ)、コンビニ=小さな白丸、許可待ち=橙の丸+番号
+function pin(kind,txt){
+  const e=document.createElement('div'), p=kind==='pend', s=p?26:kind==='conv'?10:16;
+  e.style.cssText='width:'+s+'px;height:'+s+'px;border-radius:50%;border:'+(p?'2.5px':'2px')+' solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);'
+    +(p?'background:#c4521f;color:#fff;font:800 12px/21px sans-serif;text-align:center;cursor:pointer':kind==='conv'?'background:#d6d1ca':'background:linear-gradient(90deg,#2c6fe0 50%,#e0453b 50%)');
+  if (txt) e.textContent=txt; return e;
+}
 function syncMarkers(){
   if (!map) return;
   markers.forEach(m=>m.remove()); markers=[];
-  const add=(p,color,txt,click)=>{ const e=dot(color,txt); if (click) e.onclick=click; markers.push(new maplibregl.Marker({element:e}).setLngLat([p.lng,p.lat]).addTo(map)); };
-  TOILETS.forEach(t=>add(t,'#9a948c'));
-  added.forEach(t=>add(t,'#2f6fe4'));
-  pend.forEach((t,i)=>add(t,'#c4521f',String(i+1),()=>pick(t.id)));
+  const add=(p,kind,txt,click)=>{ const e=pin(kind,txt); if (click) e.onclick=click; markers.push(new maplibregl.Marker({element:e}).setLngLat([p.lng,p.lat]).addTo(map)); };
+  TOILETS.forEach(t=>add(t,t.type==='conv'?'conv':'toilet'));
+  added.forEach(t=>add(t,t.type==='conv'?'conv':'toilet'));
+  pend.forEach((t,i)=>add(t,'pend',String(i+1),()=>pick(t.id)));
 }
 
 // 申請の近くにすでにある場所(データ + 公開中のユーザー追加)
@@ -84,13 +116,39 @@ function card(r,i){
 function renderMissing(){
   const by={}; miss.forEach(r=>{ (by[r.toiletId]=by[r.toiletId]||new Set()).add(r.uid); });
   const rows=Object.entries(by).map(([id,s])=>({id,n:s.size,t:id.startsWith('u-')?added.find(x=>x.id===id.slice(2)):TOILETS.find(x=>x.id===id)})).filter(o=>o.t).sort((a,b)=>b.n-a.n);
-  $('mn').textContent=rows.length?'('+rows.length+'件)':'(なし)';
-  $('missing').innerHTML=rows.map(o=>'<div class="card" data-mid="'+esc(o.id)+'"><b>'+esc(o.t.name||'(名前なし)')+'</b> <span class="pill">'+(o.t.type==='conv'?'コンビニ':'トイレ')+'</span><span class="pill">'+o.n+'人が「なかった」'+(o.n>=3?'(アプリで薄く表示中)':'')+'</span> <a href="https://www.google.com/maps?q='+o.t.lat+','+o.t.lng+'" target="_blank" rel="noopener">Google マップ</a>'+(o.id.startsWith('u-')?' <button class="ng" data-a="mdel" style="float:right">削除</button>':' <span class="sub">(公開データ)</span>')+'</div>').join('')||'<div class="sub">なし</div>';
+  $('mn').textContent=rows.length||'なし'; $('mn').classList.toggle('hot',rows.some(o=>o.n>=3));
+  $('missing').innerHTML=rows.map(o=>'<div class="card" data-mid="'+esc(o.id)+'"><b>'+esc(o.t.name||'(名前なし)')+'</b> <span class="pill">'+(o.t.type==='conv'?'コンビニ':'トイレ')+'</span><span class="pill">'+o.n+'人が「なかった」'+(o.n>=3?'(アプリで薄く表示中)':'')+'</span> <a href="https://www.google.com/maps?q='+o.t.lat+','+o.t.lng+'" target="_blank" rel="noopener">Google マップ</a>'+(o.id.startsWith('u-')?' <button class="ng" data-a="mdel" style="float:right">削除</button>':' <span class="sub">(公開データ)</span>')+'</div>').join('')||'<div class="empty">なし</div>';
   document.querySelectorAll('#missing [data-a=mdel]').forEach(b=>b.onclick=async()=>{
     const id=b.closest('.card').dataset.mid.slice(2), t=added.find(x=>x.id===id);
     if (!confirm('「'+(t?t.name:id)+'」を削除します(元に戻せません)')) return;
     try{ await db.collection('loo-toilets').doc(id).delete(); }catch(e){ alert('削除できませんでした: '+(e.code||e.message)); }
   });
+}
+// 上の数字と、管理者の端末の一覧。端末の数が前回見たときより増えていたら赤くして知らせる(知らない人が入っていないかの見張り)
+const lastSeenMs=a=>a.lastSeen&&a.lastSeen.toMillis?a.lastSeen.toMillis():0;
+function renderAdmins(){
+  if (!adminsLoaded&&!adminsErr) return;   // 読み込み前の 0 台を基準にしない
+  const n=admins.length, on=admins.filter(a=>Date.now()-lastSeenMs(a)<=ONLINE_MS).length;
+  let prev=null; try{ const v=localStorage.getItem('loo-admin-count'); prev=v==null?null:+v; }catch(e){}
+  const grew=prev!=null&&n>prev, el=$('st-admins');
+  el.classList.toggle('alert',grew);
+  el.innerHTML='<b>'+(adminsErr?'?':n)+'台</b><span>管理者の端末(いま入っている: '+on+'台)'+(grew?' ・前回より +'+(n-prev)+'台':'')+'</span>';
+  $('adn').textContent=adminsErr?'':n+'台'; $('adn').classList.toggle('hot',grew);
+  if (adminsErr){ $('admins').innerHTML='<div class="empty">一覧を読めません。ルールの貼り替えが済んでいるか確認してください</div>'; return; }
+  $('admins').innerHTML='<table><thead><tr><th>端末</th><th>登録</th><th>最終アクセス</th><th></th></tr></thead><tbody>'
+    +admins.slice().sort((a,b)=>lastSeenMs(b)-lastSeenMs(a)).map(a=>{ const live=Date.now()-lastSeenMs(a)<=ONLINE_MS; return '<tr data-uid="'+esc(a.id)+'"><td><span class="dot'+(live?' on':'')+'"></span>'+esc(a.id.slice(0,8))+(a.id===me?' <span class="pill me">この端末</span>':'')+'</td><td>'+when(a.createdAt)+'</td><td>'+(lastSeenMs(a)?when(a.lastSeen):'-')+'</td><td style="text-align:right">'+(a.id===me?'':'<button class="ng" data-a="kick">外す</button>')+'</td></tr>'; }).join('')+'</tbody></table>'
+    +'<div class="sub" style="margin-top:8px"><button data-a="ack" style="padding:4px 10px;font-size:12px">いまの台数を確認済みにする</button></div>';
+  document.querySelectorAll('#admins [data-a=kick]').forEach(b=>b.onclick=async()=>{
+    const id=b.closest('tr').dataset.uid;
+    if (!confirm('この端末(' + id.slice(0,8) + ')を運営から外します')) return;
+    try{ await db.collection('loo-admins').doc(id).delete(); }catch(e){ alert('外せませんでした: '+(e.code||e.message)); }
+  });
+  const ack=document.querySelector('#admins [data-a=ack]'); if (ack) ack.onclick=()=>{ try{ localStorage.setItem('loo-admin-count',String(n)); }catch(e){} renderAdmins(); };
+  if (prev==null) { try{ localStorage.setItem('loo-admin-count',String(n)); }catch(e){} }
+}
+function renderStats(){
+  const ua=added.filter(t=>t.uid).length, mset=new Set(miss.map(r=>r.toiletId)).size;
+  $('st-pend').textContent=pend.length; $('st-miss').textContent=mset; $('st-pub').textContent=ua;
 }
 let dirty=false;
 // 入力中に再描画すると直している最中の値が消えるので、入力が終わってから描き直す
@@ -98,12 +156,13 @@ function typing(){ const a=document.activeElement; return !!(a&&a.closest&&a.clo
 addEventListener('focusout',()=>setTimeout(()=>{ if (dirty&&!typing()){ dirty=false; render(); } },0));
 function render(){
   if (typing()){ dirty=true; return; }
-  $('pn').textContent=pend.length?'('+pend.length+'件)':'(なし)';
-  $('pending').innerHTML=pend.length?pend.map(card).join(''):'<div class="sub">許可待ちはありません</div>';
+  renderStats(); renderAdmins();
+  $('pn').textContent=pend.length||'なし'; $('pn').classList.toggle('hot',pend.length>0);
+  $('pending').innerHTML=pend.length?pend.map(card).join(''):'<div class="empty">許可待ちはありません</div>';
   renderMissing();
   const ua=added.filter(t=>t.uid);
-  $('an').textContent='('+ua.length+'件)';
-  $('added').innerHTML=ua.map(t=>'<div class="card" data-aid="'+esc(t.id)+'"><b>'+esc(t.name)+'</b> <span class="pill">'+(t.type==='conv'?'コンビニ':'トイレ')+'</span>'+(t.approved?'<span class="pill">許可済み</span>':'<span class="pill">許可制の前の投稿</span>')+' <button class="ng" data-a="del" style="float:right">削除</button></div>').join('')||'<div class="sub">なし</div>';
+  $('an').textContent=ua.length||'なし';
+  $('added').innerHTML=ua.map(t=>'<div class="card" data-aid="'+esc(t.id)+'"><b>'+esc(t.name)+'</b> <span class="pill">'+(t.type==='conv'?'コンビニ':'トイレ')+'</span>'+(t.approved?'<span class="pill">許可済み</span>':'<span class="pill">許可制の前の投稿</span>')+' <button class="ng" data-a="del" style="float:right">削除</button></div>').join('')||'<div class="empty">なし</div>';
   document.querySelectorAll('#pending .card').forEach(c=>{
     const r=pend.find(x=>x.id===c.dataset.id);
     c.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>act(b.dataset.a,r,c));

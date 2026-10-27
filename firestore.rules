@@ -16,15 +16,21 @@ service cloud.firestore {
     match /loo-secret/{id} {
       allow read, write: if false;
     }
-    // 運営の登録。合言葉(code)が loo-secret/admin と同じときだけ、自分の uid の文書を作れる。自分の分は読める・消せる(運営をやめる)
+    // 運営の登録。合言葉(code)が loo-secret/admin と同じときだけ、自分の uid の文書を作れる。自分の分は読める・最終アクセス(lastSeen)だけ更新できる・消せる(運営をやめる)
+    // 運営は、全員の一覧を読める(管理画面の「管理者の端末」)・知らない端末を外せる
     match /loo-admins/{uid} {
-      allow get: if request.auth != null && request.auth.uid == uid;
+      allow get: if request.auth != null && (request.auth.uid == uid || looIsAdmin());
+      allow list: if looIsAdmin();
       allow create: if request.auth != null && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['code','createdAt'])
         && request.resource.data.code is string
         && request.resource.data.code == get(/databases/$(database)/documents/loo-secret/admin).data.code;
-      allow update: if false;
-      allow delete: if request.auth != null && request.auth.uid == uid;
+      allow update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['code','createdAt','lastSeen'])
+        && request.resource.data.code == resource.data.code
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.lastSeen == request.time;
+      allow delete: if request.auth != null && (request.auth.uid == uid || looIsAdmin());
     }
     // トイレ・コンビニの項目の検査(申請 loo-requests と、運営が許可して書く loo-toilets の両方で使う)
     function looToiletOk(d) {

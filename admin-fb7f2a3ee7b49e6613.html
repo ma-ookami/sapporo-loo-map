@@ -7,48 +7,129 @@
 <title>運営 | 札幌トイレ・コンビニマップ</title>
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" integrity="sha384-MinO0mNliZ3vwppuPOUnGa+iq619pfMhLVUXfC4LHwSCvF9H+6P/KO4Q7qBOYV5V" crossorigin="anonymous">
 <style>
-:root{--bg:#f4f2ee;--card:#fff;--ink:#1d1a17;--sub:#7a746d;--line:#e4e0da;--accent:#c4521f;--ok:#1f9d62;--ng:#c0392b;--tint:#ecebe7}
-@media (prefers-color-scheme:dark){:root{--bg:#1c1915;--card:#26221d;--ink:#f3f0ea;--sub:#a39d95;--line:#3a352e;--tint:#34302a}}
+:root{--bg:#f3f1ed;--card:#fff;--ink:#1d1a17;--sub:#7a746d;--line:#e6e2dc;--accent:#c4521f;--accent-soft:#fbe9df;--ok:#1f9d62;--ng:#c0392b;--tint:#efede9;--warn-bg:#fdebd6;--warn-ink:#8a4b00;--top:#1d1a17;--shadow:0 1px 2px rgba(29,26,23,.06),0 6px 20px rgba(29,26,23,.06);--blue:#2c6fe0;--red:#e0453b}
+@media (prefers-color-scheme:dark){:root{--bg:#171410;--card:#221e19;--ink:#f3f0ea;--sub:#a39d95;--line:#37322b;--tint:#2d2923;--accent-soft:rgba(226,104,58,.18);--warn-bg:rgba(232,150,62,.16);--warn-ink:#f0c58f;--top:#0e0c0a;--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3)}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif}
-.wrap{max-width:860px;margin:0 auto;padding:16px}
-h1{font-size:18px;margin:0 0 4px}h2{font-size:15px;margin:24px 0 8px}
-.sub{color:var(--sub);font-size:12.5px}
-button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:8px 14px;background:var(--tint);color:var(--ink)}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif}
+a{color:var(--accent)}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:8px 14px;background:var(--tint);color:var(--ink);transition:filter .15s,transform .05s}
+button:hover{filter:brightness(.96)}button:active{transform:translateY(1px)}
 button.cta{background:var(--accent);color:#fff;font-weight:700}
 button.ok{background:var(--ok);color:#fff;font-weight:700}
 button.ng{background:transparent;color:var(--ng);border:1px solid var(--ng)}
-#map{height:280px;border-radius:14px;margin:12px 0;border:1px solid var(--line)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0}
-.card.on{outline:2px solid var(--accent)}
+button.ghost{background:transparent;color:inherit;border:1px solid rgba(255,255,255,.25)}
+.sub{color:var(--sub);font-size:12.5px}
+[hidden]{display:none!important}
+
+/* ログイン */
+.login{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(1200px 600px at 50% -10%,#f6e7cf 0%,var(--bg) 60%)}
+@media (prefers-color-scheme:dark){.login{background:radial-gradient(1200px 600px at 50% -10%,#3a2a1c 0%,var(--bg) 60%)}}
+.lcard{position:relative;width:100%;max-width:380px;background:var(--card);border-radius:24px;box-shadow:var(--shadow);padding:60px 28px 28px;text-align:center;margin-top:46px}
+#lbear{position:absolute;left:50%;top:-46px;transform:translateX(-50%);width:92px;height:92px;filter:drop-shadow(0 6px 10px rgba(29,26,23,.18))}
+#lbear svg{width:100%;height:100%}
+.lcard h1{font-size:20px;margin:6px 0 2px}
+.lcard .sub{margin:0 0 20px}
+.lcard input{width:100%;font:inherit;font-size:16px;text-align:center;letter-spacing:.2em;padding:13px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--bg);color:var(--ink);outline:none}
+.lcard input:focus{border-color:var(--accent)}
+.lcard button.cta{width:100%;margin-top:12px;padding:13px;border-radius:14px;font-size:15px}
+.lcard .lock{display:inline-grid;place-items:center;width:20px;height:20px;margin-right:4px;vertical-align:-4px}
+#msg{margin:12px 0 0;color:var(--ng);font-size:13px;min-height:1.2em}
+
+/* 本体 */
+.top{position:sticky;top:0;z-index:20;background:var(--top);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 20px}
+#tbear{width:34px;height:34px;flex:none}#tbear svg{width:100%;height:100%}
+.top h1{font-size:15px;margin:0;font-weight:800;letter-spacing:.02em}
+.top h1 small{display:block;font-weight:500;font-size:11px;opacity:.65;letter-spacing:0}
+.top .sp{flex:1}
+.top .me{font-size:12px;opacity:.8;display:flex;align-items:center;gap:6px}
+.top .me i{width:8px;height:8px;border-radius:50%;background:#3ec48a;box-shadow:0 0 0 3px rgba(62,196,138,.25)}
+.wrap{max-width:1180px;margin:0 auto;padding:20px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat{background:var(--card);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow);border-left:4px solid var(--line);min-width:0}
+.stat b{display:block;font-size:28px;line-height:1.1;font-weight:800;letter-spacing:-.02em}
+.stat span{font-size:12px;color:var(--sub)}
+.stat.admins{border-left-color:#3b82f6}.stat.pend{border-left-color:var(--accent)}.stat.miss{border-left-color:#e0a030}.stat.pub{border-left-color:var(--ok)}
+.stat.alert{border-left-color:var(--ng)}.stat.alert b{color:var(--ng)}
+.panel{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+.panel h2{font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
+.panel h2 em{font-style:normal;font-size:11.5px;font-weight:700;background:var(--tint);color:var(--sub);border-radius:99px;padding:1px 9px}
+.panel h2 em.hot{background:var(--accent);color:#fff}
+.panel>.sub{margin:0 0 8px}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:16px;align-items:start}
+.mapcol{position:sticky;top:64px}
+#map{height:calc(100vh - 150px);min-height:320px;max-height:640px;border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin:8px 4px 0;font-size:12px;color:var(--sub)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-2px;margin-right:4px;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.card{border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0;background:var(--card);transition:box-shadow .15s,border-color .15s}
+.card.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .row label{display:flex;flex-direction:column;font-size:11.5px;color:var(--sub);gap:2px}
 .row input,.row select,.row textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
 .row input[type=text]{width:220px}.row textarea{width:100%;min-height:52px}
-.near{font-size:12.5px;margin:6px 0;padding:6px 8px;border-radius:8px;background:var(--tint)}
-.near.warn{background:#fdebd6;color:#8a4b00}
+.near{font-size:12.5px;margin:6px 0;padding:6px 10px;border-radius:10px;background:var(--tint);color:var(--sub)}
+.near.warn{background:var(--warn-bg);color:var(--warn-ink)}
 .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.pill{display:inline-block;padding:1px 8px;border-radius:99px;background:var(--tint);font-size:11.5px;margin-right:4px}
-#msg{margin:10px 0;color:var(--ng)}
-.num{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:800;margin-right:6px}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;background:var(--tint);font-size:11.5px;margin-right:4px}
+.pill.me{background:#dbeafe;color:#1d4ed8}
+.num{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:800;margin-right:6px}
+.empty{padding:14px;border-radius:12px;background:var(--tint);color:var(--sub);text-align:center;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11.5px;color:var(--sub);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#b9b4ad;margin-right:6px}
+.dot.on{background:#3ec48a;box-shadow:0 0 0 3px rgba(62,196,138,.25)}
+.maplibregl-ctrl-attrib{font-size:10px}
+@media (max-width:980px){.cols{grid-template-columns:1fr}.mapcol{position:static;order:-1}#map{height:300px}.stats{grid-template-columns:repeat(2,1fr)}.top{padding:10px 14px}.wrap{padding:14px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>運営 <span class="sub">札幌トイレ・コンビニマップ</span></h1>
-  <div class="sub">申請を見て、許可するとみんなの地図に出ます。このページはアプリからはリンクしていません。</div>
-  <div id="auth" class="row"></div>
-  <div id="msg"></div>
-  <div id="main" hidden>
-    <div id="map"></div>
-    <h2>許可待ちの申請 <span id="pn" class="sub"></span></h2>
-    <div id="pending"></div>
-    <h2>「ここにはなかった」の報告 <span id="mn" class="sub"></span></h2>
-    <div class="sub">3人以上で、アプリでは薄く表示して最寄り・リストから外れます。なくなっていたら削除してください(公開データの分は、データ側で直します)。</div>
-    <div id="missing"></div>
-    <h2>公開中のユーザー追加 <span id="an" class="sub"></span></h2>
-    <div class="sub">間違いや荒らしは、ここから削除できます。</div>
-    <div id="added"></div>
+<div id="login" class="login" hidden>
+  <form class="lcard" id="lform" autocomplete="off" onsubmit="return false">
+    <div class="bear" id="lbear"></div>
+    <h1>運営ログイン</h1>
+    <p class="sub">札幌トイレ・コンビニマップ</p>
+    <input id="code" type="password" autocomplete="off" placeholder="合言葉" aria-label="合言葉">
+    <button class="cta" id="enter" type="submit">入る</button>
+    <div id="msg" role="alert"></div>
+  </form>
+</div>
+
+<div id="main" hidden>
+  <header class="top">
+    <div class="bear" id="tbear"></div>
+    <h1>運営コンソール<small>札幌トイレ・コンビニマップ</small></h1>
+    <div class="sp"></div>
+    <div class="me"><i></i>運営として入っています</div>
+    <button class="ghost" id="logout">この端末を外す</button>
+  </header>
+  <div class="wrap">
+    <section class="stats" id="stats">
+      <div class="stat admins" id="st-admins"><b>-</b><span>管理者の端末</span></div>
+      <div class="stat pend"><b id="st-pend">-</b><span>許可待ちの申請</span></div>
+      <div class="stat miss"><b id="st-miss">-</b><span>「なかった」の報告がある場所</span></div>
+      <div class="stat pub"><b id="st-pub">-</b><span>公開中のユーザー追加</span></div>
+    </section>
+    <section class="panel" id="adminpanel">
+      <h2>管理者の端末 <em id="adn"></em></h2>
+      <div class="sub">合言葉を入れて運営として登録された端末の一覧です。身に覚えのない端末があれば「外す」で外し、合言葉(loo-secret/admin の code)も変えてください。</div>
+      <div id="admins"></div>
+    </section>
+    <div class="cols">
+      <div>
+        <section class="panel"><h2>許可待ちの申請 <em id="pn"></em></h2><div id="pending"></div></section>
+        <section class="panel"><h2>「ここにはなかった」の報告 <em id="mn"></em></h2>
+          <div class="sub">3人以上で、アプリでは薄く表示して最寄り・リストから外れます。なくなっていたら削除してください(公開データの分は、データ側で直します)。</div>
+          <div id="missing"></div></section>
+        <section class="panel"><h2>公開中のユーザー追加 <em id="an"></em></h2>
+          <div class="sub">間違いや荒らしは、ここから削除できます。</div>
+          <div id="added"></div></section>
+      </div>
+      <aside class="mapcol">
+        <div id="map"></div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>許可待ち(番号は左の一覧と同じ)</span><span><i style="background:linear-gradient(90deg,var(--blue) 50%,var(--red) 50%)"></i>公開中</span></div>
+      </aside>
+    </div>
   </div>
 </div>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" integrity="sha384-SYKAG6cglRMN0RVvhNeBY0r3FYKNOJtznwA0v7B5Vp9tr31xAHsZC0DqkQ/pZDmj" crossorigin="anonymous"></script>
@@ -57,6 +138,8 @@ button.ng{background:transparent;color:var(--ng);border:1px solid var(--ng)}
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="data/toilets.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/bear.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>

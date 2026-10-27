@@ -417,3 +417,7 @@ body.adding .legend-btn,body.adding #legend{display:none}
 .pin.user.unconf:not(.conv) .dash{color:var(--ink);opacity:.55}
 .pin.user.sel:not(.conv) .pi{background:var(--ink);color:var(--on-ink)}
 .pin.user.unconf.sel:not(.conv) .dash{color:var(--on-ink);opacity:.7}
+.lm .dash{width:22px;height:22px}
+.ri.user:not(.conv){background:linear-gradient(90deg,var(--wc-blue) 50%,var(--wc-red) 50%);color:#fff}
+.ri.user.unconf:not(.conv){background:linear-gradient(90deg,color-mix(in srgb,var(--wc-blue) 28%,var(--card)) 50%,color-mix(in srgb,var(--wc-red) 28%,var(--card)) 50%);color:var(--ink);outline:1.5px dashed color-mix(in srgb,var(--ink) 55%,transparent);outline-offset:-3px}
+.row .ri .ic{color:inherit}

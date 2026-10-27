@@ -53,7 +53,7 @@
         && id.matches('[A-Za-z0-9]{20}')
         && looToiletOk(request.resource.data)
         && request.resource.data.createdAt is timestamp
-        && request.resource.data.approved == true;
+        && (!('approved' in request.resource.data) || request.resource.data.approved == true);
       allow update: if looIsAdmin()
         && looToiletOk(request.resource.data)
         && request.resource.data.uid == resource.data.uid;

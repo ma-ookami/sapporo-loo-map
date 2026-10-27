@@ -225,7 +225,7 @@ addEventListener('focusout',()=>setTimeout(()=>{ if (dirty&&!typing()){ dirty=fa
 function render(){
   document.title=(pend.length?'('+pend.length+') ':'')+'運営 | 札幌トイレ・コンビニマップ';
   if (typing()){ dirty=true; return; }
-  renderStats(); renderAdmins(); renderBlocked(); renderHidden();
+  renderStats(); renderAdmins(); renderBlocked(); renderHidden(); renderBackup();
   $('pn').textContent=pend.length||'なし'; $('pn').classList.toggle('hot',pend.length>0);
   // 申請: 名前で絞り込み・並べ替え(番号は地図のピンと同じまま)
   const qp=q.pend.trim().toLowerCase(), sp=$('s-pend').value;
@@ -294,7 +294,53 @@ async function actAdded(a,t,c){
     if (a==='del'){ if (!confirm('「'+t.name+'」を削除します(元に戻せません)')) return; await db.collection('loo-toilets').doc(t.id).delete(); }
   }catch(e){ alert('できませんでした: '+(e.code||e.message)); }
 }
+// ---- バックアップ(JSON を保存)と復元 ----
+// 保存するのは、ユーザーが作ったデータ。合言葉(loo-secret)と運営の端末(loo-admins)は含めない
+const BK_COLS=['loo-toilets','loo-requests','loo-reports','loo-rejects','loo-blocked','loo-hidden'];
+const toJson=v=>{ if (v&&typeof v.toMillis==='function') return {__ts:v.toMillis()}; if (Array.isArray(v)) return v.map(toJson); if (v&&typeof v==='object'){ const o={}; for (const k in v) o[k]=toJson(v[k]); return o; } return v; };
+const fromJson=v=>{ if (v&&typeof v==='object'){ if (typeof v.__ts==='number') return firebase.firestore.Timestamp.fromMillis(v.__ts); if (Array.isArray(v)) return v.map(fromJson); const o={}; for (const k in v) o[k]=fromJson(v[k]); return o; } return v; };
+const BK_KEY='loo-admin-backup';
+function renderBackup(){
+  let t=null; try{ t=+localStorage.getItem(BK_KEY)||null; }catch(e){}
+  const days=t?Math.floor((Date.now()-t)/86400000):null, old=t==null||days>=7;
+  $('bkn').textContent=t==null?'未保存':days===0?'今日保存':days+'日前'; $('bkn').classList.toggle('hot',old);
+  $('bk-info').textContent=t?'前回: '+new Date(t).toLocaleString('ja-JP')+(old?'(1週間以上たっています。保存してください)':''):'まだ保存していません。';
+}
+async function backupNow(){
+  const btn=$('bk-save'); btn.disabled=true; btn.textContent='保存中…';
+  try{
+    const cols={}; let n=0;
+    for (const c of BK_COLS){ const s=await db.collection(c).get(); cols[c]=s.docs.map(d=>({id:d.id,data:toJson(d.data())})); n+=cols[c].length; }
+    const blob=new Blob([JSON.stringify({app:'sapporo-loo-map',version:1,savedAt:new Date().toISOString(),collections:cols},null,1)],{type:'application/json'});
+    const d=new Date(), p=x=>String(x).padStart(2,'0'), name='sapporo-loo-backup-'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes())+'.json';
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    try{ localStorage.setItem(BK_KEY,String(Date.now())); }catch(e){}
+    renderBackup();
+    $('bk-info').textContent=name+' を保存しました('+n+' 件)。ファイルを安全な場所に移してください。';
+  }catch(e){ alert('保存できませんでした: '+(e.code||e.message)); }
+  btn.disabled=false; btn.textContent='バックアップを保存';
+}
+// 復元: ルールで書けるものだけ(公開中のトイレ・ブロック・却下の記録・非表示)。すでにあるものは上書きしない。申請と報告は、ルール上 本人しか書けないので戻せない(ファイルには残る)
+async function restoreFile(file){
+  try{
+    const j=JSON.parse(await file.text());
+    if (!j||j.app!=='sapporo-loo-map'||!j.collections) throw new Error('バックアップのファイルではありません');
+    const plan=[], skip={};
+    for (const c of ['loo-toilets','loo-blocked','loo-rejects','loo-hidden']){
+      const have=new Set((await db.collection(c).get()).docs.map(d=>d.id));
+      (j.collections[c]||[]).forEach(x=>{ if (have.has(x.id)) skip[c]=(skip[c]||0)+1; else plan.push([c,x]); });
+    }
+    const cnt=c=>plan.filter(p=>p[0]===c).length;
+    const msg='このファイル('+(j.savedAt||'')+')から戻します。\n公開中のトイレ '+cnt('loo-toilets')+' 件 / ブロック '+cnt('loo-blocked')+' 件 / 却下の記録 '+cnt('loo-rejects')+' 件 / 非表示 '+cnt('loo-hidden')+' 件\n(すでにあるものは、そのままにします。申請と報告は、戻せません)';
+    if (!plan.length){ alert('戻すものはありません(すべて、すでにあります)'); return; }
+    if (!confirm(msg)) return;
+    for (let i=0;i<plan.length;i+=400){ const b=db.batch(); plan.slice(i,i+400).forEach(([c,x])=>b.set(db.collection(c).doc(x.id),fromJson(x.data))); await b.commit(); }
+    alert('戻しました('+plan.length+' 件)');
+  }catch(e){ alert('戻せませんでした: '+(e.code||e.message)); }
+  $('bk-file').value='';
+}
 function initTools(){
+  $('bk-save').onclick=backupNow; $('bk-file').onchange=e=>{ if (e.target.files[0]) restoreFile(e.target.files[0]); };
   [['q-pend','pend'],['q-miss','miss'],['q-added','added']].forEach(([id,k])=>{ $(id).oninput=e=>{ q[k]=e.target.value; render(); }; });
   $('s-pend').onchange=render; $('s-added').onchange=render;
 }

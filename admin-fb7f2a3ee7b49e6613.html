@@ -67,6 +67,7 @@ button.ghost{background:transparent;color:inherit;border:1px solid rgba(255,255,
 .pp .n{position:absolute;top:-9px;right:-9px;min-width:18px;height:18px;border-radius:99px;background:var(--accent);color:#fff;border:2px solid #fff;font:800 10.5px/14px sans-serif;text-align:center;padding:0 3px}
 .pp.sm{width:22px;height:22px}.pp.sm .dash{width:22px;height:22px}.pp.sm svg.ic{width:13px;height:13px}.pp.c.sm{width:20px;height:20px}
 #map.lowzoom .cv{display:none}
+.filebtn{display:inline-block;padding:8px 14px;border-radius:10px;background:var(--tint);cursor:pointer;font-size:14px}
 .tools{display:flex;gap:8px;margin:8px 0}
 .tools input,.tools select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-width:0}
 .tools input{flex:1}
@@ -148,6 +149,10 @@ tr:last-child td{border-bottom:0}
       <div class="sub">合言葉を入れて運営として登録された端末の一覧です。身に覚えのない端末があれば「外す」で外し、合言葉(loo-secret/admin の code)も変えてください。</div>
       <div id="admins"></div>
     </section>
+    <section class="panel v-overview" id="bkpanel"><h2>データのバックアップ <em id="bkn"></em></h2>
+      <div class="sub">ユーザーが追加したトイレ・申請・報告・却下の記録・ブロック・非表示を、ファイル(JSON)に保存します。定期的に保存して、パソコンやクラウドストレージなど安全な場所に置いてください。合言葉と運営の端末は含みません。</div>
+      <div class="acts"><button class="cta" id="bk-save">バックアップを保存</button><label class="filebtn">ファイルから復元<input type="file" id="bk-file" accept=".json,application/json" hidden></label></div>
+      <div class="sub" id="bk-info" style="margin-top:8px"></div></section>
     <section class="panel v-overview" id="blockedpanel"><h2>ブロック中の申請者 <em id="bn"></em></h2><div class="sub">ブロックした人は、申請を送れません。「許可待ちの申請」の「この人をブロック」から追加します。</div><div id="blocked"></div></section>
     <div class="cols">
       <div>

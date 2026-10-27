@@ -66,6 +66,7 @@ D('いまの様子({n}時間だけ表示)', 'Condition right now (shown for {n} 
 ADD('使えなかったら教えてね(24時間だけ表示)', 'Tell us if it was unusable (shown for 24 hours only)'); ADD('最近、使えなかった報告', 'Reported unusable recently');
 ADD('この場所を共有', 'Share this place'); ADD('リンクをコピーしました', 'Link copied'); ADD('コピーできませんでした', "Couldn't copy");
 ADD('申請する', 'Submit'); ADD('申請しました。運営が確認すると、みんなの地図に出ます', 'Submitted. It will appear on everyone’s map once reviewed.'); ADD('運営の確認待ち(あなたにだけ見えています)', 'Awaiting review (only you can see this)');
+ADD('1人が教えてくれました。もう1人の報告で、地図に出ます。借りたことがあれば、教えてね', 'One person has told us. One more report and it will show on the map. If you have borrowed it, let us know.');
 D('お店のご厚意で借りるトイレです', 'This toilet is lent as a favor by the store. Please buy something if you can, avoid busy times and keep it clean. Some stores are for customers only.');
 D('ビルやお店のトイレは、お客さん専用', 'Toilets in buildings and shops are sometimes for customers only. If you can’t use one, just try somewhere else.');
 

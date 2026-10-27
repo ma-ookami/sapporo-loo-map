@@ -49,12 +49,16 @@ const activeBrands=()=>BRAND_KEYS.filter(b=>st.filters['b_'+b]);
 const convMode=()=>st.filters.conly||activeBrands().length>0;
 const passes=t=>(!st.filters.tonly||t.type==='toilet')&&(!st.filters.conly||t.type==='conv')&&(!activeBrands().length||(t.type==='conv'&&activeBrands().includes(t.brand)))&&(!st.filters.conv||(t.type==='conv'&&['yes','ask'].includes(loanOf(t))))&&(!st.filters.free||t.fee===false)&&(!st.filters.wheel||t.wheelchair===true)&&(!st.filters.open||openNow(t.hours)!==false)&&(!st.filters.h24||t.hours==='24/7');
 // コンビニの貸し出し: 報告(1人1票)の多数決。同数は「声をかけて」。追加した人の選択も1票。まだ無ければ null(未確認)
+// コンビニの貸し出し: みんなの報告の多数決(同数は声かけ)。LOAN_DAYS 日より古い報告は数えない。LOAN_MIN 人未満は不明のまま
+const LOAN_MIN=2, LOAN_DAYS=90;
+const loanFresh=r=>r.at>=Date.now()-LOAN_DAYS*86400000;
 function loanOf(t){
   if (t.type!=='conv') return null;
   const c={yes:0,ask:0,no:0};
   if (t.source==='user'&&t.loan) c[t.loan]++;
-  for (const r of st.reports) if (r.toiletId===t.id&&r.kind.startsWith('loan-')) c[r.kind.slice(5)]++;
-  const max=Math.max(c.yes,c.ask,c.no); if (!max) return null;
+  for (const r of st.reports) if (r.toiletId===t.id&&r.kind.startsWith('loan-')&&loanFresh(r)) c[r.kind.slice(5)]++;
+  if (c.yes+c.ask+c.no<LOAN_MIN) return null;
+  const max=Math.max(c.yes,c.ask,c.no);
   const top=Object.keys(c).filter(k=>c[k]===max);
   return top.length===1?top[0]:'ask';
 }

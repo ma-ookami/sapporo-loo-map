@@ -2,7 +2,7 @@
 const KINDS=[['closed','使えなかった']];
 
 const LKINDS=[['loan-yes','check','借りられる','そのまま'],['loan-ask','chat','声をかけて','店員さんに一言/貼り紙あり'],['loan-no','close','借りられない','貸出なし/断られた']];
-function loanCounts(id){ const c={'loan-yes':0,'loan-ask':0,'loan-no':0}; for (const r of st.reports) if (r.toiletId===id&&c[r.kind]!==undefined) c[r.kind]++; return c; }
+function loanCounts(id){ const c={'loan-yes':0,'loan-ask':0,'loan-no':0}; for (const r of st.reports) if (r.toiletId===id&&c[r.kind]!==undefined&&loanFresh(r)) c[r.kind]++; return c; }
 function reportCounts(id){
   const since=Date.now()-24*3600*1000, c={clean:0,crowded:0,closed:0}; let mine=null;
   for (const r of st.reports){ if (r.toiletId!==id||r.at<since||c[r.kind]===undefined) continue; c[r.kind]++; if (r.mine) mine=r.kind; }
@@ -91,7 +91,7 @@ function renderDetail(body,t){
     ${t.type==='conv'
       ?`<div class="sec2">このコンビニのトイレ、借りられる?</div>
     <div class="lq">${LKINDS.map(([k,ic,l,sub])=>`<button data-k="${k}" aria-pressed="${mine===k}"><span class="lic">${icon(ic,20)}</span><b>${l}</b><small>${sub.replace("/","<br>")}</small><em>${lc[k]?lc[k]+'人':'&nbsp;'}</em></button>`).join('')}</div>
-    <div class="repnote">${(n=>n?`${n}人が教えてくれました。借りたことがあれば、あなたも教えてね`:'まだ誰も教えてくれていません。借りたことがあれば、教えてね')(lc['loan-yes']+lc['loan-ask']+lc['loan-no'])}</div>`
+    <div class="repnote">${(n=>n>=LOAN_MIN?`${n}人が教えてくれました。借りたことがあれば、あなたも教えてね`:n?'1人が教えてくれました。もう1人の報告で、地図に出ます。借りたことがあれば、教えてね':'まだ誰も教えてくれていません。借りたことがあれば、教えてね')(lc['loan-yes']+lc['loan-ask']+lc['loan-no'])}</div>`
       :`<div class="sec2">使えなかったら教えてね(24時間だけ表示)</div>
     <div class="reps">${KINDS.map(([k,l])=>`<button data-k="${k}" aria-pressed="${mine===k}"><i></i>${l}${c[k]?` <b>${c[k]}</b>`:''}</button>`).join('')}</div>`}
     <div class="care">${icon('info',16)}<span>${t.type==='conv'?'お店のご厚意で借りるトイレです。できればお買い物を。混んでいるときは遠慮して、きれいに使いましょう。お客さん専用のお店もあります。':'ビルやお店のトイレは、お客さん専用のこともあります。使えなかったときは、無理せず別の場所へ。'}</span></div>

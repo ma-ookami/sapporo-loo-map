@@ -8,7 +8,7 @@ const LOANS={yes:'借りられる',ask:'声をかけて',no:'借りられない'
 const dist=(a,b)=>{ const R=6371000,r=Math.PI/180,dl=(b.lat-a.lat)*r,dg=(b.lng-a.lng)*r,h=Math.sin(dl/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dg/2)**2; return 2*R*Math.asin(Math.sqrt(h)); };
 const when=t=>{ try{ const d=t&&t.toDate?t.toDate():null; return d?d.toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):''; }catch(e){ return ''; } };
 
-let db=null, map=null, markers=[], pend=[], added=[], sel=null, unsubs=[];
+let db=null, map=null, markers=[], pend=[], added=[], miss=[], sel=null, unsubs=[];
 
 function start(){
   const cfg=window.FIREBASE_CONFIG;
@@ -37,6 +37,7 @@ async function onUser(u){
   const denied=e=>{ $('main').hidden=true; $('msg').textContent='読めませんでした: '+(e.code||e.message); console.warn(e); };
   $('main').hidden=false; initMap();
   unsubs.push(db.collection('loo-requests').onSnapshot(s=>{ pend=s.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?x.createdAt.toMillis():0)-(y.createdAt?y.createdAt.toMillis():0)); render(); },denied));
+  unsubs.push(db.collection('loo-reports').where('kind','==','missing').onSnapshot(s=>{ miss=s.docs.map(d=>d.data()); render(); },denied));
   unsubs.push(db.collection('loo-toilets').onSnapshot(s=>{ added=s.docs.map(d=>({id:d.id,...d.data()})); render(); },denied));
 }
 
@@ -79,6 +80,18 @@ function card(r,i){
     +'</div>';
 }
 
+// 「ここにはなかった」の報告が付いた場所(人数の多い順)。ユーザー追加(u-<ID>)は削除できる
+function renderMissing(){
+  const by={}; miss.forEach(r=>{ (by[r.toiletId]=by[r.toiletId]||new Set()).add(r.uid); });
+  const rows=Object.entries(by).map(([id,s])=>({id,n:s.size,t:id.startsWith('u-')?added.find(x=>x.id===id.slice(2)):TOILETS.find(x=>x.id===id)})).filter(o=>o.t).sort((a,b)=>b.n-a.n);
+  $('mn').textContent=rows.length?'('+rows.length+'件)':'(なし)';
+  $('missing').innerHTML=rows.map(o=>'<div class="card" data-mid="'+esc(o.id)+'"><b>'+esc(o.t.name||'(名前なし)')+'</b> <span class="pill">'+(o.t.type==='conv'?'コンビニ':'トイレ')+'</span><span class="pill">'+o.n+'人が「なかった」'+(o.n>=3?'(アプリで薄く表示中)':'')+'</span> <a href="https://www.google.com/maps?q='+o.t.lat+','+o.t.lng+'" target="_blank" rel="noopener">Google マップ</a>'+(o.id.startsWith('u-')?' <button class="ng" data-a="mdel" style="float:right">削除</button>':' <span class="sub">(公開データ)</span>')+'</div>').join('')||'<div class="sub">なし</div>';
+  document.querySelectorAll('#missing [data-a=mdel]').forEach(b=>b.onclick=async()=>{
+    const id=b.closest('.card').dataset.mid.slice(2), t=added.find(x=>x.id===id);
+    if (!confirm('「'+(t?t.name:id)+'」を削除します(元に戻せません)')) return;
+    try{ await db.collection('loo-toilets').doc(id).delete(); }catch(e){ alert('削除できませんでした: '+(e.code||e.message)); }
+  });
+}
 let dirty=false;
 // 入力中に再描画すると直している最中の値が消えるので、入力が終わってから描き直す
 function typing(){ const a=document.activeElement; return !!(a&&a.closest&&a.closest('#pending')&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); }
@@ -87,6 +100,7 @@ function render(){
   if (typing()){ dirty=true; return; }
   $('pn').textContent=pend.length?'('+pend.length+'件)':'(なし)';
   $('pending').innerHTML=pend.length?pend.map(card).join(''):'<div class="sub">許可待ちはありません</div>';
+  renderMissing();
   const ua=added.filter(t=>t.uid);
   $('an').textContent='('+ua.length+'件)';
   $('added').innerHTML=ua.map(t=>'<div class="card" data-aid="'+esc(t.id)+'"><b>'+esc(t.name)+'</b> <span class="pill">'+(t.type==='conv'?'コンビニ':'トイレ')+'</span>'+(t.approved?'<span class="pill">許可済み</span>':'<span class="pill">許可制の前の投稿</span>')+' <button class="ng" data-a="del" style="float:right">削除</button></div>').join('')||'<div class="sub">なし</div>';

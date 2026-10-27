@@ -18,6 +18,7 @@ I18N.en={
  "「ここにはなかった」と報告済み(押すと取り消し)": "Reported “not here” (tap to undo)",
  "「なかった」の報告があります": "Someone reported it isn't there",
  "「徒歩○分」の計算に使います": "Used to calculate “N min walk”",
+ "1人が教えてくれました。もう1人の報告で、地図に出ます。借りたことがあれば、教えてね": "One person has told us. One more report and it will show on the map. If you have borrowed it, let us know.",
  "2階以上": "Floor 2+",
  "5以上": "5+",
  "Google マップを開いて、「{name}」までの徒歩ルートを表示します。よろしいですか?": "Open Google Maps and show walking directions to “{name}”. Continue?",

@@ -1,10 +1,23 @@
 // playground の firestore.rules に、「ここから/ここまで」の間を「match /databases/{database}/documents { ... }」の中へ足す(他のアプリの match の後ろでよい。すでにあるなら、目印の間だけ置き換える)
-// 運営: 下の looIsAdmin() の 'CHANGE_ME_ADMIN_EMAIL' を、admin.html に Google ログインするメールアドレスに書き換えてから公開する(書き換えるまでは、誰も運営になれないので安全)
+// 運営: 合言葉で入る。Firebase コンソールで、コレクション loo-secret にドキュメント ID「admin」を作り、フィールド code(文字列)に、20 文字以上の推測されにくい合言葉を入れる(クライアントからは読めない)。管理画面で同じ合言葉を入れた端末が、運営として登録される(loo-admins/<uid>)。運営をやめさせるときは、loo-admins のその文書を消す
     // ===== 札幌トイレマップ(loo-) ここから =====
     function looIsAdmin() {
       return request.auth != null
-        && request.auth.token.email == 'CHANGE_ME_ADMIN_EMAIL'
-        && request.auth.token.email_verified == true;
+        && exists(/databases/$(database)/documents/loo-admins/$(request.auth.uid));
+    }
+    // 合言葉の置き場。クライアントからは読めも書けもしない(下の loo-admins の照合に、ルールだけが読む)
+    match /loo-secret/{id} {
+      allow read, write: if false;
+    }
+    // 運営の登録。合言葉(code)が loo-secret/admin と同じときだけ、自分の uid の文書を作れる。自分の分は読める・消せる(運営をやめる)
+    match /loo-admins/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['code','createdAt'])
+        && request.resource.data.code is string
+        && request.resource.data.code == get(/databases/$(database)/documents/loo-secret/admin).data.code;
+      allow update: if false;
+      allow delete: if request.auth != null && request.auth.uid == uid;
     }
     // トイレ・コンビニの項目の検査(申請 loo-requests と、運営が許可して書く loo-toilets の両方で使う)
     function looToiletOk(d) {

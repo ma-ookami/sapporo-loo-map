@@ -3,15 +3,28 @@ rules_version = '2';
 // 札幌トイレマップ(単独で使うとき用): 公開中のトイレ(loo-toilets)・申請(loo-requests)・一言報告(loo-reports)だけを扱う。
 // 他のアプリと同じ Firebase プロジェクト(playground)で使うため、コレクション名は loo- で始める。
 // - 追加は「申請 → 運営が許可」。申請(loo-requests)は匿名ログイン済みなら誰でも作れ、読めるのは本人と運営だけ
-// - 運営だけが loo-toilets に書ける(admin.html)。運営のメールは looIsAdmin() の 'CHANGE_ME_ADMIN_EMAIL' に書く
+// - 運営だけが loo-toilets に書ける。運営は合言葉(loo-secret/admin)で登録する(README §1b)
 // - loo-reports(一言報告)は 1人1トイレ1件。読むのは誰でも、書く・消すのは本人だけ
 service cloud.firestore {
   match /databases/{database}/documents {
     // ===== 札幌トイレマップ(loo-) ここから =====
     function looIsAdmin() {
       return request.auth != null
-        && request.auth.token.email == 'CHANGE_ME_ADMIN_EMAIL'
-        && request.auth.token.email_verified == true;
+        && exists(/databases/$(database)/documents/loo-admins/$(request.auth.uid));
+    }
+    // 合言葉の置き場。クライアントからは読めも書けもしない(下の loo-admins の照合に、ルールだけが読む)
+    match /loo-secret/{id} {
+      allow read, write: if false;
+    }
+    // 運営の登録。合言葉(code)が loo-secret/admin と同じときだけ、自分の uid の文書を作れる。自分の分は読める・消せる(運営をやめる)
+    match /loo-admins/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['code','createdAt'])
+        && request.resource.data.code is string
+        && request.resource.data.code == get(/databases/$(database)/documents/loo-secret/admin).data.code;
+      allow update: if false;
+      allow delete: if request.auth != null && request.auth.uid == uid;
     }
     // トイレ・コンビニの項目の検査(申請 loo-requests と、運営が許可して書く loo-toilets の両方で使う)
     function looToiletOk(d) {

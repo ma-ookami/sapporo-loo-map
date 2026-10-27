@@ -1,5 +1,5 @@
-/* 運営の画面(admin.html)。Google ログイン → 申請(loo-requests)を見て、許可(loo-toilets に移す)・却下(消す)。
-   運営かどうかは firestore.rules の looIsAdmin()(メールアドレス)が決める。この画面は、読めなければ「運営ではありません」と出すだけ */
+/* 運営の画面(推測されにくい名前のファイル。README §1b)。合言葉を入れると、この端末の匿名 uid が loo-admins に登録される(ルールが loo-secret/admin の合言葉と照合)。
+   申請(loo-requests)を見て、許可(loo-toilets に移す)・却下(消す)。運営かどうかは firestore.rules の looIsAdmin()(loo-admins/<uid> があるか)が決める */
 const $=id=>document.getElementById(id);
 const ts=()=>firebase.firestore.FieldValue.serverTimestamp();
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -14,19 +14,27 @@ function start(){
   const cfg=window.FIREBASE_CONFIG;
   if (!(cfg&&cfg.projectId&&window.firebase)){ $('msg').textContent='Firebase の設定がありません'; return; }
   firebase.initializeApp(cfg); db=firebase.firestore();
-  firebase.auth().onAuthStateChanged(onUser);
+  // アプリと同じ匿名ログイン(同じブラウザならアプリと同じ uid)。運営かどうかは loo-admins/<uid> があるかどうか
+  firebase.auth().onAuthStateChanged(u=>{ if (u) onUser(u); else firebase.auth().signInAnonymously().catch(e=>{ $('msg').textContent='ログインできませんでした: '+(e.code||e.message); }); });
 }
-function onUser(u){
+async function onUser(u){
   unsubs.forEach(f=>f()); unsubs=[]; $('main').hidden=true; $('msg').textContent='';
+  let ok=false;
+  try{ ok=(await db.collection('loo-admins').doc(u.uid).get()).exists; }catch(e){ ok=false; }
   const a=$('auth');
-  if (!u||u.isAnonymous){
-    a.innerHTML='<button class="cta" id="login">Google でログイン</button>';
-    $('login').onclick=()=>firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>{ $('msg').textContent='ログインできませんでした: '+(e.code||e.message); });
+  if (!ok){
+    a.innerHTML='<label style="flex-direction:column;display:flex;font-size:12px;color:var(--sub);gap:2px">合言葉<input id="code" type="password" autocomplete="off" style="font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;width:260px;background:var(--card);color:var(--ink)"></label><button class="cta" id="enter" style="align-self:flex-end">入る</button>';
+    const go=async()=>{
+      const code=$('code').value; if (!code) return;
+      try{ await db.collection('loo-admins').doc(u.uid).set({code,createdAt:ts()}); onUser(u); }
+      catch(e){ $('msg').textContent='入れませんでした(合言葉が違うか、まだ設定されていません)'; }
+    };
+    $('enter').onclick=go; $('code').onkeydown=e=>{ if (e.key==='Enter') go(); };
     return;
   }
-  a.innerHTML='<span class="sub">'+esc(u.email)+'</span><button id="logout">ログアウト</button>';
-  $('logout').onclick=()=>firebase.auth().signOut();
-  const denied=e=>{ $('main').hidden=true; $('msg').textContent='運営ではありません(このメールでは読めませんでした: '+u.email+')。ルールの looIsAdmin() のメールを確認してください'; console.warn(e); };
+  a.innerHTML='<span class="sub">運営として入っています</span><button id="logout">この端末を運営から外す</button>';
+  $('logout').onclick=async()=>{ try{ await db.collection('loo-admins').doc(u.uid).delete(); }catch(e){} onUser(u); };
+  const denied=e=>{ $('main').hidden=true; $('msg').textContent='読めませんでした: '+(e.code||e.message); console.warn(e); };
   $('main').hidden=false; initMap();
   unsubs.push(db.collection('loo-requests').onSnapshot(s=>{ pend=s.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?x.createdAt.toMillis():0)-(y.createdAt?y.createdAt.toMillis():0)); render(); },denied));
   unsubs.push(db.collection('loo-toilets').onSnapshot(s=>{ added=s.docs.map(d=>({id:d.id,...d.data()})); render(); },denied));

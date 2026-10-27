@@ -3,8 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>札幌トイレ・コンビニマップ</title>
-<meta name="description" content="すすきの周辺のトイレを地図で探す。いちばん近いトイレへ一発ナビ。">
+<title>札幌トイレ・コンビニマップ|すすきの・札幌駅のトイレを探す</title>
+<meta name="description" content="すすきの〜札幌駅の、近くのトイレと、トイレを借りられるコンビニを地図で探せる無料のWebアプリ。無料・車いす・24時間・いま営業中で絞り込み、いちばん近い場所へ徒歩ナビ。">
+<link rel="canonical" href="https://sapporo-pitstop.rokunanabox.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="札幌トイレ・コンビニマップ">
+<meta property="og:title" content="札幌トイレ・コンビニマップ|すすきの・札幌駅のトイレを探す">
+<meta property="og:description" content="近くのトイレと、トイレを借りられるコンビニを地図で探せる。無料・車いす・24時間で絞り込み、いちばん近い場所へ徒歩ナビ。">
+<meta property="og:url" content="https://sapporo-pitstop.rokunanabox.com/">
+<meta property="og:image" content="https://sapporo-pitstop.rokunanabox.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://sapporo-pitstop.rokunanabox.com/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"札幌トイレ・コンビニマップ","alternateName":"Sapporo Loo Map","url":"https://sapporo-pitstop.rokunanabox.com/","description":"すすきの〜札幌駅の、トイレとトイレを借りられるコンビニを地図で探せる無料のWebアプリ。","applicationCategory":"TravelApplication","operatingSystem":"Any","inLanguage":["ja","en"],"offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"},"areaServed":{"@type":"Place","name":"札幌市中央区(すすきの・大通・札幌駅周辺)"}}</script>
 <meta name="theme-color" content="#f6f4f1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1714" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
@@ -16,10 +29,17 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="トイレマップ">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" integrity="sha384-MinO0mNliZ3vwppuPOUnGa+iq619pfMhLVUXfC4LHwSCvF9H+6P/KO4Q7qBOYV5V" crossorigin="anonymous">
-<link rel="stylesheet" href="css/style.css?v=0710dcab">
+<link rel="stylesheet" href="css/style.css?v=85ca785f">
 </head>
 <body>
 <div id="map"></div>
+<div class="sr-only" id="about">
+<h1>札幌トイレ・コンビニマップ</h1>
+<p>すすきの・大通・札幌駅周辺で、いま近くにあるトイレと、トイレを借りられるコンビニを地図で探せる無料のWebアプリです。インストール不要で、スマホのホーム画面にも追加できます。</p>
+<ul><li>無料・車いす対応・24時間・いま営業中のトイレで絞り込み</li><li>いちばん近い場所までの徒歩ナビ(Google マップ)</li><li>地下にあるトイレの印、個室の数、利用者からの「使えなかった」報告</li><li>セブン-イレブン・ファミリーマート・ローソン・セイコーマートなど、コンビニの貸し出しの状況</li></ul>
+<p>地図データは © OpenStreetMap contributors。お客さん専用のトイレもあります。コンビニなどでは、お店のご厚意で借りることになるので、できるだけお買い物を。</p>
+<p><a href="privacy.html">プライバシーとデータについて</a></p>
+</div>
 
 <header id="top">
   <div class="brand" id="brand"></div>

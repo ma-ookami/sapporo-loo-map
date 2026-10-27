@@ -1,20 +1,19 @@
-// 運営画面(admin.html)の確認。Firebase は偽物(メモリ上)に差し替える: node tools/test-admin.js [out.png]
+// 運営画面(admin-fb7f2a3ee7b49e6613.html)の確認。Firebase は偽物(メモリ上)に差し替える: node tools/test-admin.js [out.png]
 const { chromium } = require('../../taskline/node_modules/playwright-core');
 const FAKE = () => {
   const mk = ms => ({ toMillis: () => ms, toDate: () => new Date(ms) });
-  const store = { 'loo-requests': {}, 'loo-toilets': {} }, subs = [];
+  const store = { 'loo-requests': {}, 'loo-toilets': {}, 'loo-admins': {} }, subs = [];
   const emit = () => subs.forEach(s => s());
   const snap = n => ({ docs: Object.entries(store[n]).map(([id, d]) => ({ id, data: () => d })) });
   const near = window.__near;
   store['loo-requests'].AAAAAAAAAAAAAAAAAAAA = { name: '新しい店のトイレ', lat: near.lat + 0.00005, lng: near.lng, fee: false, wheelchair: true, floor: 2, ease: null, find: null, type: 'toilet', brand: null, loan: null, note: '2階の奥', uid: 'userAAAA1111', createdAt: mk(Date.now() - 60000) };
   store['loo-requests'].BBBBBBBBBBBBBBBBBBBB = { name: 'いたずら', lat: 43.0600, lng: 141.3500, fee: null, wheelchair: null, floor: null, ease: null, find: null, type: 'toilet', brand: null, loan: null, note: 'ここ', uid: 'userBBBB2222', createdAt: mk(Date.now() - 30000) };
   window.__store = store;
-  const coll = n => ({ onSnapshot(cb) { const f = () => cb(snap(n)); subs.push(f); f(); return () => { subs.splice(subs.indexOf(f), 1); }; }, doc: id => ({ _n: n, _id: id, delete: async () => { delete store[n][id]; emit(); } }) });
+  const coll = n => ({ onSnapshot(cb) { const f = () => cb(snap(n)); subs.push(f); f(); return () => { subs.splice(subs.indexOf(f), 1); }; }, doc: id => ({ _n: n, _id: id, get: async () => ({ exists: id in store[n] }), set: async d => { if (n === 'loo-admins' && d.code !== 'good-code') { const e = new Error('denied'); e.code = 'permission-denied'; throw e; } store[n][id] = d; emit(); }, delete: async () => { delete store[n][id]; emit(); } }) });
   const fs = () => ({ collection: coll, batch: () => { const ops = []; return { set: (r, d) => ops.push(() => { store[r._n][r._id] = d; }), delete: r => ops.push(() => { delete store[r._n][r._id]; }), commit: async () => { ops.forEach(o => o()); emit(); } }; } });
   fs.FieldValue = { serverTimestamp: () => 0 };
-  let cb; const user = { email: 'admin@example.com', isAnonymous: false };
-  const auth = () => ({ onAuthStateChanged: f => { cb = f; setTimeout(() => f(user), 50); }, signOut: async () => cb(null) });
-  auth.GoogleAuthProvider = function () {};
+  let cb; const user = { uid: 'anonA', isAnonymous: true };
+  const auth = () => ({ onAuthStateChanged: f => { cb = f; setTimeout(() => f(null), 20); }, signInAnonymously: async () => { setTimeout(() => cb(user), 20); } });
   window.firebase = { initializeApp() {}, auth, firestore: fs };
 };
 (async () => {
@@ -25,7 +24,13 @@ const FAKE = () => {
   const near = await (async () => { const q = await ctx.newPage(); await q.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/data/toilets.js'); const t = await q.evaluate(() => document.body.innerText.match(/"lat": ([\d.]+),\s+"lng": ([\d.]+)/)); await q.close(); return { lat: +t[1], lng: +t[2] }; })();
   await p.addInitScript(n => { window.__near = n; }, near);
   await p.addInitScript('(' + FAKE.toString() + ')()');
-  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/admin.html'); await p.waitForTimeout(2500);
+  await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/admin-fb7f2a3ee7b49e6613.html'); await p.waitForTimeout(2000);
+  console.log('0 合言葉の入力欄', await p.locator('#code').count(), '| 申請はまだ見えない', await p.locator('#pending .card').count());
+  if (process.argv[3]) await p.screenshot({ path: process.argv[3], clip: { x: 0, y: 0, width: 900, height: 200 } });
+  await p.fill('#code', 'wrong'); await p.click('#enter'); await p.waitForTimeout(500);
+  console.log('0b 違う合言葉', await p.locator('#msg').innerText(), '| main', await p.locator('#main').isVisible());
+  await p.fill('#code', 'good-code'); await p.click('#enter'); await p.waitForTimeout(2000);
+  console.log('0c 正しい合言葉で入れた', await p.locator('#main').isVisible());
   console.log('1 申請の数', await p.locator('#pending .card').count(), '| 近くの重複の表示', await p.locator('#pending .near.warn').count());
   if (process.argv[2]) await p.locator('#pending').screenshot({ path: process.argv[2] });
   // 編集して許可(名前を直す)

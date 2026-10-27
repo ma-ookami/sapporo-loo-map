@@ -433,3 +433,4 @@ body.adding .legend-btn,body.adding #legend{display:none}
 .lm .pin.conv .ld{width:11px;height:11px;top:-4px;right:-4px}
 .lm .pin.conv.loan-no .ld{width:14px;height:14px;top:-5px;right:-5px;font-size:11px}
 .tag.user{background:var(--tint);color:var(--sub)}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}

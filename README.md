@@ -7,7 +7,7 @@
 ## 0. いまの状態(最初に読む)
 - **Git:** 手元の `main` は `origin/main` より **1 コミット先行(`6affbe0` が未 push)**。確認は `git status -sb`。**push はユーザーが「送って」「pushして」と言ったときだけ**(言われたら、そのまま送ってよい)。
 - **公開:** GitHub Pages(`main` / root)。独自ドメインは `CNAME`(`sapporo-pitstop.rokunanabox.com`)。送ったあと、反映まで数分。
-- **【要対応】運営の許可制を実装済み。ルール(`firestore.playground-snippet.rules`)の貼り直しと、`looIsAdmin()` の `CHANGE_ME_ADMIN_EMAIL` を運営のメールに書き換えるのが必要(書き換えるまで誰も運営になれない=申請は全部、許可待ちのまま)。貼るまでは、トイレの追加が保存できない(`loo-requests` が無いため)。** Firebase(playground)のルールは、変えるたびにユーザーがコンソールに貼り直す。それ以前に足したもの: `loo-reports` の `lv-gr`/`lv-ug`/`lv-up`(どの階?・文書 ID `<toiletId>_lv_<uid>`)と `stall-1`〜`stall-5`(個室の数・同 `_stall_<uid>`)、`loo-toilets` の任意項目 `stalls`。貼る前は、その報告・入力だけが保存できない(ほかは動く)。貼る前に `node tools/check-rules.js firestore.playground.rules`(括弧の数)。**他のアプリのルールもコンソールに入っているなら、全文ではなく「ここから/ここまで」の目印の間だけ置き換える**(全文を貼ると他のアプリのルールが消える)。
+- **【要対応】運営の許可制を実装済み。ルール(`firestore.playground-snippet.rules`)の貼り直しと、コンソールで `loo-secret/admin` に `code`(20 文字以上の合言葉)を作るのが必要(作るまで誰も運営になれない=申請は全部、許可待ちのまま)。貼るまでは、トイレの追加が保存できない(`loo-requests` が無いため)。** Firebase(playground)のルールは、変えるたびにユーザーがコンソールに貼り直す。それ以前に足したもの: `loo-reports` の `lv-gr`/`lv-ug`/`lv-up`(どの階?・文書 ID `<toiletId>_lv_<uid>`)と `stall-1`〜`stall-5`(個室の数・同 `_stall_<uid>`)、`loo-toilets` の任意項目 `stalls`。貼る前は、その報告・入力だけが保存できない(ほかは動く)。貼る前に `node tools/check-rules.js firestore.playground.rules`(括弧の数)。**他のアプリのルールもコンソールに入っているなら、全文ではなく「ここから/ここまで」の目印の間だけ置き換える**(全文を貼ると他のアプリのルールが消える)。
 - **iPhone 実機は未確認:** 設定を閉じられること(`--vh` で直した)、地下の「B」の印の位置、未確認の点線の輪、個室のボタン、英語表示、位置情報、すりガラス・ダーク・スワイプ、ホーム画面追加。Firestore につないだ状態の動作(Java が無くエミュレータが使えない)。
 - **テストは短く、変更に関係する 1〜2 本だけ**(ユーザーの方針・§7)。全部を連続で回さない。
 - 反映されないときは強制再読み込み(iPhone のホーム画面アイコンは削除して追加し直す)。`?v=` スタンプ(§8)導入前の古い `index.html` が残っていると混ざる。
@@ -15,7 +15,7 @@
 ## 1. 次にやること・決めること
 ### ユーザーの判断待ち(勝手に進めない)
 1. **フッターの設計(未決定)。** いまは「リスト・＋追加・設定」。ユーザーは「設定がフッターにあるのは違和感」「絞り込みが上と下に分かれるのも違和感」と言い、**自分で案を考えると言っている**。案を出すときの条件: 絞り込みは1か所にまとめる / フッターには使う頻度の高い操作だけ置く。(私の案は、設定を上の右へ戻し、フッターを「リスト・＋追加・絞り込み」にして絞り込みの2行をパネルに移す、または「リスト・＋追加」だけにする。どれも未採用)
-2. (済)運営の許可制は実装した(§1b)。ルールを貼って、`admin.html` で実機の流れ(申請→許可)を確認するのがまだ。
+2. (済)運営の許可制は実装した(§1b)。ルールを貼って、運営の画面 で実機の流れ(申請→許可)を確認するのがまだ。
 3. 私が書いた文言の確認: 初回の案内「使う前に」、プライバシーのページ(連絡先は GitHub Issues)、英語の訳(`js/i18n-en.js`)。
 ### 実装済み(もう一度提案しない)
 オフライン(`sw.js`)/ 近く(20m)に登録済みがあれば確認 / 投稿の間隔・回数の制限(ルール)/ maplibre の SRI / 「Google マップを開きます」の確認 / 「ここにはなかった」報告 / 英語表示(端末の言語で初期表示)/ 地下の表示(トイレだけ)/ 個室の数(利用者に教えてもらう)/ ユーザー追加の見た目と確認(§2)/ コンビニ探し / 設定 / ダークモード / 地図の色 / 現在地の案内。
@@ -26,7 +26,7 @@
 - OSM への還元(`capacity` タグ)/ App Store に出すなら、Expo 版を育てるより **Web 版を Capacitor で包む**ほうが現実的(Apple Developer 登録済み。決定はまだ)
 
 ## 1b. 実装済み(ルール未貼り・実機未確認): 投稿は「申請 → 運営が許可」
-- **実装:** クラウドのとき、追加は `loo-requests`(許可待ち)に入る。本人にだけ点線+「運営の確認待ち」で見える。運営が `admin.html`(Google ログイン、アプリからはリンクしない。メールは `looIsAdmin()`)で許可すると、同じ ID で `loo-toilets` に `approved:true` で移り、全員に出て「確認済み」(実線)になる。却下=申請を消す。許可前に項目を編集でき、40m 以内の同種の場所と地図で見られる。`admin.html` では公開中のユーザー追加の削除もできる。許可制の前の投稿(`approved` なし)はそのまま残り、従来どおり報告で確認される。ローカルモード(`?local=1`)は、いままでどおり即反映
+- **実装:** クラウドのとき、追加は `loo-requests`(許可待ち)に入る。本人にだけ点線+「運営の確認待ち」で見える。運営が `admin-fb7f2a3ee7b49e6613.html`(合言葉で入る。Google ログインなし。アプリからはリンクせず、`robots.txt` にも書かない推測されにくい名前。**リポジトリが公開なら名前は見える**ので、守っているのは合言葉とルール)で許可すると、同じ ID で `loo-toilets` に `approved:true` で移り、全員に出て「確認済み」(実線)になる。却下=申請を消す。許可前に項目を編集でき、40m 以内の同種の場所と地図で見られる。`admin.html` では公開中のユーザー追加の削除もできる。許可制の前の投稿(`approved` なし)はそのまま残り、従来どおり報告で確認される。ローカルモード(`?local=1`)は、いままでどおり即反映
 - 申請の連投制限は `loo-users`(30 秒に1件・24時間に10件)をそのまま使う。通知は画面の「確認中」表示だけ、却下理由は出さない
 - 確認は偽の Firebase で動かす `node tools/test-admin.js`。**本物のルール・ログインは未確認**(エミュレータ不可)
 - 以下は、決める前の検討メモ(経緯)
@@ -67,7 +67,7 @@
 - `js/geo.js` 距離・整形・ブランド/貸し出しの名前、`PACE`(徒歩速度)/ `hours.js` 営業時間の判定 / `icons.js` 細線アイコンと星 / `bear.js` くまトイ SVG(4表情・ゆれ・まばたき)/ `cloud.js` 保存(Firestore か localStorage)/ `map.js` 状態 `st`・地図・ピン・現在地・絞り込み(`passes`/`usable`/`convMode`)/ `settings.js` 設定画面 / `ui.js` シート・詳細・フッター・チップ・凡例・案内 / `add.js` 追加 / `main.js` 起動
 - `css/style.css` 全部(CSS 変数 → ダーク。ダークは `@media` と `html[data-theme=dark]` の2か所に同じ規則がある。設定追加時に `data-theme` 版も忘れない)
 - `data/toilets.js` 生成物(§4)/ `privacy.html` / `manifest.webmanifest` / アイコン `icon-192/512.png`・`apple-touch-icon.png`(`node tools/make-icons.js` で bear.js から生成)
-- `admin.html` + `js/admin.js`(運営の画面。§1b)
+- `admin-fb7f2a3ee7b49e6613.html` + `js/admin.js`(運営の画面。§1b。合言葉を入れた端末の匿名 uid が `loo-admins` に入り、ルールの `looIsAdmin()` が見る)
 - `firebase-config.js`(playground の設定。`?local=1` でローカルモード)/ `firestore.rules`(単独版)/ `firestore.playground-snippet.rules` / `firestore.playground.rules`(PaP との合体版)
 - `tools/`: `stamp.js`、`to-js.js`、`make-icons.js`、`shot.js`、`test-*.js`
 
@@ -114,6 +114,10 @@
 - iOS Safari は `navigator.vibrate` 非対応(振動は Android のみ)。位置情報は https 必須、`file://` 不可
 - git の「LF will be replaced by CRLF」の警告は無害
 - `st.filters` のキーを増やすときは、`index.html` のボタン(2段目は `data-g=t|c`)と `map.js` の `st.filters`・`passes` をそろえる
+
+## 8b. 検索(SEO)
+- `index.html` の head に title/description/canonical(独自ドメイン)/OGP/Twitter/JSON-LD、本文に読み上げ用の説明(`#about`、`.sr-only`)。`robots.txt`(運営の画面は、名前を明かさないため書かない)・`sitemap.xml`(新しいページを足したら追記)・共有画像 `og.png`(`node tools/make-og.js`)
+- **未実施(ユーザー作業):** Search Console / Bing Webmaster に登録(所有権の確認)してサイトマップを送る。**次の案(未着手):** エリア別の案内ページ(すすきの/大通/札幌駅。`tools/` で `data/toilets.js` から生成。場所ごとの薄いページは作らない)
 
 ## 9. コミットと報告のルール
 - 親フォルダの `CLAUDE.md` に従う: 日本語・報告は短く(結果・要対応・未確認だけ)、小さな変更は Edit、構文チェックしてからコミット

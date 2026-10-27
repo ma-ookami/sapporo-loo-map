@@ -409,3 +409,11 @@ body.adding .legend-btn,body.adding #legend{display:none}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--user:#a98af0;--user-soft:rgba(169,138,240,.2)}}
 :root[data-theme=dark]{--user:#a98af0;--user-soft:rgba(169,138,240,.2)}
 :root[data-theme=light]{--user:#7a4fd0;--user-soft:#ece6fa}
+.pin.user:not(.conv) .ub{display:none}
+.pin.user.unconf:not(.conv) .pi,.pin.user.unconf.sel:not(.conv) .pi{border-color:transparent}
+.pin:not(.conv) .dash{transform:scale(1.2)}
+.pin.user:not(.conv) .pi{background:linear-gradient(90deg,var(--wc-blue) 50%,var(--wc-red) 50%)}
+.pin.user.unconf:not(.conv) .pi{background:linear-gradient(90deg,color-mix(in srgb,var(--wc-blue) 28%,var(--card)) 50%,color-mix(in srgb,var(--wc-red) 28%,var(--card)) 50%);color:var(--ink)}
+.pin.user.unconf:not(.conv) .dash{color:var(--ink);opacity:.55}
+.pin.user.sel:not(.conv) .pi{background:var(--ink);color:var(--on-ink)}
+.pin.user.unconf.sel:not(.conv) .dash{color:var(--on-ink);opacity:.7}

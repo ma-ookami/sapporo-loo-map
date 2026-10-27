@@ -4,7 +4,7 @@ const cloud={
   mode:'local', uid:'local', fb:null, _t:[], _r:[], _tl:[], _pl:[],
   // 公開中 + 自分の申請中(許可されて公開側に出たものは申請側から外す)
   _emit(){ const ids=new Set(this._tl.map(x=>x.id)); this._ot(this._tl.concat(this._pl.filter(x=>!ids.has(x.id)))); },
-  async init(onToilets,onReports){
+  async init(onToilets,onReports,onHidden){
     this._ot=onToilets; this._or=onReports;
     const cfg=window.FIREBASE_CONFIG;
     // ?local=1 のときは、設定があってもこの端末だけに保存する(テスト・試し書き用)
@@ -16,6 +16,7 @@ const cloud={
         this.uid=cred.user.uid; this.mode='cloud'; this.fb=firebase.firestore();
         this.fb.collection('loo-toilets').onSnapshot(s=>{ this._tl=s.docs.map(d=>this._row(d.id,d.data())); this._emit(); },()=>{});
         this.fb.collection('loo-requests').where('uid','==',this.uid).onSnapshot(s=>{ this._pl=s.docs.map(d=>this._row(d.id,d.data(),true)); this._emit(); },()=>{});
+        if (onHidden) this.fb.collection('loo-hidden').onSnapshot(s=>onHidden(s.docs.map(d=>d.id)),()=>{});
         this.fb.collection('loo-reports').onSnapshot(s=>onReports(s.docs.map(d=>{ const r=d.data(); return {toiletId:r.toiletId,kind:r.kind,mine:r.uid===this.uid,uid:r.uid,at:r.createdAt?r.createdAt.toMillis():Date.now()}; })),()=>{});
         return;
       }catch(e){ console.warn('firebase 失敗。ローカルモードで動きます',e); setTimeout(()=>{ if (typeof toast==='function') toast('サーバーにつながらないので、この端末にだけ保存します'); },1500); }

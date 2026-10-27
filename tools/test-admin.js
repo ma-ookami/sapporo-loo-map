@@ -2,7 +2,7 @@
 const { chromium } = require('../../taskline/node_modules/playwright-core');
 const FAKE = () => {
   const mk = ms => ({ toMillis: () => ms, toDate: () => new Date(ms) });
-  const store = { 'loo-requests': {}, 'loo-toilets': {}, 'loo-admins': {}, 'loo-reports': {} }, subs = [];
+  const store = { 'loo-requests': {}, 'loo-toilets': {}, 'loo-admins': {}, 'loo-reports': {}, 'loo-rejects': {}, 'loo-blocked': {}, 'loo-hidden': {} }, subs = [];
   const emit = () => subs.forEach(s => s());
   const snap = n => ({ docs: Object.entries(store[n]).map(([id, d]) => ({ id, data: () => d })) });
   const near = window.__near;
@@ -10,7 +10,8 @@ const FAKE = () => {
   store['loo-requests'].BBBBBBBBBBBBBBBBBBBB = { name: 'いたずら', lat: 43.0600, lng: 141.3500, fee: null, wheelchair: null, floor: null, ease: null, find: null, type: 'toilet', brand: null, loan: null, note: 'ここ', uid: 'userBBBB2222', createdAt: mk(Date.now() - 30000) };
   ['a', 'b', 'c'].forEach(u => { store['loo-reports']['u-AAAAAAAAAAAAAAAAAAAA_' + u] = { toiletId: 'u-AAAAAAAAAAAAAAAAAAAA', kind: 'missing', uid: u }; });
   store['loo-admins'].otherDevice123 = { code: 'x', createdAt: mk(Date.now() - 5 * 86400000), lastSeen: mk(Date.now() - 3 * 3600000) };
-  window.__store = store;
+  store['loo-requests'].CCCCCCCCCCCCCCCCCCCC = { name: 'いたずら2', lat: 43.0601, lng: 141.3501, fee: null, wheelchair: null, floor: null, ease: null, find: null, type: 'toilet', brand: null, loan: null, note: '', uid: 'userBBBB2222', createdAt: mk(Date.now() - 20000) };
+  window.__store = store; window.__emit = emit; window.__mk = mk;
   const coll = n => ({ where: () => coll(n), onSnapshot(cb) { const f = () => cb(snap(n)); subs.push(f); f(); return () => { subs.splice(subs.indexOf(f), 1); }; }, doc: id => ({ _n: n, _id: id, get: async () => ({ exists: id in store[n] }), update: async d => { if (id in store[n]) { store[n][id] = { ...store[n][id], ...d }; emit(); } }, set: async d => { if (n === 'loo-admins' && d.code !== 'good-code') { const e = new Error('denied'); e.code = 'permission-denied'; throw e; } store[n][id] = d; emit(); }, delete: async () => { delete store[n][id]; emit(); } }) });
   const fs = () => ({ collection: coll, batch: () => { const ops = []; return { set: (r, d) => ops.push(() => { store[r._n][r._id] = d; }), delete: r => ops.push(() => { delete store[r._n][r._id]; }), commit: async () => { ops.forEach(o => o()); emit(); } }; } });
   fs.FieldValue = { serverTimestamp: () => mk(Date.now()) };
@@ -35,7 +36,7 @@ const FAKE = () => {
   console.log('0c 正しい合言葉で入れた', await p.locator('#main').isVisible());
   console.log('1 申請の数', await p.locator('#pending .card').count(), '| 近くの重複の表示', await p.locator('#pending .near.warn').count());
   if (process.argv[2]) await p.screenshot({ path: process.argv[2] });
-  console.log('1b 管理者の端末', (await p.locator('#st-admins').innerText()).replace(/s+/g, ' '), '| 表の行', await p.locator('#admins tbody tr').count());
+  console.log('1b 管理者の端末', (await p.locator('#st-admins').innerText()).replace(/\s+/g, ' '), '| 表の行', await p.locator('#admins tbody tr').count());
   if (process.env.W && process.argv[2]) for (const t of ['overview', 'pending', 'reports', 'map']) { await p.click('#nav [data-tab=' + t + ']'); await p.waitForTimeout(t === 'map' ? 2500 : 300); await p.screenshot({ path: process.argv[2].replace('.png', '-' + t + '.png') }); }
   if (process.env.W) await p.click('#nav [data-tab=pending]');
   // 編集して許可(名前を直す)
@@ -43,10 +44,35 @@ const FAKE = () => {
   await p.click('#pending .card:nth-child(1) [data-a=approve]'); await p.waitForTimeout(400);
   const s = await p.evaluate(() => JSON.stringify({ req: Object.keys(__store['loo-requests']), toi: Object.entries(__store['loo-toilets']).map(([id, d]) => ({ id, ...d, createdAt: !!d.createdAt })) }));
   console.log('2 許可後', s);
+  // 公開中の編集
+  await p.click('#added [data-a=aedit]'); await p.fill('#added [data-k=name]', '直した名前'); await p.click('#added [data-a=asave]'); await p.waitForTimeout(400);
+  console.log('2b 公開中の編集', await p.evaluate(() => __store['loo-toilets'].AAAAAAAAAAAAAAAAAAAA.name + ' approved=' + __store['loo-toilets'].AAAAAAAAAAAAAAAAAAAA.approved));
+  // 絞り込み・並べ替え(番号は変わらない)
+  await p.fill('#q-pend', 'いたずら2'); await p.waitForTimeout(200);
+  console.log('2c 絞り込み', await p.locator('#pending .card').count(), '番号', await p.locator('#pending .num').allInnerTexts());
+  await p.fill('#q-pend', ''); await p.selectOption('#s-pend', 'new'); await p.waitForTimeout(200);
+  console.log('2d 新しい順の番号', await p.locator('#pending .num').allInnerTexts());
+  // 新着の知らせ
+  await p.evaluate(() => { __store['loo-requests'].DDDDDDDDDDDDDDDDDDDD = { name: '新着', lat: 43.05, lng: 141.35, fee: null, wheelchair: null, floor: null, ease: null, find: null, type: 'toilet', brand: null, loan: null, note: '', uid: 'userEEEE', createdAt: __mk(Date.now()) }; __emit(); }); await p.waitForTimeout(300);
+  console.log('2e 新着の知らせ', await p.locator('#newbar').isVisible(), (await p.locator('#newbar').innerText()), '| title', await p.title());
+  await p.evaluate(() => { delete __store['loo-requests'].DDDDDDDDDDDDDDDDDDDD; __emit(); }); await p.selectOption('#s-pend', 'old'); await p.waitForTimeout(200);
+  // 却下(記録が残る)
   await p.click('#pending .card:nth-child(1) [data-a=reject]'); await p.waitForTimeout(400);
-  console.log('3 却下後の申請', await p.evaluate(() => Object.keys(__store['loo-requests']).length), '| 画面', await p.locator('#pending').innerText());
-  console.log('4 「なかった」の一覧', (await p.locator('#missing').innerText()).replace(/s+/g, ' '));
+  console.log('3 却下', await p.evaluate(() => Object.keys(__store['loo-requests']).join(',') + ' | rejects ' + Object.keys(__store['loo-rejects']).length));
+  // ブロック(同じ申請者の申請中も却下)
+  console.log('3b 履歴の表示', (await p.locator('#pending .card:nth-child(1) .sub').nth(1).innerText()).replace(/\s+/g, ' '));
+  await p.click('#pending .card:nth-child(1) [data-a=block]'); await p.waitForTimeout(400);
+  console.log('3c ブロック後', await p.evaluate(() => 'req ' + Object.keys(__store['loo-requests']).length + ' blocked ' + Object.keys(__store['loo-blocked']).join(',') + ' rejects ' + Object.keys(__store['loo-rejects']).length), '| 画面', (await p.locator('#blocked').innerText()).replace(/\s+/g, ' '));
+  await p.click('#blocked [data-a=unblock]'); await p.waitForTimeout(300);
+  console.log('3d 解除', await p.evaluate(() => Object.keys(__store['loo-blocked']).length));
+  console.log('4 「なかった」の一覧', (await p.locator('#missing').innerText()).replace(/\s+/g, ' '));
   await p.click('#missing [data-a=mdel]'); await p.waitForTimeout(300);
-  console.log('5 そこから削除', await p.evaluate(() => Object.keys(__store['loo-toilets']).length), '| 一覧', (await p.locator('#missing').innerText()).replace(/s+/g, ' '));
+  // 公開データの非表示(「なかった」3 人)
+  await p.evaluate(() => { const id = TOILETS.find(t => t.type === 'toilet').id; ['a', 'b', 'c'].forEach(u => { __store['loo-reports'][id + '_' + u] = { toiletId: id, kind: 'missing', uid: u }; }); __emit(); }); await p.waitForTimeout(300);
+  await p.click('#missing [data-a=mhide]'); await p.waitForTimeout(300);
+  console.log('4b 非表示', await p.evaluate(() => Object.keys(__store['loo-hidden']).length), '| 一覧', (await p.locator('#hidden').innerText()).replace(/\s+/g, ' ').slice(0, 40));
+  await p.click('#hidden [data-a=unhide]'); await p.waitForTimeout(300);
+  console.log('4c 戻す', await p.evaluate(() => Object.keys(__store['loo-hidden']).length));
+  console.log('5 そこから削除', await p.evaluate(() => Object.keys(__store['loo-toilets']).length), '| 一覧', (await p.locator('#missing').innerText()).replace(/\s+/g, ' '));
   await b.close();
 })();

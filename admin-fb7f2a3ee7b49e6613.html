@@ -67,6 +67,10 @@ button.ghost{background:transparent;color:inherit;border:1px solid rgba(255,255,
 .pp .n{position:absolute;top:-9px;right:-9px;min-width:18px;height:18px;border-radius:99px;background:var(--accent);color:#fff;border:2px solid #fff;font:800 10.5px/14px sans-serif;text-align:center;padding:0 3px}
 .pp.sm{width:22px;height:22px}.pp.sm .dash{width:22px;height:22px}.pp.sm svg.ic{width:13px;height:13px}.pp.c.sm{width:20px;height:20px}
 #map.lowzoom .cv{display:none}
+.tools{display:flex;gap:8px;margin:8px 0}
+.tools input,.tools select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-width:0}
+.tools input{flex:1}
+.newbar{position:sticky;top:58px;z-index:19;background:var(--accent);color:#fff;text-align:center;padding:9px 14px;font-weight:700;cursor:pointer}
 .legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:10px 4px 0;font-size:12px;color:var(--sub)}
 .legend>span{display:inline-flex;align-items:center;gap:6px}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-2px;margin-right:4px;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
@@ -131,6 +135,7 @@ tr:last-child td{border-bottom:0}
     <div class="me"><i></i><span class="wide">運営として入っています</span></div>
     <button class="ghost" id="logout"><span class="wide">この端末を外す</span><span class="narrow">外す</span></button>
   </header>
+  <div class="newbar" id="newbar" hidden role="status"></div>
   <div class="wrap">
     <section class="stats v-overview" id="stats">
       <div class="stat admins" id="st-admins"><b>-</b><span>管理者の端末</span></div>
@@ -143,14 +148,22 @@ tr:last-child td{border-bottom:0}
       <div class="sub">合言葉を入れて運営として登録された端末の一覧です。身に覚えのない端末があれば「外す」で外し、合言葉(loo-secret/admin の code)も変えてください。</div>
       <div id="admins"></div>
     </section>
+    <section class="panel v-overview" id="blockedpanel"><h2>ブロック中の申請者 <em id="bn"></em></h2><div class="sub">ブロックした人は、申請を送れません。「許可待ちの申請」の「この人をブロック」から追加します。</div><div id="blocked"></div></section>
     <div class="cols">
       <div>
-        <section class="panel v-pending"><h2>許可待ちの申請 <em id="pn"></em></h2><div id="pending"></div></section>
+        <section class="panel v-pending"><h2>許可待ちの申請 <em id="pn"></em></h2>
+          <div class="tools"><input type="search" id="q-pend" placeholder="名前で絞り込み"><select id="s-pend" aria-label="並べ替え"><option value="old">古い順</option><option value="new">新しい順</option><option value="dup">重複の疑い順</option></select></div>
+          <div id="pending"></div></section>
         <section class="panel v-reports"><h2>「ここにはなかった」の報告 <em id="mn"></em></h2>
           <div class="sub">3人以上で、アプリでは薄く表示して最寄り・リストから外れます。なくなっていたら削除してください(公開データの分は、データ側で直します)。</div>
+          <div class="tools"><input type="search" id="q-miss" placeholder="名前で絞り込み"></div>
           <div id="missing"></div></section>
+        <section class="panel v-reports"><h2>非表示にした公開データ <em id="hn"></em></h2>
+          <div class="sub">「ここにはなかった」が付いた公開データ(OSM)を、アプリで出さなくしたものです。「戻す」で、また出ます。</div>
+          <div id="hidden"></div></section>
         <section class="panel v-reports"><h2>公開中のユーザー追加 <em id="an"></em></h2>
           <div class="sub">間違いや荒らしは、ここから削除できます。</div>
+          <div class="tools"><input type="search" id="q-added" placeholder="名前で絞り込み"><select id="s-added" aria-label="並べ替え"><option value="new">新しい順</option><option value="name">名前順</option></select></div>
           <div id="added"></div></section>
       </div>
       <aside class="mapcol v-map">

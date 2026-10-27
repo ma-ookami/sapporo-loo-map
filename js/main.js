@@ -26,7 +26,10 @@ function init(){
   setInterval(()=>{ if (st.filters.open&&!st.adding&&!st.sel){ resort(); syncPins(); renderSheet(); } },60000);
   let seen=false; try{ seen=!!localStorage.getItem('loo-guide'); }catch(e){}
   if (!seen) showGuide();
-  cloud.init(list=>{ st.added=list; st.toilets=TOILETS.concat(list); refresh(); openSharedSpot(); if(!$('settings').hidden) renderSettings(); },rs=>{ st.reports=rs; resort(); syncPins(); if(!st.adding) renderSheet(); if(!$('settings').hidden) renderSettings(); });
+  // 運営が非表示にした公開データ(loo-hidden)は出さない
+  const rebuild=()=>{ st.toilets=TOILETS.concat(st.added).filter(t=>!st.hidden.has(t.id)); if (st.sel&&!st.toilets.some(t=>t.id===st.sel)) st.sel=null; };
+  st.hidden=new Set();
+  cloud.init(list=>{ st.added=list; rebuild(); refresh(); openSharedSpot(); if(!$('settings').hidden) renderSettings(); },rs=>{ st.reports=rs; resort(); syncPins(); if(!st.adding) renderSheet(); if(!$('settings').hidden) renderSettings(); },ids=>{ st.hidden=new Set(ids); rebuild(); refresh(); });
 }
 init();
 // オフライン対応(https か localhost のときだけ。file:// や ?local=1 の試しでは登録しない)

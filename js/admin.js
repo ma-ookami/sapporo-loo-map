@@ -8,7 +8,7 @@ const LOANS={yes:'借りられる',ask:'声をかけて',no:'借りられない'
 const dist=(a,b)=>{ const R=6371000,r=Math.PI/180,dl=(b.lat-a.lat)*r,dg=(b.lng-a.lng)*r,h=Math.sin(dl/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dg/2)**2; return 2*R*Math.asin(Math.sqrt(h)); };
 const when=t=>{ try{ const d=t&&t.toDate?t.toDate():null; return d?d.toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):''; }catch(e){ return ''; } };
 
-let db=null, map=null, markers=[], pend=[], added=[], miss=[], admins=[], adminsLoaded=false, fitted=false, me=null, sel=null, unsubs=[], beat=null, adminsErr=false;
+let db=null, map=null, markers=[], pend=[], added=[], miss=[], admins=[], rejects=[], blocked=[], hidden=[], editing=new Set(), seenPend=null, q={pend:'',miss:'',added:''}, adminsLoaded=false, fitted=false, me=null, sel=null, unsubs=[], beat=null, adminsErr=false;
 const ONLINE_MS=10*60*1000;   // 最終アクセスがこの時間以内なら「いま入っている」
 
 function start(){
@@ -18,7 +18,7 @@ function start(){
   // アプリと同じ匿名ログイン(同じブラウザならアプリと同じ uid)。運営かどうかは loo-admins/<uid> があるかどうか
   firebase.auth().onAuthStateChanged(u=>{ if (u) onUser(u); else firebase.auth().signInAnonymously().catch(e=>showLogin(null,'ログインできませんでした: '+(e.code||e.message))); });
 }
-function stop(){ unsubs.forEach(f=>f()); unsubs=[]; if (beat){ clearInterval(beat); beat=null; } }
+function stop(){ seenPend=null; unsubs.forEach(f=>f()); unsubs=[]; if (beat){ clearInterval(beat); beat=null; } }
 function showLogin(u,msg){
   stop(); $('main').hidden=true; $('login').hidden=false;
   if (!$('lbear').firstChild) $('lbear').innerHTML=bearSvg(92,'normal');
@@ -45,9 +45,17 @@ async function onUser(u){
   const ping=()=>db.collection('loo-admins').doc(u.uid).update({lastSeen:ts()}).catch(()=>{});
   ping(); beat=setInterval(ping,5*60*1000);
   const denied=e=>{ console.warn(e); $('main').hidden=true; showLogin(null,'読めませんでした: '+(e.code||e.message)); };
-  unsubs.push(db.collection('loo-requests').onSnapshot(s=>{ pend=s.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?x.createdAt.toMillis():0)-(y.createdAt?y.createdAt.toMillis():0)); render(); },denied));
+  unsubs.push(db.collection('loo-requests').onSnapshot(s=>{
+    const list=s.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?x.createdAt.toMillis():0)-(y.createdAt?y.createdAt.toMillis():0));
+    list.forEach((r,i)=>{ r._n=i+1; });   // 地図のピンの番号(古い順)。並べ替えても変わらない
+    if (seenPend){ const fresh=list.filter(r=>!seenPend.has(r.id)); if (fresh.length) notifyNew(fresh.length); }
+    seenPend=new Set(list.map(r=>r.id)); pend=list; render();
+  },denied));
   unsubs.push(db.collection('loo-reports').where('kind','==','missing').onSnapshot(s=>{ miss=s.docs.map(d=>d.data()); render(); },denied));
   unsubs.push(db.collection('loo-toilets').onSnapshot(s=>{ added=s.docs.map(d=>({id:d.id,...d.data()})); render(); },denied));
+  // 却下の記録・ブロック・非表示(新しいコレクション。ルールを貼る前は読めないので、エラーは無視して空のまま)
+  const soft=(name,set)=>unsubs.push(db.collection(name).onSnapshot(s=>{ set(s.docs.map(d=>({id:d.id,...d.data()}))); render(); },e=>console.warn(name,e.code)));
+  soft('loo-rejects',a=>{ rejects=a; }); soft('loo-blocked',a=>{ blocked=a; }); soft('loo-hidden',a=>{ hidden=a; });
   unsubs.push(db.collection('loo-admins').onSnapshot(s=>{ adminsErr=false; adminsLoaded=true; admins=s.docs.map(d=>({id:d.id,...d.data()})); render(); },e=>{ adminsErr=true; render(); }));
 }
 
@@ -93,19 +101,21 @@ function syncMarkers(){
 }
 function initLegend(){ $('lg-t').innerHTML=icon('wc',13); $('lg-c').innerHTML=icon('store',12); $('lg-p').innerHTML=icon('wc',13)+DASH_SVG; }
 
+// 新しい申請が届いたとき、上に知らせを出す(タップで申請の画面へ)。タブのタイトルの件数は render() で更新
+function notifyNew(n){
+  const b=$('newbar'); b.hidden=false; b.textContent='新しい申請が '+n+' 件届きました(タップで見る)';
+  b.onclick=()=>{ b.hidden=true; const t=document.querySelector('#nav [data-tab=pending]'); if (t&&getComputedStyle($('nav')).display!=='none') t.click(); else scrollTo({top:$('pending').getBoundingClientRect().top+scrollY-80,behavior:'smooth'}); };
+}
 // 申請の近くにすでにある場所(データ + 公開中のユーザー追加)
 function nearOf(r){
   return TOILETS.concat(added).filter(x=>x.type===r.type).map(x=>({x,d:dist(r,x)})).filter(o=>o.d<=40).sort((a,b)=>a.d-b.d).slice(0,4);
 }
 const sel_=(id,opts,cur)=>'<select id="'+id+'">'+opts.map(([v,l])=>'<option value="'+v+'"'+(String(cur)===String(v)?' selected':'')+'>'+l+'</option>').join('')+'</select>';
 
-function card(r,i){
-  const conv=r.type==='conv', near=nearOf(r);
-  const nh=near.length?'<div class="near warn">近くに既にある: '+near.map(o=>esc(o.x.name||'(名前なし)')+' '+Math.round(o.d)+'m').join(' / ')+'(重複かもしれません)</div>':'<div class="near">40m 以内に同じ種類の場所はありません</div>';
-  return '<div class="card'+(sel===r.id?' on':'')+'" data-id="'+esc(r.id)+'">'
-    +'<div><span class="num">'+(i+1)+'</span><b>'+esc(r.name)+'</b> <span class="pill">'+(conv?'コンビニ':'トイレ')+'</span><span class="sub">'+when(r.createdAt)+' ・ 申請者 '+esc(String(r.uid).slice(0,6))+' ・ <a href="https://www.google.com/maps?q='+r.lat+','+r.lng+'" target="_blank" rel="noopener">Google マップ</a></span></div>'
-    +nh
-    +'<div class="row">'
+// 名前・種類・階・料金などの入力欄(申請の編集と、公開中の編集で同じものを使う)
+function fieldsHtml(r){
+  const conv=r.type==='conv';
+  return '<div class="row">'
     +'<label>名前<input type="text" data-k="name" value="'+esc(r.name)+'" maxlength="40"></label>'
     +'<label>種類'+sel_('', [['toilet','トイレ'],['conv','コンビニ']],r.type).replace('<select id=""','<select data-k="type"')+'</label>'
     +(conv?'<label>ブランド'+sel_('',Object.entries(BRANDS),r.brand).replace('<select id=""','<select data-k="brand"')+'</label><label>貸し出し'+sel_('',Object.entries(LOANS),r.loan).replace('<select id=""','<select data-k="loan"')+'</label>'
@@ -113,22 +123,63 @@ function card(r,i){
        +'<label>料金'+sel_('',[['','不明'],['free','無料'],['paid','有料']],r.fee===true?'paid':r.fee===false?'free':'').replace('<select id=""','<select data-k="fee"')+'</label>'
        +'<label>車いす'+sel_('',[['','不明'],['yes','可'],['no','不可']],r.wheelchair===true?'yes':r.wheelchair===false?'no':'').replace('<select id=""','<select data-k="wheelchair"')+'</label>')
     +'</div>'
-    +'<div class="row"><label style="width:100%">メモ<textarea data-k="note" maxlength="200">'+esc(r.note)+'</textarea></label></div>'
-    +'<div class="acts"><button class="ok" data-a="approve">許可して公開</button><button class="ng" data-a="reject">却下(消す)</button><button data-a="fly">地図で見る</button></div>'
+    +'<div class="row"><label style="width:100%">メモ<textarea data-k="note" maxlength="200">'+esc(r.note)+'</textarea></label></div>';
+}
+const blockedSet=()=>new Set(blocked.map(b=>b.id));
+// 申請者ごとの履歴: 許可(公開中の自分の投稿のうち許可済み)・却下(記録)・申請中
+function histOf(uid){ return {ok:added.filter(x=>x.uid===uid&&x.approved).length, ng:rejects.filter(x=>x.uid===uid).length, pe:pend.filter(x=>x.uid===uid).length}; }
+function card(r){
+  const near=nearOf(r), h=histOf(r.uid), isB=blockedSet().has(r.uid);
+  const nh=near.length?'<div class="near warn">近くに既にある: '+near.map(o=>esc(o.x.name||'(名前なし)')+' '+Math.round(o.d)+'m').join(' / ')+'(重複かもしれません)</div>':'<div class="near">40m 以内に同じ種類の場所はありません</div>';
+  return '<div class="card'+(sel===r.id?' on':'')+'" data-id="'+esc(r.id)+'">'
+    +'<div><span class="num">'+r._n+'</span><b>'+esc(r.name)+'</b> <span class="pill">'+(r.type==='conv'?'コンビニ':'トイレ')+'</span><span class="sub">'+when(r.createdAt)+' ・ <a href="https://www.google.com/maps?q='+r.lat+','+r.lng+'" target="_blank" rel="noopener">Google マップ</a></span></div>'
+    +'<div class="sub" style="margin-top:4px">申請者 '+esc(String(r.uid).slice(0,6))+': 許可 '+h.ok+' ・ 却下 '+h.ng+' ・ 申請中 '+h.pe+(isB?' <span class="pill" style="background:var(--ng);color:#fff">ブロック中</span>':'')+'</div>'
+    +nh+fieldsHtml(r)
+    +'<div class="acts"><button class="ok" data-a="approve">許可して公開</button><button class="ng" data-a="reject">却下(消す)</button><button data-a="fly">地図で見る</button>'+(isB?'':'<button class="ng" data-a="block" style="margin-left:auto">この人をブロック</button>')+'</div>'
+    +'</div>';
+}
+function addedCard(t){
+  const on=editing.has(t.id);
+  return '<div class="card" data-aid="'+esc(t.id)+'"><div><b>'+esc(t.name)+'</b> <span class="pill">'+(t.type==='conv'?'コンビニ':'トイレ')+'</span>'+(t.approved?'<span class="pill">許可済み</span>':'<span class="pill">許可制の前の投稿</span>')+'<span class="sub">'+when(t.createdAt)+'</span>'
+    +'<span style="float:right;display:inline-flex;gap:6px">'+(on?'':'<button data-a="aedit">編集</button>')+'<button class="ng" data-a="del">削除</button></span></div>'
+    +(on?fieldsHtml(t)+'<div class="acts"><button class="ok" data-a="asave">保存</button><button data-a="acancel">キャンセル</button></div>':'')
     +'</div>';
 }
 
 // 「ここにはなかった」の報告が付いた場所(人数の多い順)。ユーザー追加(u-<ID>)は削除できる
 function renderMissing(){
+  const hiddenIds=new Set(hidden.map(h=>h.id)), ql=q.miss.trim().toLowerCase();
   const by={}; miss.forEach(r=>{ (by[r.toiletId]=by[r.toiletId]||new Set()).add(r.uid); });
-  const rows=Object.entries(by).map(([id,s])=>({id,n:s.size,t:id.startsWith('u-')?added.find(x=>x.id===id.slice(2)):TOILETS.find(x=>x.id===id)})).filter(o=>o.t).sort((a,b)=>b.n-a.n);
-  $('mn').textContent=rows.length||'なし'; $('mn').classList.toggle('hot',rows.some(o=>o.n>=3));
-  $('missing').innerHTML=rows.map(o=>'<div class="card" data-mid="'+esc(o.id)+'"><b>'+esc(o.t.name||'(名前なし)')+'</b> <span class="pill">'+(o.t.type==='conv'?'コンビニ':'トイレ')+'</span><span class="pill">'+o.n+'人が「なかった」'+(o.n>=3?'(アプリで薄く表示中)':'')+'</span> <a href="https://www.google.com/maps?q='+o.t.lat+','+o.t.lng+'" target="_blank" rel="noopener">Google マップ</a>'+(o.id.startsWith('u-')?' <button class="ng" data-a="mdel" style="float:right">削除</button>':' <span class="sub">(公開データ)</span>')+'</div>').join('')||'<div class="empty">なし</div>';
+  const all=Object.entries(by).map(([id,s])=>({id,n:s.size,t:id.startsWith('u-')?added.find(x=>x.id===id.slice(2)):TOILETS.find(x=>x.id===id)})).filter(o=>o.t).sort((a,b)=>b.n-a.n);
+  const rows=all.filter(o=>!ql||String(o.t.name||'').toLowerCase().includes(ql));
+  $('mn').textContent=all.length||'なし'; $('mn').classList.toggle('hot',all.some(o=>o.n>=3&&!hiddenIds.has(o.id)));
+  $('missing').innerHTML=rows.map(o=>{
+    const user=o.id.startsWith('u-'), hid=hiddenIds.has(o.id);
+    return '<div class="card" data-mid="'+esc(o.id)+'"><b>'+esc(o.t.name||'(名前なし)')+'</b> <span class="pill">'+(o.t.type==='conv'?'コンビニ':'トイレ')+'</span><span class="pill">'+o.n+'人が「なかった」'+(o.n>=3&&!hid?'(アプリで薄く表示中)':'')+'</span> <a href="https://www.google.com/maps?q='+o.t.lat+','+o.t.lng+'" target="_blank" rel="noopener">Google マップ</a>'
+      +'<span style="float:right">'+(user?'<button class="ng" data-a="mdel">削除</button>':hid?'<span class="pill">非表示中</span>':'<button class="ng" data-a="mhide">アプリで非表示にする</button>')+'</span></div>';
+  }).join('')||'<div class="empty">'+(all.length?'該当なし':'なし')+'</div>';
   document.querySelectorAll('#missing [data-a=mdel]').forEach(b=>b.onclick=async()=>{
     const id=b.closest('.card').dataset.mid.slice(2), t=added.find(x=>x.id===id);
     if (!confirm('「'+(t?t.name:id)+'」を削除します(元に戻せません)')) return;
     try{ await db.collection('loo-toilets').doc(id).delete(); }catch(e){ alert('削除できませんでした: '+(e.code||e.message)); }
   });
+  document.querySelectorAll('#missing [data-a=mhide]').forEach(b=>b.onclick=()=>hideData(b.closest('.card').dataset.mid));
+}
+// 公開データ(OSM)を、アプリで出さないようにする(loo-hidden)。戻すと、また出る
+async function hideData(id){
+  const t=TOILETS.find(x=>x.id===id); if (!t) return;
+  if (!confirm('「'+(t.name||'(名前なし)')+'」をアプリで非表示にします(あとで戻せます)')) return;
+  try{ await db.collection('loo-hidden').doc(id).set({at:ts(),name:t.name||''}); }catch(e){ alert('できませんでした: '+(e.code||e.message)+'(ルールの貼り替えが済んでいるか確認してください)'); }
+}
+function renderHidden(){
+  $('hn').textContent=hidden.length||'なし';
+  $('hidden').innerHTML=hidden.map(h=>{ const t=TOILETS.find(x=>x.id===h.id); return '<div class="card" data-hid="'+esc(h.id)+'"><b>'+esc((t&&t.name)||h.name||'(名前なし)')+'</b> <span class="pill">'+((t&&t.type)==='conv'?'コンビニ':'トイレ')+'</span><span class="sub">'+when(h.at)+'</span><span style="float:right"><button data-a="unhide">戻す</button></span></div>'; }).join('')||'<div class="empty">なし</div>';
+  document.querySelectorAll('#hidden [data-a=unhide]').forEach(b=>b.onclick=async()=>{ try{ await db.collection('loo-hidden').doc(b.closest('.card').dataset.hid).delete(); }catch(e){ alert('できませんでした: '+(e.code||e.message)); } });
+}
+function renderBlocked(){
+  $('bn').textContent=blocked.length||'なし';
+  $('blocked').innerHTML=blocked.map(b=>'<div class="card" data-bid="'+esc(b.id)+'"><b>'+esc(b.id.slice(0,8))+'</b> <span class="sub">'+esc(b.name||'')+' ・ '+when(b.at)+'</span><span style="float:right"><button data-a="unblock">解除</button></span></div>').join('')||'<div class="empty">なし</div>';
+  document.querySelectorAll('#blocked [data-a=unblock]').forEach(b=>b.onclick=async()=>{ if (!confirm('ブロックを解除します')) return; try{ await db.collection('loo-blocked').doc(b.closest('.card').dataset.bid).delete(); }catch(e){ alert('できませんでした: '+(e.code||e.message)); } });
 }
 // 上の数字と、管理者の端末の一覧。端末の数が前回見たときより増えていたら赤くして知らせる(知らない人が入っていないかの見張り)
 const lastSeenMs=a=>a.lastSeen&&a.lastSeen.toMillis?a.lastSeen.toMillis():0;
@@ -169,33 +220,39 @@ function renderStats(){
 }
 let dirty=false;
 // 入力中に再描画すると直している最中の値が消えるので、入力が終わってから描き直す
-function typing(){ const a=document.activeElement; return !!(a&&a.closest&&a.closest('#pending')&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); }
+function typing(){ const a=document.activeElement; return !!(a&&a.closest&&a.closest('#pending,#added')&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); }
 addEventListener('focusout',()=>setTimeout(()=>{ if (dirty&&!typing()){ dirty=false; render(); } },0));
 function render(){
+  document.title=(pend.length?'('+pend.length+') ':'')+'運営 | 札幌トイレ・コンビニマップ';
   if (typing()){ dirty=true; return; }
-  renderStats(); renderAdmins();
+  renderStats(); renderAdmins(); renderBlocked(); renderHidden();
   $('pn').textContent=pend.length||'なし'; $('pn').classList.toggle('hot',pend.length>0);
-  $('pending').innerHTML=pend.length?pend.map(card).join(''):'<div class="empty">許可待ちはありません</div>';
+  // 申請: 名前で絞り込み・並べ替え(番号は地図のピンと同じまま)
+  const qp=q.pend.trim().toLowerCase(), sp=$('s-pend').value;
+  let pl=pend.filter(r=>!qp||String(r.name).toLowerCase().includes(qp));
+  if (sp==='new') pl=pl.slice().sort((a,b)=>b._n-a._n); else if (sp==='dup') pl=pl.slice().sort((a,b)=>nearOf(b).length-nearOf(a).length||a._n-b._n);
+  $('pending').innerHTML=pl.length?pl.map(card).join(''):'<div class="empty">'+(pend.length?'該当なし':'許可待ちはありません')+'</div>';
   renderMissing();
-  const ua=added.filter(t=>t.uid);
+  const ua=added.filter(t=>t.uid), qa=q.added.trim().toLowerCase(), sa=$('s-added').value;
   $('an').textContent=ua.length||'なし';
-  $('added').innerHTML=ua.map(t=>'<div class="card" data-aid="'+esc(t.id)+'"><b>'+esc(t.name)+'</b> <span class="pill">'+(t.type==='conv'?'コンビニ':'トイレ')+'</span>'+(t.approved?'<span class="pill">許可済み</span>':'<span class="pill">許可制の前の投稿</span>')+' <button class="ng" data-a="del" style="float:right">削除</button></div>').join('')||'<div class="empty">なし</div>';
+  let al=ua.filter(t=>!qa||String(t.name).toLowerCase().includes(qa));
+  al=al.slice().sort(sa==='name'?(a,b)=>String(a.name).localeCompare(String(b.name),'ja'):(a,b)=>(b.createdAt?b.createdAt.toMillis():0)-(a.createdAt?a.createdAt.toMillis():0));
+  $('added').innerHTML=al.map(addedCard).join('')||'<div class="empty">'+(ua.length?'該当なし':'なし')+'</div>';
   document.querySelectorAll('#pending .card').forEach(c=>{
     const r=pend.find(x=>x.id===c.dataset.id);
     c.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>act(b.dataset.a,r,c));
     c.onclick=e=>{ if (e.target.closest('button,input,select,textarea,a')) return; pick(r.id); };
   });
-  document.querySelectorAll('#added [data-a=del]').forEach(b=>b.onclick=async()=>{
-    const id=b.closest('.card').dataset.aid, t=added.find(x=>x.id===id);
-    if (!confirm('「'+t.name+'」を削除します(元に戻せません)')) return;
-    try{ await db.collection('loo-toilets').doc(id).delete(); }catch(e){ alert('削除できませんでした: '+(e.code||e.message)); }
+  document.querySelectorAll('#added .card').forEach(c=>{
+    const t=added.find(x=>x.id===c.dataset.aid);
+    c.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>actAdded(b.dataset.a,t,c));
   });
   syncMarkers();
 }
 function pick(id){ sel=id; const r=pend.find(x=>x.id===id); document.querySelectorAll('#pending .card').forEach(c=>c.classList.toggle('on',c.dataset.id===id)); if (r&&map) map.flyTo({center:[r.lng,r.lat],zoom:17}); const el=document.querySelector('#pending .card[data-id="'+id+'"]'); if (el) el.scrollIntoView({block:'nearest'}); }
 
-// 画面で直した値を、保存できる形(ルールの型)にする
-function edited(r,c){
+// 画面で直した値を、保存できる形(ルールの型)にする。公開中の編集では、許可済みの印(approved)を元のまま残す
+function edited(r,c,keep){
   const v=k=>{ const e=c.querySelector('[data-k='+k+']'); return e?e.value:null; };
   const type=v('type'), conv=type==='conv';
   const fl=v('floor'); let floor=null;
@@ -206,21 +263,42 @@ function edited(r,c){
     wheelchair:conv?null:(v('wheelchair')==='yes'?true:v('wheelchair')==='no'?false:null),
     floor:conv?null:floor, ease:r.ease??null, find:r.find??null,
     brand:conv?(v('brand')||r.brand||'other'):null, loan:conv?(v('loan')||r.loan||null):null,
-    note:(v('note')||'').trim(), uid:r.uid, createdAt:r.createdAt, approved:true};
+    note:(v('note')||'').trim(), uid:r.uid, createdAt:r.createdAt};
+  if (!keep||r.approved) o.approved=true;
   if (!conv&&r.stalls) o.stalls=r.stalls;
   return o;
 }
+const rejectOps=(b,r)=>{ b.set(db.collection('loo-rejects').doc(r.id),{uid:r.uid,name:r.name,at:ts()}); b.delete(db.collection('loo-requests').doc(r.id)); };
 async function act(a,r,c){
   if (a==='fly'){ pick(r.id); return; }
   try{
-    if (a==='reject'){ if (!confirm('「'+r.name+'」を却下して消します')) return; await db.collection('loo-requests').doc(r.id).delete(); return; }
+    if (a==='reject'){ if (!confirm('「'+r.name+'」を却下して消します')) return; const b=db.batch(); rejectOps(b,r); await b.commit(); return; }
     if (a==='approve'){
       const o=edited(r,c), b=db.batch();
       b.set(db.collection('loo-toilets').doc(r.id),o); b.delete(db.collection('loo-requests').doc(r.id));
       await b.commit();
     }
+    if (a==='block'){
+      const mine=pend.filter(x=>x.uid===r.uid);
+      if (!confirm('この申請者('+String(r.uid).slice(0,6)+')をブロックします。以後は申請できません。申請中の'+mine.length+'件は却下して消します')) return;
+      const b=db.batch(); b.set(db.collection('loo-blocked').doc(r.uid),{at:ts(),name:r.name}); mine.forEach(x=>rejectOps(b,x)); await b.commit();
+    }
   }catch(e){ alert('できませんでした: '+(e.code||e.message)); }
 }
+// 公開中のユーザー追加: 編集・保存・削除
+async function actAdded(a,t,c){
+  try{
+    if (a==='aedit'){ editing.add(t.id); render(); return; }
+    if (a==='acancel'){ editing.delete(t.id); render(); return; }
+    if (a==='asave'){ await db.collection('loo-toilets').doc(t.id).set(edited(t,c,true)); editing.delete(t.id); render(); return; }
+    if (a==='del'){ if (!confirm('「'+t.name+'」を削除します(元に戻せません)')) return; await db.collection('loo-toilets').doc(t.id).delete(); }
+  }catch(e){ alert('できませんでした: '+(e.code||e.message)); }
+}
+function initTools(){
+  [['q-pend','pend'],['q-miss','miss'],['q-added','added']].forEach(([id,k])=>{ $(id).oninput=e=>{ q[k]=e.target.value; render(); }; });
+  $('s-pend').onchange=render; $('s-added').onchange=render;
+}
 initLegend();
+initTools();
 initTabs();
 start();

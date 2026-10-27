@@ -212,12 +212,30 @@ service cloud.firestore {
         && id.matches('[A-Za-z0-9]{20}')
         && getAfter(/databases/$(database)/documents/loo-users/$(request.auth.uid)).data.lastId == id
         && getAfter(/databases/$(database)/documents/loo-users/$(request.auth.uid)).data.lastAt == request.time
+        && !exists(/databases/$(database)/documents/loo-blocked/$(request.auth.uid))
         && looToiletOk(request.resource.data)
         && !('approved' in request.resource.data)
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.createdAt == request.time;
       allow update: if looIsAdmin() && looToiletOk(request.resource.data) && request.resource.data.uid == resource.data.uid;
       allow delete: if request.auth != null && (resource.data.uid == request.auth.uid || looIsAdmin());
+    }
+
+    // ブロックした申請者(uid)。運営だけが読み書きできる。ブロックされた uid は、申請(loo-requests)を作れない
+    match /loo-blocked/{uid} {
+      allow read, delete: if looIsAdmin();
+      allow create: if looIsAdmin() && request.resource.data.keys().hasOnly(['at','name']);
+    }
+    // 却下の記録(申請者ごとの履歴を見るため)。運営だけが読み書きできる
+    match /loo-rejects/{id} {
+      allow read, delete: if looIsAdmin();
+      allow create: if looIsAdmin() && request.resource.data.keys().hasOnly(['uid','name','at']);
+    }
+    // 運営が非表示にした公開データ(OSM)の ID。アプリは、これに入っているものを出さない。読めるのは誰でも、書けるのは運営だけ
+    match /loo-hidden/{id} {
+      allow read: if true;
+      allow create: if looIsAdmin() && request.resource.data.keys().hasOnly(['at','name']);
+      allow delete: if looIsAdmin();
     }
 
     // 「使えなかった」などの一言報告。1人1トイレ1件(ID = トイレID_ユーザーID)。上書き・取り消しは本人だけ

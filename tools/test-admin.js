@@ -20,7 +20,7 @@ const FAKE = () => {
 };
 (async () => {
   const b = await chromium.launch({ executablePath: require('./browser.js'), args: ['--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
-  const ctx = await b.newContext({ locale: 'ja-JP', viewport: { width: 1280, height: 900 } });
+  const ctx = await b.newContext({ locale: 'ja-JP', viewport: { width: +(process.env.W || 1280), height: +(process.env.H || 900) }, deviceScaleFactor: process.env.W ? 2 : 1 });
   await ctx.route(/gstatic\.com\/firebasejs/, r => r.fulfill({ contentType: 'text/javascript', body: '' }));
   const p = await ctx.newPage(); p.on('pageerror', e => console.log('ERR', e.message)); p.on('dialog', d => d.accept());
   const near = await (async () => { const q = await ctx.newPage(); await q.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/data/toilets.js'); const t = await q.evaluate(() => document.body.innerText.match(/"lat": ([\d.]+),\s+"lng": ([\d.]+)/)); await q.close(); return { lat: +t[1], lng: +t[2] }; })();
@@ -36,6 +36,8 @@ const FAKE = () => {
   console.log('1 申請の数', await p.locator('#pending .card').count(), '| 近くの重複の表示', await p.locator('#pending .near.warn').count());
   if (process.argv[2]) await p.screenshot({ path: process.argv[2] });
   console.log('1b 管理者の端末', (await p.locator('#st-admins').innerText()).replace(/s+/g, ' '), '| 表の行', await p.locator('#admins tbody tr').count());
+  if (process.env.W && process.argv[2]) for (const t of ['overview', 'pending', 'reports', 'map']) { await p.click('#nav [data-tab=' + t + ']'); await p.waitForTimeout(t === 'map' ? 2500 : 300); await p.screenshot({ path: process.argv[2].replace('.png', '-' + t + '.png') }); }
+  if (process.env.W) await p.click('#nav [data-tab=pending]');
   // 編集して許可(名前を直す)
   await p.fill('#pending .card:nth-child(1) [data-k=name]', '新しい店のトイレ(直した)');
   await p.click('#pending .card:nth-child(1) [data-a=approve]'); await p.waitForTimeout(400);

@@ -8,7 +8,7 @@ const LOANS={yes:'借りられる',ask:'声をかけて',no:'借りられない'
 const dist=(a,b)=>{ const R=6371000,r=Math.PI/180,dl=(b.lat-a.lat)*r,dg=(b.lng-a.lng)*r,h=Math.sin(dl/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dg/2)**2; return 2*R*Math.asin(Math.sqrt(h)); };
 const when=t=>{ try{ const d=t&&t.toDate?t.toDate():null; return d?d.toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):''; }catch(e){ return ''; } };
 
-let db=null, map=null, markers=[], pend=[], added=[], miss=[], admins=[], adminsLoaded=false, me=null, sel=null, unsubs=[], beat=null, adminsErr=false;
+let db=null, map=null, markers=[], pend=[], added=[], miss=[], admins=[], adminsLoaded=false, fitted=false, me=null, sel=null, unsubs=[], beat=null, adminsErr=false;
 const ONLINE_MS=10*60*1000;   // 最終アクセスがこの時間以内なら「いま入っている」
 
 function start(){
@@ -65,27 +65,33 @@ function tidyStyle(m){
 function initMap(){
   if (map) return;
   const dark=matchMedia('(prefers-color-scheme: dark)').matches;
-  map=new maplibregl.Map({container:'map',style:'https://tiles.openfreemap.org/styles/'+(dark?'dark':'positron'),center:[141.353,43.0545],zoom:14.5,attributionControl:false,dragRotate:false,pitchWithRotate:false,touchPitch:false});
+  map=new maplibregl.Map({container:'map',style:'https://tiles.openfreemap.org/styles/'+(dark?'dark':'positron'),center:[141.353,43.0545],zoom:15.5,attributionControl:false,dragRotate:false,pitchWithRotate:false,touchPitch:false});
   map.touchZoomRotate.disableRotation();
   map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
   map.once('style.load',()=>tidyStyle(map));
+  // サイトと同じく、引いた地図(zoom 15 未満)ではコンビニを出さない
+  const zc=()=>$('map').classList.toggle('lowzoom',map.getZoom()<15);
+  map.on('zoom',zc); zc();
 }
 // ピン: 公開中のトイレ=青赤の半々(サイトと同じ)、コンビニ=小さな白丸、許可待ち=橙の丸+番号
-function pin(kind,txt){
-  const e=document.createElement('div'), p=kind==='pend', s=p?26:kind==='conv'?10:16;
-  e.style.cssText='width:'+s+'px;height:'+s+'px;border-radius:50%;border:'+(p?'2.5px':'2px')+' solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);'
-    +(p?'background:#c4521f;color:#fff;font:800 12px/21px sans-serif;text-align:center;cursor:pointer':kind==='conv'?'background:#d6d1ca':'background:linear-gradient(90deg,#2c6fe0 50%,#e0453b 50%)');
-  if (txt) e.textContent=txt; return e;
+const BRAND_COLOR={seven:'#e5484d',family:'#2fa65a',lawson:'#3a9bdc',seico:'#f08a24',other:'#b9b4ad'};
+// kind: toilet / conv / pend。外側の要素には transform を付けない(maplibre が位置に使う)ので、見た目は内側(.pp)に付ける
+function pinHtml(kind,t,n,sm){
+  const cls=kind==='pend'?'p':kind==='conv'?'c':'t', ic=kind==='conv'?icon('store',14):icon('wc',kind==='pend'?16:16);
+  const st=kind==='conv'?' style="--bc:'+(BRAND_COLOR[t&&t.brand]||BRAND_COLOR.other)+'"':'';
+  return '<i class="pp '+cls+(sm?' sm':'')+'"'+st+'>'+ic+(kind==='pend'?DASH_SVG+'<span class="n">'+n+'</span>':'')+'</i>';
 }
 function syncMarkers(){
   if (!map) return;
   markers.forEach(m=>m.remove()); markers=[];
-  const add=(p,kind,txt,click)=>{ const e=pin(kind,txt); if (click) e.onclick=click; markers.push(new maplibregl.Marker({element:e}).setLngLat([p.lng,p.lat]).addTo(map)); };
-  TOILETS.forEach(t=>add(t,t.type==='conv'?'conv':'toilet'));
-  added.forEach(t=>add(t,t.type==='conv'?'conv':'toilet'));
+  const add=(p,kind,n,click)=>{ const e=document.createElement('div'); e.className=kind==='conv'?'cv':''; e.innerHTML=pinHtml(kind,p,n); if (click){ e.style.cursor='pointer'; e.onclick=click; } markers.push(new maplibregl.Marker({element:e}).setLngLat([p.lng,p.lat]).addTo(map)); };
+  TOILETS.concat(added).forEach(t=>add(t,t.type==='conv'?'conv':'toilet'));
   pend.forEach((t,i)=>add(t,'pend',String(i+1),()=>pick(t.id)));
+  // 最初に申請が読めたとき、申請の場所が見えるように寄る(あとは動かさない)
+  if (!fitted&&pend.length){ fitted=true; const b=new maplibregl.LngLatBounds(); pend.forEach(t=>b.extend([t.lng,t.lat])); map.fitBounds(b,{padding:70,maxZoom:16,duration:0}); }
 }
+function initLegend(){ $('lg-t').innerHTML=icon('wc',13); $('lg-c').innerHTML=icon('store',12); $('lg-p').innerHTML=icon('wc',13)+DASH_SVG; }
 
 // 申請の近くにすでにある場所(データ + 公開中のユーザー追加)
 function nearOf(r){
@@ -146,8 +152,19 @@ function renderAdmins(){
   const ack=document.querySelector('#admins [data-a=ack]'); if (ack) ack.onclick=()=>{ try{ localStorage.setItem('loo-admin-count',String(n)); }catch(e){} renderAdmins(); };
   if (prev==null) { try{ localStorage.setItem('loo-admin-count',String(n)); }catch(e){} }
 }
+// 下の切り替え(狭い画面だけ表示される。広い画面は全部並ぶ)
+function initTabs(){
+  document.body.dataset.tab='overview';
+  document.querySelectorAll('#nav [data-i]').forEach(s=>{ s.outerHTML=icon(s.dataset.i,22); });
+  document.querySelectorAll('#nav [data-tab]').forEach(b=>b.onclick=()=>{
+    document.body.dataset.tab=b.dataset.tab;
+    document.querySelectorAll('#nav [data-tab]').forEach(x=>x.classList.toggle('on',x===b));
+    scrollTo(0,0); if (b.dataset.tab==='map'&&map) setTimeout(()=>map.resize(),0);
+  });
+}
 function renderStats(){
   const ua=added.filter(t=>t.uid).length, mset=new Set(miss.map(r=>r.toiletId)).size;
+  $('tb-pend').textContent=pend.length||''; $('tb-rep').textContent=mset||'';
   $('st-pend').textContent=pend.length; $('st-miss').textContent=mset; $('st-pub').textContent=ua;
 }
 let dirty=false;
@@ -204,4 +221,6 @@ async function act(a,r,c){
     }
   }catch(e){ alert('できませんでした: '+(e.code||e.message)); }
 }
+initLegend();
+initTabs();
 start();

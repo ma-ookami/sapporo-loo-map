@@ -12,7 +12,7 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif}
 a{color:var(--accent)}
-button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:8px 14px;background:var(--tint);color:var(--ink);transition:filter .15s,transform .05s}
+button{font:inherit;white-space:nowrap;cursor:pointer;border:0;border-radius:10px;padding:8px 14px;background:var(--tint);color:var(--ink);transition:filter .15s,transform .05s}
 button:hover{filter:brightness(.96)}button:active{transform:translateY(1px)}
 button.cta{background:var(--accent);color:#fff;font-weight:700}
 button.ok{background:var(--ok);color:#fff;font-weight:700}
@@ -38,10 +38,11 @@ button.ghost{background:transparent;color:inherit;border:1px solid rgba(255,255,
 /* 本体 */
 .top{position:sticky;top:0;z-index:20;background:var(--top);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 20px}
 #tbear{width:34px;height:34px;flex:none}#tbear svg{width:100%;height:100%}
-.top h1{font-size:15px;margin:0;font-weight:800;letter-spacing:.02em}
-.top h1 small{display:block;font-weight:500;font-size:11px;opacity:.65;letter-spacing:0}
+.top h1{font-size:15px;margin:0;font-weight:800;letter-spacing:.02em;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;line-height:1.25}
+.top h1 small{display:block;font-weight:500;font-size:11px;opacity:.65;letter-spacing:0;overflow:hidden;text-overflow:ellipsis}
+.top button{white-space:nowrap;flex:none}
 .top .sp{flex:1}
-.top .me{font-size:12px;opacity:.8;display:flex;align-items:center;gap:6px}
+.top .me{font-size:12px;opacity:.8;display:flex;align-items:center;gap:6px;white-space:nowrap;flex:none}
 .top .me i{width:8px;height:8px;border-radius:50%;background:#3ec48a;box-shadow:0 0 0 3px rgba(62,196,138,.25)}
 .wrap{max-width:1180px;margin:0 auto;padding:20px}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
@@ -58,7 +59,16 @@ button.ghost{background:transparent;color:inherit;border:1px solid rgba(255,255,
 .cols{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:16px;align-items:start}
 .mapcol{position:sticky;top:64px}
 #map{height:calc(100vh - 150px);min-height:320px;max-height:640px;border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
-.legend{display:flex;gap:12px;flex-wrap:wrap;margin:8px 4px 0;font-size:12px;color:var(--sub)}
+.pp{position:relative;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 3px 10px rgba(29,26,23,.28);color:#fff}
+.pp.t{background:linear-gradient(90deg,var(--blue) 50%,var(--red) 50%)}
+.pp.p{background:linear-gradient(90deg,#c9daf8 50%,#f8d0cd 50%);border-color:transparent;color:#1d1a17}
+.pp.c{width:24px;height:24px;background:color-mix(in srgb,var(--bc) 20%,#fff);border:2.5px solid color-mix(in srgb,var(--bc) 55%,#fff);color:#1d1a17}
+.pp .dash{position:absolute;left:-2.5px;top:-2.5px;width:28px;height:28px;color:#1d1a17;opacity:.55;transform:scale(1.2);pointer-events:none}
+.pp .n{position:absolute;top:-9px;right:-9px;min-width:18px;height:18px;border-radius:99px;background:var(--accent);color:#fff;border:2px solid #fff;font:800 10.5px/14px sans-serif;text-align:center;padding:0 3px}
+.pp.sm{width:22px;height:22px}.pp.sm .dash{width:22px;height:22px}.pp.sm svg.ic{width:13px;height:13px}.pp.c.sm{width:20px;height:20px}
+#map.lowzoom .cv{display:none}
+.legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:10px 4px 0;font-size:12px;color:var(--sub)}
+.legend>span{display:inline-flex;align-items:center;gap:6px}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-2px;margin-right:4px;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
 .card{border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0;background:var(--card);transition:box-shadow .15s,border-color .15s}
 .card.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
@@ -73,14 +83,32 @@ button.ghost{background:transparent;color:inherit;border:1px solid rgba(255,255,
 .pill.me{background:#dbeafe;color:#1d4ed8}
 .num{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:800;margin-right:6px}
 .empty{padding:14px;border-radius:12px;background:var(--tint);color:var(--sub);text-align:center;font-size:13px}
-table{width:100%;border-collapse:collapse;font-size:13px}
+#admins{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{white-space:nowrap}
 th{text-align:left;font-size:11.5px;color:var(--sub);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
 td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
 tr:last-child td{border-bottom:0}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#b9b4ad;margin-right:6px}
 .dot.on{background:#3ec48a;box-shadow:0 0 0 3px rgba(62,196,138,.25)}
 .maplibregl-ctrl-attrib{font-size:10px}
-@media (max-width:980px){.cols{grid-template-columns:1fr}.mapcol{position:static;order:-1}#map{height:300px}.stats{grid-template-columns:repeat(2,1fr)}.top{padding:10px 14px}.wrap{padding:14px}}
+.narrow{display:none}
+/* 下の切り替え(狭い画面だけ。サイトと同じ作り) */
+.nav{display:none}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border-radius:12px;padding:8px 2px;font-size:11px;font-weight:600;color:var(--sub);position:relative}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button.on{color:var(--accent);background:var(--accent-soft)}
+.nav button b{position:absolute;top:2px;left:calc(50% + 6px);min-width:17px;height:17px;border-radius:99px;background:var(--accent);color:#fff;font-size:10.5px;line-height:17px;padding:0 4px;text-align:center}
+.nav button b:empty{display:none}
+@media (max-width:980px){
+  .cols{grid-template-columns:1fr}.mapcol{position:static}.stats{grid-template-columns:repeat(2,1fr)}.top{padding:10px 14px;gap:10px}.wrap{padding:14px 14px 96px}
+  .wide{display:none}.narrow{display:inline}
+  #admins th:nth-child(2),#admins td:nth-child(2){display:none}
+  .nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;gap:4px;padding:6px 10px calc(6px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(29,26,23,.08)}
+  .v-overview,.v-pending,.v-reports,.v-map{display:none}
+  body[data-tab=overview] .v-overview,body[data-tab=pending] .v-pending,body[data-tab=reports] .v-reports,body[data-tab=map] .v-map{display:block}
+  body[data-tab=overview] .stats.v-overview{display:grid}
+  #map{height:calc(100vh - 300px);min-height:280px;max-height:none}
+}
 </style>
 </head>
 <body>
@@ -100,38 +128,48 @@ tr:last-child td{border-bottom:0}
     <div class="bear" id="tbear"></div>
     <h1>運営コンソール<small>札幌トイレ・コンビニマップ</small></h1>
     <div class="sp"></div>
-    <div class="me"><i></i>運営として入っています</div>
-    <button class="ghost" id="logout">この端末を外す</button>
+    <div class="me"><i></i><span class="wide">運営として入っています</span></div>
+    <button class="ghost" id="logout"><span class="wide">この端末を外す</span><span class="narrow">外す</span></button>
   </header>
   <div class="wrap">
-    <section class="stats" id="stats">
+    <section class="stats v-overview" id="stats">
       <div class="stat admins" id="st-admins"><b>-</b><span>管理者の端末</span></div>
       <div class="stat pend"><b id="st-pend">-</b><span>許可待ちの申請</span></div>
       <div class="stat miss"><b id="st-miss">-</b><span>「なかった」の報告がある場所</span></div>
       <div class="stat pub"><b id="st-pub">-</b><span>公開中のユーザー追加</span></div>
     </section>
-    <section class="panel" id="adminpanel">
+    <section class="panel v-overview" id="adminpanel">
       <h2>管理者の端末 <em id="adn"></em></h2>
       <div class="sub">合言葉を入れて運営として登録された端末の一覧です。身に覚えのない端末があれば「外す」で外し、合言葉(loo-secret/admin の code)も変えてください。</div>
       <div id="admins"></div>
     </section>
     <div class="cols">
       <div>
-        <section class="panel"><h2>許可待ちの申請 <em id="pn"></em></h2><div id="pending"></div></section>
-        <section class="panel"><h2>「ここにはなかった」の報告 <em id="mn"></em></h2>
+        <section class="panel v-pending"><h2>許可待ちの申請 <em id="pn"></em></h2><div id="pending"></div></section>
+        <section class="panel v-reports"><h2>「ここにはなかった」の報告 <em id="mn"></em></h2>
           <div class="sub">3人以上で、アプリでは薄く表示して最寄り・リストから外れます。なくなっていたら削除してください(公開データの分は、データ側で直します)。</div>
           <div id="missing"></div></section>
-        <section class="panel"><h2>公開中のユーザー追加 <em id="an"></em></h2>
+        <section class="panel v-reports"><h2>公開中のユーザー追加 <em id="an"></em></h2>
           <div class="sub">間違いや荒らしは、ここから削除できます。</div>
           <div id="added"></div></section>
       </div>
-      <aside class="mapcol">
+      <aside class="mapcol v-map">
         <div id="map"></div>
-        <div class="legend"><span><i style="background:var(--accent)"></i>許可待ち(番号は左の一覧と同じ)</span><span><i style="background:linear-gradient(90deg,var(--blue) 50%,var(--red) 50%)"></i>公開中</span></div>
+        <div class="legend">
+          <span><i class="pp t sm" id="lg-t"></i>公開中のトイレ</span>
+          <span><i class="pp c sm" id="lg-c" style="--bc:#2fa65a"></i>コンビニ(縁の色はチェーン。拡大すると出ます)</span>
+          <span><i class="pp p sm" id="lg-p"></i>許可待ち(番号は申請の一覧と同じ)</span>
+        </div>
       </aside>
     </div>
   </div>
 </div>
+<nav class="nav" id="nav" aria-label="画面の切り替え">
+  <button data-tab="overview" class="on"><span data-i="info"></span>概要</button>
+  <button data-tab="pending"><span data-i="check"></span>申請<b id="tb-pend"></b></button>
+  <button data-tab="reports"><span data-i="list"></span>報告<b id="tb-rep"></b></button>
+  <button data-tab="map"><span data-i="map"></span>地図</button>
+</nav>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" integrity="sha384-SYKAG6cglRMN0RVvhNeBY0r3FYKNOJtznwA0v7B5Vp9tr31xAHsZC0DqkQ/pZDmj" crossorigin="anonymous"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>

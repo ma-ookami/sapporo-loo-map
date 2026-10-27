@@ -97,7 +97,7 @@ function syncMarkers(){
   for (const [id,m] of markers) if (!ids.has(id)){ m.remove(); markers.delete(id); }
   for (const t of st.toilets){
     if (markers.has(t.id)) continue;
-    const e=document.createElement('div'); e.className='pin'+(t.type==='conv'?' conv b-'+(BRAND_KEYS.includes(t.brand)?t.brand:'other')+' loan-'+(loanOf(t)||'null'):'')+(t.source==='user'?' user':''); e.innerHTML='<div class="pi">'+icon(t.type==='conv'?'store':'wc',18)+(t.type==='conv'?'<i class="ld"></i>':'')+'<i class="ugb">B</i><i class="ub">'+PERSON_SVG+'</i></div>';
+    const e=document.createElement('div'); e.className='pin'+(t.type==='conv'?' conv b-'+(BRAND_KEYS.includes(t.brand)?t.brand:'other')+' loan-'+(loanOf(t)||'null'):'')+(t.source==='user'?' user':''); e.innerHTML='<div class="pi">'+icon(t.type==='conv'?'store':'wc',18)+(t.type==='conv'?'<i class="ld"></i>':'')+DASH_SVG+'<i class="ugb">B</i><i class="ub">'+PERSON_SVG+'</i></div>';
     e.onclick=ev=>{ ev.stopPropagation(); if(!st.adding) focus(t.id); };
     markers.set(t.id,new maplibregl.Marker({element:e,anchor:'center'}).setLngLat([t.lng,t.lat]).addTo(map));
   }

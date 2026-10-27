@@ -72,11 +72,11 @@ function floorBlock(t){
 const STK=[['stall-1','1'],['stall-2','2'],['stall-3','3'],['stall-4','4'],['stall-5','5以上']];
 function stallBlock(t){
   if (t.type==='conv') return '';
-  const c={}; let mineSt=null; STK.forEach(([k])=>{ c[k]=0; });
-  for (const r of st.reports){ if (r.toiletId!==t.id||c[r.kind]===undefined) continue; c[r.kind]++; if (r.mine) mineSt=r.kind; }
+  let mineSt=null;
+  for (const r of st.reports) if (r.toiletId===t.id&&r.mine&&r.kind.startsWith('stall-')) mineSt=r.kind;
   const n=stallVotes(t).length;
-  return '<div class="sec2">個室はいくつ?</div><div class="reps st">'
-    +STK.map(([k,l])=>'<button data-st="'+k+'" aria-pressed="'+(mineSt===k)+'"><i></i>'+l+(c[k]?' <b>'+c[k]+'</b>':'')+'</button>').join('')+'</div>'
+  return '<div class="sec2">個室はいくつ?</div><div class="seg stl">'
+    +STK.map(([k,l])=>'<button type="button" data-st="'+k+'" aria-pressed="'+(mineSt===k)+'">'+l+'</button>').join('')+'</div>'
     +'<div class="repnote">'+(n?'{n}人が教えてくれました。数えたことがあれば、あなたも教えてね'.replace('{n}',n):'まだ分かっていません。数えたことがあれば、教えてね')+'</div>';
 }
 function renderDetail(body,t){
@@ -100,7 +100,7 @@ function renderDetail(body,t){
     ${t.mine?'<button class="del" id="del">この情報を削除</button>':''}`;
   placeLegend();
   $('dx').onclick=unselect;
-  body.querySelectorAll('.reps:not(.lv):not(.st) button,.lq button').forEach(b=>b.onclick=async()=>{
+  body.querySelectorAll('.reps:not(.lv) button,.lq button').forEach(b=>b.onclick=async()=>{
     buzz(); const k=b.dataset.k;
     try{ await cloud.report(t.id,mine===k?null:k); }catch(e){ toast('送れませんでした'); }
   });
@@ -108,7 +108,7 @@ function renderDetail(body,t){
     buzz(); const k=b.dataset.lv, mineLv=(st.reports.find(r=>r.toiletId===t.id&&r.mine&&r.kind.startsWith('lv-'))||{}).kind;
     try{ await cloud.reportFloor(t.id,mineLv===k?null:k); }catch(e){ toast('送れませんでした'); }
   });
-  body.querySelectorAll('.reps.st button').forEach(b=>b.onclick=async()=>{
+  body.querySelectorAll('.seg.stl button').forEach(b=>b.onclick=async()=>{
     buzz(); const k=b.dataset.st, mineSt=(st.reports.find(r=>r.toiletId===t.id&&r.mine&&r.kind.startsWith('stall-'))||{}).kind;
     try{ await cloud.reportStall(t.id,mineSt===k?null:k); }catch(e){ toast('送れませんでした'); }
   });
@@ -179,7 +179,7 @@ const LEGEND_ROWS=[
   ['pin ug','wc','地下にある(Bの印)']
 ];
 function legendHtml(){
-  return LEGEND_ROWS.map(r=>'<div class="lrow2"><span class="lm">'+(r[1]?'<div class="'+r[0]+'"><div class="pi">'+icon(r[1],13)+(r[0].includes('conv')?'<i class="ld"></i>':'')+(r[0].includes(' ug')?'<i class="ugb">B</i>':'')+(r[0].includes(' user')?'<i class="ub">'+PERSON_SVG+'</i>':'')+'</div></div>':'<div class="'+r[0]+'"></div>')+'</span><span>'+r[2]+'</span></div>').join('');
+  return LEGEND_ROWS.map(r=>'<div class="lrow2"><span class="lm">'+(r[1]?'<div class="'+r[0]+'"><div class="pi">'+icon(r[1],13)+(r[0].includes('conv')?'<i class="ld"></i>':'')+(r[0].includes(' ug')?'<i class="ugb">B</i>':'')+(r[0].includes(' unconf')?DASH_SVG:'')+(r[0].includes(' user')?'<i class="ub">'+PERSON_SVG+'</i>':'')+'</div></div>':'<div class="'+r[0]+'"></div>')+'</span><span>'+r[2]+'</span></div>').join('');
 }
 const WIDE=()=>matchMedia('(min-width:600px)').matches;   // 広い画面(PC・タブレット)は凡例を出しっぱなし、スマホはボタンで開く
 function placeLegend(){

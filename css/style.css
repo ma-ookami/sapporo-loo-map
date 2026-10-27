@@ -396,3 +396,12 @@ body.adding .legend-btn,body.adding #legend{display:none}
 .tag.user.dashed{border:1px dashed var(--ok)}
 .reps.st i{background:#8fb39a}
 .pin.conv .ub{right:auto;left:-6px}
+
+/* 未確認: 細かい点線の輪(白い枠は実線のまま)。個室のボタンは横並び */
+.pin .dash{display:none;position:absolute;left:-2.5px;top:-2.5px;width:34px;height:34px;pointer-events:none;color:var(--user)}
+.pin.unconf .dash{display:block}
+.pin.user.unconf:not(.conv) .pi{border:2.5px solid #fff}
+.pin.user.unconf.conv .pi{border-style:solid}
+.ri.user.unconf:not(.conv){outline:1.5px dashed var(--user);outline-offset:-3px}
+.seg.stl{margin-top:2px}
+.seg.stl button{padding:9px 0}

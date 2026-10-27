@@ -29,3 +29,6 @@ const starsRow=(n,size)=>[1,2,3,4,5].map(i=>`<span class="st${i<=n?' on':''}">${
 
 // ユーザーが追加した場所のバッジ(ピンの右上)
 const PERSON_SVG='<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4.6"/><path d="M3.5 21.5c0-4.8 3.8-8.2 8.5-8.2s8.5 3.4 8.5 8.2z"/></svg>';
+
+// 未確認のピンの内側の、細かい点線の輪
+const DASH_SVG='<svg class="dash" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="12.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-dasharray="2.2 2.6" stroke-linecap="round"/></svg>';

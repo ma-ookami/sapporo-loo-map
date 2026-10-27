@@ -421,3 +421,6 @@ body.adding .legend-btn,body.adding #legend{display:none}
 .ri.user:not(.conv){background:linear-gradient(90deg,var(--wc-blue) 50%,var(--wc-red) 50%);color:#fff}
 .ri.user.unconf:not(.conv){background:linear-gradient(90deg,color-mix(in srgb,var(--wc-blue) 28%,var(--card)) 50%,color-mix(in srgb,var(--wc-red) 28%,var(--card)) 50%);color:var(--ink);outline:1.5px dashed color-mix(in srgb,var(--ink) 55%,transparent);outline-offset:-3px}
 .row .ri .ic{color:inherit}
+.lm .ugb{width:12px;height:12px;right:-5px;bottom:-5px;font-size:8px;border-width:1.5px;line-height:1;padding:0;box-sizing:border-box;display:none}
+.lm .pin.ug .ugb{display:grid}
+.lm .ugb{padding:0 0 2px}

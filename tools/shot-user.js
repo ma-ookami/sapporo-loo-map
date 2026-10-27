@@ -2,7 +2,7 @@
 const { chromium } = require('../../taskline/node_modules/playwright-core');
 (async () => {
   const b = await chromium.launch({ executablePath: require('./browser.js'), args: ['--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
-  const ctx = await b.newContext({ locale: 'ja-JP', viewport: { width: 390, height: 780 }, deviceScaleFactor: 3, hasTouch: true, colorScheme: process.argv[3] === 'dark' ? 'dark' : 'light', geolocation: { latitude: 43.0545, longitude: 141.3530 }, permissions: ['geolocation'] });
+  const ctx = await b.newContext({ locale: 'ja-JP', viewport: { width: 390, height: 780 }, deviceScaleFactor: +(process.env.DSF||3), hasTouch: true, colorScheme: process.argv[3] === 'dark' ? 'dark' : 'light', geolocation: { latitude: 43.0545, longitude: 141.3530 }, permissions: ['geolocation'] });
   await ctx.addInitScript(() => localStorage.setItem('loo-guide', '1'));
   const p = await ctx.newPage(); p.on('pageerror', e => console.log('ERR', e.message));
   await p.goto('file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1'); await p.waitForTimeout(5000);
@@ -21,6 +21,6 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   await p.evaluate(() => { const l = document.querySelector('#legend,.legend'); if (l) { l.style.display = 'block'; l.style.visibility = 'visible'; l.style.opacity = 1; } });
   const lb = await p.evaluate(() => { const l = document.querySelector('#legend,.legend'); if (!l) return null; const r = l.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; });
   console.log('legend box', JSON.stringify(lb));
-  if (lb && lb.width) await p.screenshot({ path: o + '-legend.png', clip: lb });
+  { const q = await p.locator('.lm .pin.ug').first().boundingBox(); await p.screenshot({ path: o + '-ug.png', clip: { x: q.x - 4, y: q.y - 4, width: q.width + 12, height: q.height + 12 } }); } if (lb && lb.width) await p.screenshot({ path: o + '-legend.png', clip: lb });
   await b.close();
 })();

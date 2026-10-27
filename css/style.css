@@ -432,3 +432,4 @@ body.adding .legend-btn,body.adding #legend{display:none}
 .lm .ugb{width:16px;height:16px;right:-6px;bottom:-6px;font-size:10px;padding:0 0 2px}
 .lm .pin.conv .ld{width:11px;height:11px;top:-4px;right:-4px}
 .lm .pin.conv.loan-no .ld{width:14px;height:14px;top:-5px;right:-5px;font-size:11px}
+.tag.user{background:var(--tint);color:var(--sub)}

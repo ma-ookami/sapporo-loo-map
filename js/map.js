@@ -68,7 +68,8 @@ function stallsOf(t){ const v=stallVotes(t).sort((a,b)=>a-b); return v.length?v[
 // ユーザーが追加した場所の「確認」: 作った人以外の 2 人以上が、行ったことの分かる報告をした(「ここにはなかった」は数えない)
 const CONFIRM_N=2;
 function confirmedBy(t){ const s=new Set(); for (const r of st.reports) if (r.toiletId===t.id&&r.kind!=='missing'&&r.uid&&r.uid!==t.uid) s.add(r.uid); return s.size; }
-const isConfirmed=t=>t.source!=='user'||confirmedBy(t)>=CONFIRM_N;
+// 運営が許可したもの(approved)は確認済み。許可待ち(pending)は未確認。許可制の前の投稿は、報告で確認される
+const isConfirmed=t=>t.source!=='user'||(!t.pending&&(t.approved||confirmedBy(t)>=CONFIRM_N));
 // 階: データ(floor)があればそれ。無ければ「どの階?」の報告の多数決(地上=1 / 地下=-1 / 2階以上=2)。同数・報告なしは null(不明)
 const LV_FLOOR={'lv-gr':1,'lv-ug':-1,'lv-up':2};
 function floorOf(t){

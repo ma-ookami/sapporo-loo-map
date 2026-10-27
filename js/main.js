@@ -17,6 +17,8 @@ function init(){
   // 地図のタップで、開いている詳細・リストを閉じる(追加中は何もしない)
   map.on('click',()=>{ if (st.adding) return; if (st.sel) unselect(); else if (st.open) setTab('map'); });
   initUi(); syncMarkers(); syncPins(); renderSheet();
+  try{ st.wantId=new URLSearchParams(location.search).get('id'); }catch(e){}
+  openSharedSpot();
   $('here').onclick=()=>{ buzz(); locateNow(); };
   map.on('dragstart',()=>{ st.moved=true; });
   watchHere();
@@ -24,7 +26,7 @@ function init(){
   setInterval(()=>{ if (st.filters.open&&!st.adding&&!st.sel){ resort(); syncPins(); renderSheet(); } },60000);
   let seen=false; try{ seen=!!localStorage.getItem('loo-guide'); }catch(e){}
   if (!seen) showGuide();
-  cloud.init(list=>{ st.added=list; st.toilets=TOILETS.concat(list); refresh(); if(!$('settings').hidden) renderSettings(); },rs=>{ st.reports=rs; resort(); syncPins(); if(!st.adding) renderSheet(); if(!$('settings').hidden) renderSettings(); });
+  cloud.init(list=>{ st.added=list; st.toilets=TOILETS.concat(list); refresh(); openSharedSpot(); if(!$('settings').hidden) renderSettings(); },rs=>{ st.reports=rs; resort(); syncPins(); if(!st.adding) renderSheet(); if(!$('settings').hidden) renderSettings(); });
 }
 init();
 // オフライン対応(https か localhost のときだけ。file:// や ?local=1 の試しでは登録しない)

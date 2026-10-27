@@ -13,6 +13,7 @@ const ICONS={
   layers:'<path d="M12 3.5l9 5-9 5-9-5z"/><path d="M3 12.5l9 5 9-5"/><path d="M3 16.5l9 5 9-5"/>',
   sliders:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
   close:'<path d="M6 6l12 12M18 6 6 18"/>',
+  share:'<path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 12v7h14v-7"/>',
   chevron:'<path d="M9 6l6 6-6 6"/>',
   store:'<path d="M4 9l1.5-4.5h13L20 9M4 9v10.5h16V9"/><path d="M4 9c0 1.6 1.2 2.5 2.7 2.5S9.4 10.6 9.4 9c0 1.6 1.2 2.5 2.6 2.5s2.6-.9 2.6-2.5c0 1.6 1.2 2.5 2.7 2.5S20 10.6 20 9"/><path d="M10 19.5v-4.5h4v4.5"/>'
 };

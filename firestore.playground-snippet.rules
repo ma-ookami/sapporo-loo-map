@@ -1,33 +1,63 @@
-// playground の firestore.rules に、次の2つの match を「match /databases/{database}/documents { ... }」の中へ足す(他のアプリの match の後ろでよい)
+// playground の firestore.rules に、「ここから/ここまで」の間を「match /databases/{database}/documents { ... }」の中へ足す(他のアプリの match の後ろでよい。すでにあるなら、目印の間だけ置き換える)
+// 運営: 下の looIsAdmin() の 'CHANGE_ME_ADMIN_EMAIL' を、admin.html に Google ログインするメールアドレスに書き換えてから公開する(書き換えるまでは、誰も運営になれないので安全)
     // ===== 札幌トイレマップ(loo-) ここから =====
+    function looIsAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'CHANGE_ME_ADMIN_EMAIL'
+        && request.auth.token.email_verified == true;
+    }
+    // トイレ・コンビニの項目の検査(申請 loo-requests と、運営が許可して書く loo-toilets の両方で使う)
+    function looToiletOk(d) {
+      return d.keys().hasOnly(['name','lat','lng','fee','wheelchair','floor','stalls','ease','find','type','brand','loan','note','uid','createdAt','approved'])
+        && d.keys().hasAll(['name','lat','lng','fee','wheelchair','floor','ease','find','type','brand','loan','note','uid','createdAt'])
+        && (d.ease == null || (d.ease is int && d.ease >= 1 && d.ease <= 5))
+        && (d.find == null || (d.find is int && d.find >= 1 && d.find <= 5))
+        && d.type in ['toilet','conv']
+        && (d.brand == null || d.brand in ['seven','family','lawson','seico','other'])
+        && (d.loan == null || d.loan in ['yes','ask','no'])
+        && d.name is string && d.name.size() <= 40
+        && d.note is string && d.note.size() <= 200
+        && d.lat is number && d.lat > 43.03 && d.lat < 43.09
+        && d.lng is number && d.lng > 141.32 && d.lng < 141.38
+        && (d.fee == null || d.fee is bool)
+        && (d.wheelchair == null || d.wheelchair is bool)
+        && (d.floor == null || (d.floor is int && d.floor >= -3 && d.floor <= 30))
+        && (!('stalls' in d) || d.stalls == null || (d.stalls is int && d.stalls >= 1 && d.stalls <= 20))
+        && d.uid is string;
+    }
+
+    // 公開中のトイレ。読むのは誰でも。書けるのは運営だけ(申請を許可するとき loo-requests から移す。許可した印 approved: true)
+    // 運営の許可制にする前の投稿(approved なし)は、そのまま残る。削除は作った本人と運営
     match /loo-toilets/{id} {
       allow read: if true;
+      allow create: if looIsAdmin()
+        && id.matches('[A-Za-z0-9]{20}')
+        && looToiletOk(request.resource.data)
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.approved == true;
+      allow update: if looIsAdmin()
+        && looToiletOk(request.resource.data)
+        && request.resource.data.uid == resource.data.uid;
+      allow delete: if request.auth != null && (resource.data.uid == request.auth.uid || looIsAdmin());
+    }
+
+    // 申請(許可待ちのトイレ・コンビニ)。作れるのは匿名ログイン済みの誰でも(投稿の間隔は loo-users が見張る)
+    // 読めるのは申請した本人と運営だけ。許可・却下・編集は運営、取り消しは本人
+    match /loo-requests/{id} {
+      allow get, list: if request.auth != null && (resource.data.uid == request.auth.uid || looIsAdmin());
       allow create: if request.auth != null
         && id.matches('[A-Za-z0-9]{20}')
         && getAfter(/databases/$(database)/documents/loo-users/$(request.auth.uid)).data.lastId == id
         && getAfter(/databases/$(database)/documents/loo-users/$(request.auth.uid)).data.lastAt == request.time
-        && request.resource.data.keys().hasOnly(['name','lat','lng','fee','wheelchair','floor','stalls','ease','find','type','brand','loan','note','uid','createdAt'])
-        && request.resource.data.keys().hasAll(['name','lat','lng','fee','wheelchair','floor','ease','find','type','brand','loan','note','uid','createdAt'])
-        && (request.resource.data.ease == null || (request.resource.data.ease is int && request.resource.data.ease >= 1 && request.resource.data.ease <= 5))
-        && (request.resource.data.find == null || (request.resource.data.find is int && request.resource.data.find >= 1 && request.resource.data.find <= 5))
-        && request.resource.data.type in ['toilet','conv']
-        && (request.resource.data.brand == null || request.resource.data.brand in ['seven','family','lawson','seico','other'])
-        && (request.resource.data.loan == null || request.resource.data.loan in ['yes','ask','no'])
-        && request.resource.data.name is string && request.resource.data.name.size() <= 40
-        && request.resource.data.note is string && request.resource.data.note.size() <= 200
-        && request.resource.data.lat is number && request.resource.data.lat > 43.03 && request.resource.data.lat < 43.09
-        && request.resource.data.lng is number && request.resource.data.lng > 141.32 && request.resource.data.lng < 141.38
-        && (request.resource.data.fee == null || request.resource.data.fee is bool)
-        && (request.resource.data.wheelchair == null || request.resource.data.wheelchair is bool)
-        && (request.resource.data.floor == null || (request.resource.data.floor is int && request.resource.data.floor >= -3 && request.resource.data.floor <= 30))
+        && looToiletOk(request.resource.data)
+        && !('approved' in request.resource.data)
         && request.resource.data.uid == request.auth.uid
-        && (!('stalls' in request.resource.data) || request.resource.data.stalls == null || (request.resource.data.stalls is int && request.resource.data.stalls >= 1 && request.resource.data.stalls <= 20))
         && request.resource.data.createdAt == request.time;
-      allow update: if false;
-      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow update: if looIsAdmin() && looToiletOk(request.resource.data) && request.resource.data.uid == resource.data.uid;
+      allow delete: if request.auth != null && (resource.data.uid == request.auth.uid || looIsAdmin());
     }
 
-    // 「きれい/混んでた/使えなかった」の一言。1人1トイレ1件(ID = トイレID_ユーザーID)。上書き・取り消しは本人だけ
+    // 「使えなかった」などの一言報告。1人1トイレ1件(ID = トイレID_ユーザーID)。上書き・取り消しは本人だけ
     match /loo-reports/{id} {
       allow read: if true;
       allow create, update: if request.auth != null
@@ -42,7 +72,7 @@
             || (request.resource.data.kind.matches('stall-.*') && id == request.resource.data.toiletId + '_stall_' + request.auth.uid));
       allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
     }
-    // 投稿の間隔と回数(1人あたり 30 秒に1件・24時間に10件)。トイレを追加するとき、同じバッチでここも更新する(lastId = 追加するトイレの ID)
+    // 投稿(申請)の間隔と回数(1人あたり 30 秒に1件・24時間に10件)。申請するとき、同じバッチでここも更新する(lastId = 申請の ID)
     match /loo-users/{uid} {
       allow get: if request.auth != null && request.auth.uid == uid;
       allow create: if request.auth != null && request.auth.uid == uid

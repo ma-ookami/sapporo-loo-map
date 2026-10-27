@@ -1,5 +1,5 @@
 /* 下のシート(ホーム・リスト・詳細)、タブバー、絞り込みチップ */
-const KINDS=[['clean','きれい'],['crowded','混んでた'],['closed','使えなかった']];
+const KINDS=[['closed','使えなかった']];
 
 const LKINDS=[['loan-yes','check','借りられる','そのまま'],['loan-ask','chat','声をかけて','店員さんに一言/貼り紙あり'],['loan-no','close','借りられない','貸出なし/断られた']];
 function loanCounts(id){ const c={'loan-yes':0,'loan-ask':0,'loan-no':0}; for (const r of st.reports) if (r.toiletId===id&&c[r.kind]!==undefined) c[r.kind]++; return c; }
@@ -11,7 +11,7 @@ function reportCounts(id){
 const tagsOf=t=>(t.type==='conv'?`<span class="tag">${esc(brandLabel(t.brand))}</span>${(l=>`<span class="tag loan-${l||'null'}">${l?loanLabel(l):'借りられるか不明'}</span>`)(loanOf(t))}`:'')+(fl=>fl==null||t.type==='conv'?'':fl<0?`<span class="tag ug">地下 ${floorLabel(fl)}</span>`:fl===1?'<span class="tag">地上(1F)</span>':`<span class="tag">${floorLabel(fl)}</span>`)(floorOf(t))
   +(n=>n?`<span class="tag">個室 ${n}${n>=5?'以上':''}</span>`:'')(t.type==='conv'?null:stallsOf(t))
   +(t.fee===false?'<span class="tag free">無料</span>':t.fee===true?'<span class="tag">有料</span>':'')
-  +(t.wheelchair?'<span class="tag">車いす可</span>':'')+(t.hours==='24/7'?'<span class="tag free">24時間</span>':(o=>o===true?'<span class="tag free">営業中</span>':o===false?'<span class="tag loan-no">営業時間外</span>':t.hours&&t.type!=='conv'?`<span class="tag">${esc(t.hours)}</span>`:'')(openNow(t.hours)));
+  +(t.wheelchair?'<span class="tag">車いす可</span>':'')+(t.type!=='conv'&&reportCounts(t.id).c.closed?'<span class="tag loan-no">最近、使えなかった報告</span>':'')+(t.hours==='24/7'?'<span class="tag free">24時間</span>':(o=>o===true?'<span class="tag free">営業中</span>':o===false?'<span class="tag loan-no">営業時間外</span>':t.hours&&t.type!=='conv'?`<span class="tag">${esc(t.hours)}</span>`:'')(openNow(t.hours)));
 
 function focus(id){
   st.sel=id; st.open=false; buzz();
@@ -82,8 +82,8 @@ function stallBlock(t){
 function renderDetail(body,t){
   const d=distanceM(origin(),t), {c,mine:mine0}=reportCounts(t.id), lc=loanCounts(t.id), mine=(st.reports.find(r=>r.toiletId===t.id&&r.mine&&!r.kind.startsWith('lv-')&&!r.kind.startsWith('stall-'))||{}).kind||mine0;
   body.innerHTML=`<div class="dhead"><div class="av">${bearSvg(36)}</div><div><h2 translate="no">${esc(nameOf(t))}</h2>
-    <div class="d">${fmtDist(d)}・徒歩${walkMin(d)}分</div></div><button class="x" id="dx" aria-label="閉じる">${icon('close',16)}</button></div>
-    <div class="tags">${tagsOf(t)}${t.source==='user'?(isConfirmed(t)?'<span class="tag user">追加された情報(確認済み)</span>':'<span class="tag user dashed">追加された情報(未確認)</span>'):''}${doubted(t)?'<span class="tag loan-no">「なかった」の報告があります</span>':''}</div>
+    <div class="d">${fmtDist(d)}・徒歩${walkMin(d)}分</div></div>${t.pending?'':`<button class="x" id="dsh" aria-label="この場所を共有">${icon('share',16)}</button>`}<button class="x" id="dx" aria-label="閉じる">${icon('close',16)}</button></div>
+    <div class="tags">${tagsOf(t)}${t.source==='user'?(t.pending?'<span class="tag user dashed">運営の確認待ち(あなたにだけ見えています)</span>':isConfirmed(t)?'<span class="tag user">追加された情報(確認済み)</span>':'<span class="tag user dashed">追加された情報(未確認)</span>'):''}${doubted(t)?'<span class="tag loan-no">「なかった」の報告があります</span>':''}</div>
     ${t.note?`<div class="note" translate="no">${esc(t.note)}</div>`:''}
     ${floorBlock(t)}
     ${stallBlock(t)}
@@ -92,7 +92,7 @@ function renderDetail(body,t){
       ?`<div class="sec2">このコンビニのトイレ、借りられる?</div>
     <div class="lq">${LKINDS.map(([k,ic,l,sub])=>`<button data-k="${k}" aria-pressed="${mine===k}"><span class="lic">${icon(ic,20)}</span><b>${l}</b><small>${sub.replace("/","<br>")}</small><em>${lc[k]?lc[k]+'人':'&nbsp;'}</em></button>`).join('')}</div>
     <div class="repnote">${(n=>n?`${n}人が教えてくれました。借りたことがあれば、あなたも教えてね`:'まだ誰も教えてくれていません。借りたことがあれば、教えてね')(lc['loan-yes']+lc['loan-ask']+lc['loan-no'])}</div>`
-      :`<div class="sec2">いまの様子(24時間だけ表示)</div>
+      :`<div class="sec2">使えなかったら教えてね(24時間だけ表示)</div>
     <div class="reps">${KINDS.map(([k,l])=>`<button data-k="${k}" aria-pressed="${mine===k}"><i></i>${l}${c[k]?` <b>${c[k]}</b>`:''}</button>`).join('')}</div>`}
     <div class="care">${icon('info',16)}<span>${t.type==='conv'?'お店のご厚意で借りるトイレです。できればお買い物を。混んでいるときは遠慮して、きれいに使いましょう。お客さん専用のお店もあります。':'ビルやお店のトイレは、お客さん専用のこともあります。使えなかったときは、無理せず別の場所へ。'}</span></div>
     ${t.source==='user'&&!t.mine?`<button class="miss" id="miss" aria-pressed="${mine==='missing'}">${mine==='missing'?'「ここにはなかった」と報告済み(押すと取り消し)':'ここには、なかった'}</button>`:''}
@@ -100,6 +100,7 @@ function renderDetail(body,t){
     ${t.mine?'<button class="del" id="del">この情報を削除</button>':''}`;
   placeLegend();
   $('dx').onclick=unselect;
+  if ($('dsh')) $('dsh').onclick=()=>shareSpot(t);
   body.querySelectorAll('.reps:not(.lv) button,.lq button').forEach(b=>b.onclick=async()=>{
     buzz(); const k=b.dataset.k;
     try{ await cloud.report(t.id,mine===k?null:k); }catch(e){ toast('送れませんでした'); }
@@ -121,6 +122,19 @@ function renderDetail(body,t){
 function goRoute(t){
   if (!confirm(I18N.t('Google マップを開いて、「{name}」までの徒歩ルートを表示します。よろしいですか?',{name:nameOf(t)}))) return;
   window.open(routeUrl(t),'_blank','noopener');
+}
+// この場所のリンク(?id=)を共有。共有シートが無い端末ではコピー
+function spotUrl(t){ return location.origin+location.pathname+'?id='+encodeURIComponent(t.id); }
+async function shareSpot(t){
+  const url=spotUrl(t), title=nameOf(t);
+  try{ if (navigator.share){ await navigator.share({title,text:title,url}); return; } }catch(e){ if (e&&e.name==='AbortError') return; }
+  try{ await navigator.clipboard.writeText(url); toast('リンクをコピーしました'); }catch(e){ toast('コピーできませんでした'); }
+}
+// ?id= で開かれたとき、その場所を選ぶ(ユーザー追加の分は読み込み後に探す)
+function openSharedSpot(){
+  if (!st.wantId) return;
+  const t=st.toilets.find(x=>x.id===st.wantId); if (!t) return;
+  st.wantId=null; st.moved=true; focus(t.id);
 }
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.textContent=msg; d.style.bottom=(innerHeight-$('sheet').getBoundingClientRect().top+12)+'px'; document.body.appendChild(d); setTimeout(()=>d.remove(),Math.max(2200,msg.length*90)); }
 

@@ -54,7 +54,7 @@ function showForm(loc,keep){
     +'<div class="lb">使いやすさ <span class="hn">広さ・きれいさ・入りやすさ</span></div>'+starPick('ease',f.ease)
     +'<div class="lb">場所のわかりやすさ <span class="hn">見つけやすさ・行き方</span></div>'+starPick('find',f.find)
     +'<input type="text" id="fnote" maxlength="200" placeholder="メモ(営業時間・使い方など。なくてOK)">'
-    +'<div class="btns"><button class="sub" id="fback">場所を選び直す</button><button class="cta" id="fsave">登録する</button></div></div>';
+    +'<div class="btns"><button class="sub" id="fback">場所を選び直す</button><button class="cta" id="fsave">'+(cloud.mode==='cloud'?'申請する':'登録する')+'</button></div></div>';
   $('fname').value=f.name; $('fnote').value=f.note;
   placeCross();
   const snap=()=>{ f.name=$('fname').value; f.note=$('fnote').value; };
@@ -83,7 +83,7 @@ function showForm(loc,keep){
     const lim=postLimit(); if (lim){ toast(lim); return; }
     const dup=st.toilets.filter(x=>x.type===t.type&&(t.type==='toilet'||x.brand===t.brand)).map(x=>({x,d:distanceM(loc,x)})).sort((a,b)=>a.d-b.d)[0];
     if (dup&&dup.d<=20&&!confirm(I18N.t('すぐ近く({d}m)に「{name}」が登録されています。それでも登録しますか?',{d:Math.round(dup.d),name:nameOf(dup.x)}))) return;
-    try{ await cloud.add(t); markPosted(); toast('登録しました。ありがとう!'); endAdd(); }
+    try{ await cloud.add(t); markPosted(); toast(cloud.mode==='cloud'?'申請しました。運営が確認すると、みんなの地図に出ます':'登録しました。ありがとう!'); endAdd(); }
     catch(e){ toast(e&&e.code==='permission-denied'?'登録できませんでした。間をあけるか、今日の上限(10件)かもしれません':'登録できませんでした'); }
   };
 }

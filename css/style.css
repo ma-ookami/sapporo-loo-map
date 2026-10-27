@@ -424,3 +424,11 @@ body.adding .legend-btn,body.adding #legend{display:none}
 .lm .ugb{width:12px;height:12px;right:-5px;bottom:-5px;font-size:8px;border-width:1.5px;line-height:1;padding:0;box-sizing:border-box;display:none}
 .lm .pin.ug .ugb{display:grid}
 .lm .ugb{padding:0 0 2px}
+.lm{width:34px}
+.lm .pin{width:30px;height:30px}
+.lm .pi{width:30px;height:30px}
+.lm .pi .ic{width:17px;height:17px}
+.lm .dash{width:30px;height:30px}
+.lm .ugb{width:16px;height:16px;right:-6px;bottom:-6px;font-size:10px;padding:0 0 2px}
+.lm .pin.conv .ld{width:11px;height:11px;top:-4px;right:-4px}
+.lm .pin.conv.loan-no .ld{width:14px;height:14px;top:-5px;right:-5px;font-size:11px}

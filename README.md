@@ -118,6 +118,8 @@
 - git の「LF will be replaced by CRLF」の警告は無害
 - `st.filters` のキーを増やすときは、`index.html` のボタン(2段目は `data-g=t|c`)と `map.js` の `st.filters`・`passes` をそろえる
 
+- **一旦非表示:** 設定の「間違い・ご意見を送る」(GitHub Issues へのリンク。`js/settings.js` にコメントで跡あり)。連絡先を Issues 以外にする予定(未定)。`privacy.html` / `privacy.en.html` の連絡先の文(Issues へのリンク)も、あとで直す
+
 ## 8b. 検索(SEO)
 - `index.html` の head に title/description/canonical(独自ドメイン)/OGP/Twitter/JSON-LD、本文に読み上げ用の説明(`#about`、`.sr-only`)。`robots.txt`(運営の画面は、名前を明かさないため書かない)・`sitemap.xml`(新しいページを足したら追記)・共有画像 `og.png`(`node tools/make-og.js`)
 - **未実施(ユーザー作業):** Search Console / Bing Webmaster に登録(所有権の確認)してサイトマップを送る。**次の案(未着手):** エリア別の案内ページ(すすきの/大通/札幌駅。`tools/` で `data/toilets.js` から生成。場所ごとの薄いページは作らない)

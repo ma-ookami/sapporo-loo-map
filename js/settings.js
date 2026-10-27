@@ -70,7 +70,7 @@ function renderSettings(){
     <div class="ssec">このアプリについて</div>
     <button class="lrow" id="sguide">使う前に(お客さん専用・お店への配慮)${icon('chevron',16)}</button>
     <a class="lrow" href="privacy.html" target="_blank" rel="noopener">プライバシーとデータの出典${icon('chevron',16)}</a>
-    <a class="lrow" href="https://github.com/ma-ookami/sapporo-loo-map/issues" target="_blank" rel="noopener">間違い・ご意見を送る${icon('chevron',16)}</a>
+    ${''/* 「間違い・ご意見を送る」(GitHub Issues へのリンク)は一旦非表示。連絡先を決めたら戻す */}
     <div class="lrow plain"><span>版</span><span class="shint" style="margin:0">${APP_VERSION}</span></div>
     <button class="lrow danger" id="sreset">この端末の設定と記録を消す</button>
     <button class="lrow close" id="sclose">閉じる</button>

@@ -13,7 +13,7 @@ const cloud={
         const cred=await firebase.auth().signInAnonymously();
         this.uid=cred.user.uid; this.mode='cloud'; this.fb=firebase.firestore();
         this.fb.collection('loo-toilets').onSnapshot(s=>onToilets(s.docs.map(d=>this._row(d.id,d.data()))),()=>{});
-        this.fb.collection('loo-reports').onSnapshot(s=>onReports(s.docs.map(d=>{ const r=d.data(); return {toiletId:r.toiletId,kind:r.kind,mine:r.uid===this.uid,at:r.createdAt?r.createdAt.toMillis():Date.now()}; })),()=>{});
+        this.fb.collection('loo-reports').onSnapshot(s=>onReports(s.docs.map(d=>{ const r=d.data(); return {toiletId:r.toiletId,kind:r.kind,mine:r.uid===this.uid,uid:r.uid,at:r.createdAt?r.createdAt.toMillis():Date.now()}; })),()=>{});
         return;
       }catch(e){ console.warn('firebase 失敗。ローカルモードで動きます',e); setTimeout(()=>{ if (typeof toast==='function') toast('サーバーにつながらないので、この端末にだけ保存します'); },1500); }
     }
@@ -21,11 +21,11 @@ const cloud={
     onToilets(this._loadT()); onReports(this._loadR());
   },
   _row(id,d){
-    return {id:'u-'+id,name:d.name,lat:d.lat,lng:d.lng,fee:d.fee,wheelchair:d.wheelchair,floor:d.floor??null,ease:d.ease??null,find:d.find??null,type:d.type||'toilet',brand:d.brand||null,loan:d.loan||null,hours:null,note:d.note||'',source:'user',mine:d.uid===this.uid};
+    return {id:'u-'+id,name:d.name,lat:d.lat,lng:d.lng,fee:d.fee,wheelchair:d.wheelchair,floor:d.floor??null,ease:d.ease??null,find:d.find??null,type:d.type||'toilet',brand:d.brand||null,loan:d.loan||null,hours:null,note:d.note||'',source:'user',uid:d.uid,stalls:d.stalls??null,mine:d.uid===this.uid};
   },
   _get(k){ try{ return JSON.parse(localStorage.getItem(k)||'[]'); }catch(e){ return []; } },
   _loadT(){ return this._get('loo-added').map(d=>this._row(d.id,d)); },
-  _loadR(){ return this._get('loo-reports').concat(this._get('loo-floors')).map(r=>({toiletId:r.toiletId,kind:r.kind,mine:true,at:r.at})); },
+  _loadR(){ return this._get('loo-reports').concat(this._get('loo-floors')).concat(this._get('loo-stalls')).map(r=>({toiletId:r.toiletId,kind:r.kind,mine:true,at:r.at})); },
   async add(t){
     if (this.mode==='cloud'){
       // 投稿の間隔・回数の記録(loo-users)と同じバッチで書く。ルールが 30 秒に1件・24時間に10件までを見張る
@@ -33,7 +33,7 @@ const cloud={
       const snap=await uref.get(), d=snap.exists?snap.data():null;
       const inWin=d&&d.windowStart&&Date.now()<d.windowStart.toMillis()+24*3600*1000;
       const b=this.fb.batch();
-      b.set(ref,{name:t.name,lat:t.lat,lng:t.lng,fee:t.fee,wheelchair:t.wheelchair,floor:t.floor,ease:t.ease??null,find:t.find??null,type:t.type,brand:t.brand,loan:t.loan,note:t.note,uid:this.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      b.set(ref,{name:t.name,lat:t.lat,lng:t.lng,fee:t.fee,wheelchair:t.wheelchair,floor:t.floor,ease:t.ease??null,find:t.find??null,type:t.type,brand:t.brand,loan:t.loan,note:t.note,...(t.stalls?{stalls:t.stalls}:{}),uid:this.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       b.set(uref,inWin?{lastAt:ts,n:d.n+1,windowStart:d.windowStart,lastId:ref.id}:{lastAt:ts,n:1,windowStart:ts,lastId:ref.id});
       await b.commit();
       return;
@@ -57,6 +57,17 @@ const cloud={
     const a=this._get('loo-floors').filter(r=>r.toiletId!==toiletId);
     if (kind) a.push({toiletId,kind,at:Date.now()});
     localStorage.setItem('loo-floors',JSON.stringify(a)); this._or(this._loadR());
+  },
+  // 「個室はいくつ?」(stall-1〜stall-5。5 は 5以上)。ほかの報告とは別の文書(<toiletId>_stall_<uid>)。kind が null なら取り消し
+  async reportStall(toiletId,kind){
+    if (this.mode==='cloud'){
+      const ref=this.fb.collection('loo-reports').doc(toiletId+'_stall_'+this.uid);
+      if (kind) await ref.set({toiletId,kind,uid:this.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); else await ref.delete();
+      return;
+    }
+    const a=this._get('loo-stalls').filter(r=>r.toiletId!==toiletId);
+    if (kind) a.push({toiletId,kind,at:Date.now()});
+    localStorage.setItem('loo-stalls',JSON.stringify(a)); this._or(this._loadR());
   },
   async report(toiletId,kind){
     if (this.mode==='cloud'){

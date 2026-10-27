@@ -41,7 +41,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   // 追加: 場所 → トイレのフォーム(空で登録=通知)→ 登録
   await clickIf(p, '#tabadd'); await p.waitForTimeout(500); await harvest(p, '追加(場所)');
   await clickIf(p, '#pok'); await harvest(p, '追加(トイレ)'); await clickIf(p, '#fsave'); await harvest(p, '通知: 名前なし');
-  await p.fill('#fname', '英語テストビル'); await clickIf(p, '.seg[data-k=floor] button[data-v="-1"]'); await clickIf(p, '#fsave'); await p.waitForTimeout(600); await harvest(p, '登録(トイレ)');
+  await p.fill('#fname', '英語テストビル'); await clickIf(p, '.seg[data-k=stalls] button[data-v="3"]'); await clickIf(p, '.seg[data-k=floor] button[data-v="-1"]'); await clickIf(p, '#fsave'); await p.waitForTimeout(600); await harvest(p, '登録(トイレ)');
   await clickIf(p, '#tabadd'); await p.waitForTimeout(500); await clickIf(p, '#pok'); await clickIf(p, '.seg[data-k=type] button[data-v=conv]'); await harvest(p, '追加(コンビニ)');
   await clickIf(p, '#fsave'); await harvest(p, '通知: ブランドなし'); await clickIf(p, '.seg[data-k=brand] button[data-v=seven]'); await clickIf(p, '#fsave'); await harvest(p, '通知: 貸し出しなし');
   await clickIf(p, '.seg[data-k=loan] button[data-v=ask]'); await clickIf(p, '#fsave'); await p.waitForTimeout(600); await harvest(p, '登録(コンビニ)');
@@ -49,6 +49,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   const mine = await p.evaluate(() => st.toilets.find(t => t.source === 'user').id);
   await p.evaluate(i => focus(i), mine); await p.waitForTimeout(500); await harvest(p, '詳細(自分の追加)'); await clickIf(p, '#del'); await harvest(p, '削除の確認');
   await p.evaluate(() => { const t = st.toilets.find(x => x.source === 'user'); if (t) { t.mine = false; focus(t.id); } }); await p.waitForTimeout(500); await harvest(p, '詳細(他人の追加)'); await clickIf(p, '#miss'); await harvest(p, '「なかった」報告後'); await clickIf(p, '#dx');
+  await p.evaluate(() => { const t = st.toilets.find(x => x.source === 'user'); if (t) { st.reports.push({ toiletId: t.id, kind: 'clean', mine: false, uid: 'x1', at: 0 }, { toiletId: t.id, kind: 'clean', mine: false, uid: 'x2', at: 0 }); refresh(); focus(t.id); } }); await p.waitForTimeout(500); await harvest(p, '詳細(確認済み)'); await clickIf(p, '#dx');
   // 設定
   await clickIf(p, '#info'); await harvest(p, '設定');
   for (const sel of ['.seg[data-s=theme] button[data-v=light]', '.seg[data-s=theme] button[data-v=auto]', '.seg[data-s=pace] button[data-v="100"]', '.seg[data-s=pace] button[data-v="80"]', '.sw[data-s=vibrate]', '.sw[data-s=nearConv]', '.sw[data-s=showUnknown]', '.seg[data-s=mapColor] button[data-v=color]', '.seg[data-s=mapColor] button[data-v=simple]']) await clickIf(p, sel);

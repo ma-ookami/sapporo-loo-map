@@ -13,7 +13,7 @@ service cloud.firestore {
         && id.matches('[A-Za-z0-9]{20}')
         && getAfter(/databases/$(database)/documents/loo-users/$(request.auth.uid)).data.lastId == id
         && getAfter(/databases/$(database)/documents/loo-users/$(request.auth.uid)).data.lastAt == request.time
-        && request.resource.data.keys().hasOnly(['name','lat','lng','fee','wheelchair','floor','ease','find','type','brand','loan','note','uid','createdAt'])
+        && request.resource.data.keys().hasOnly(['name','lat','lng','fee','wheelchair','floor','stalls','ease','find','type','brand','loan','note','uid','createdAt'])
         && request.resource.data.keys().hasAll(['name','lat','lng','fee','wheelchair','floor','ease','find','type','brand','loan','note','uid','createdAt'])
         && (request.resource.data.ease == null || (request.resource.data.ease is int && request.resource.data.ease >= 1 && request.resource.data.ease <= 5))
         && (request.resource.data.find == null || (request.resource.data.find is int && request.resource.data.find >= 1 && request.resource.data.find <= 5))
@@ -28,6 +28,7 @@ service cloud.firestore {
         && (request.resource.data.wheelchair == null || request.resource.data.wheelchair is bool)
         && (request.resource.data.floor == null || (request.resource.data.floor is int && request.resource.data.floor >= -3 && request.resource.data.floor <= 30))
         && request.resource.data.uid == request.auth.uid
+        && (!('stalls' in request.resource.data) || request.resource.data.stalls == null || (request.resource.data.stalls is int && request.resource.data.stalls >= 1 && request.resource.data.stalls <= 20))
         && request.resource.data.createdAt == request.time;
       allow update: if false;
       allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
@@ -40,11 +41,12 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['toiletId','kind','uid','createdAt'])
         && request.resource.data.keys().hasAll(['toiletId','kind','uid','createdAt'])
         && request.resource.data.toiletId is string && request.resource.data.toiletId.size() <= 60
-        && request.resource.data.kind in ['clean','crowded','closed','loan-yes','loan-ask','loan-no','missing','lv-gr','lv-ug','lv-up']
+        && request.resource.data.kind in ['clean','crowded','closed','loan-yes','loan-ask','loan-no','missing','lv-gr','lv-ug','lv-up','stall-1','stall-2','stall-3','stall-4','stall-5']
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.createdAt == request.time
-        && ((!request.resource.data.kind.matches('lv-.*') && id == request.resource.data.toiletId + '_' + request.auth.uid)
-            || (request.resource.data.kind.matches('lv-.*') && id == request.resource.data.toiletId + '_lv_' + request.auth.uid));
+        && ((!request.resource.data.kind.matches('lv-.*') && !request.resource.data.kind.matches('stall-.*') && id == request.resource.data.toiletId + '_' + request.auth.uid)
+            || (request.resource.data.kind.matches('lv-.*') && id == request.resource.data.toiletId + '_lv_' + request.auth.uid)
+            || (request.resource.data.kind.matches('stall-.*') && id == request.resource.data.toiletId + '_stall_' + request.auth.uid));
       allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
     }
 

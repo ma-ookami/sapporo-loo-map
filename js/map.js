@@ -58,6 +58,17 @@ function loanOf(t){
   const top=Object.keys(c).filter(k=>c[k]===max);
   return top.length===1?top[0]:'ask';
 }
+// 個室の数: 作った人の入力(1票)と、みんなの「個室はいくつ?」の報告(stall-1〜5。5 は 5以上)の中央値。無ければ null
+function stallVotes(t){
+  const v=[]; if (t.source==='user'&&t.stalls) v.push(t.stalls);
+  for (const r of st.reports) if (r.toiletId===t.id&&r.kind.startsWith('stall-')) v.push(Number(r.kind.slice(6)));
+  return v;
+}
+function stallsOf(t){ const v=stallVotes(t).sort((a,b)=>a-b); return v.length?v[Math.floor((v.length-1)/2)]:null; }
+// ユーザーが追加した場所の「確認」: 作った人以外の 2 人以上が、行ったことの分かる報告をした(「ここにはなかった」は数えない)
+const CONFIRM_N=2;
+function confirmedBy(t){ const s=new Set(); for (const r of st.reports) if (r.toiletId===t.id&&r.kind!=='missing'&&r.uid&&r.uid!==t.uid) s.add(r.uid); return s.size; }
+const isConfirmed=t=>t.source!=='user'||confirmedBy(t)>=CONFIRM_N;
 // 階: データ(floor)があればそれ。無ければ「どの階?」の報告の多数決(地上=1 / 地下=-1 / 2階以上=2)。同数・報告なしは null(不明)
 const LV_FLOOR={'lv-gr':1,'lv-ug':-1,'lv-up':2};
 function floorOf(t){
@@ -86,7 +97,7 @@ function syncMarkers(){
   for (const [id,m] of markers) if (!ids.has(id)){ m.remove(); markers.delete(id); }
   for (const t of st.toilets){
     if (markers.has(t.id)) continue;
-    const e=document.createElement('div'); e.className='pin'+(t.type==='conv'?' conv b-'+(BRAND_KEYS.includes(t.brand)?t.brand:'other')+' loan-'+(loanOf(t)||'null'):'')+(t.source==='user'?' user':''); e.innerHTML='<div class="pi">'+icon(t.type==='conv'?'store':'wc',18)+(t.type==='conv'?'<i class="ld"></i>':'')+'<i class="ugb">B</i></div>';
+    const e=document.createElement('div'); e.className='pin'+(t.type==='conv'?' conv b-'+(BRAND_KEYS.includes(t.brand)?t.brand:'other')+' loan-'+(loanOf(t)||'null'):'')+(t.source==='user'?' user':''); e.innerHTML='<div class="pi">'+icon(t.type==='conv'?'store':'wc',18)+(t.type==='conv'?'<i class="ld"></i>':'')+'<i class="ugb">B</i><i class="ub">'+PERSON_SVG+'</i></div>';
     e.onclick=ev=>{ ev.stopPropagation(); if(!st.adding) focus(t.id); };
     markers.set(t.id,new maplibregl.Marker({element:e,anchor:'center'}).setLngLat([t.lng,t.lat]).addTo(map));
   }
@@ -101,6 +112,7 @@ function syncPins(){
     if (t.type==='conv'){ e.classList.remove('loan-yes','loan-ask','loan-no','loan-null'); e.classList.add('loan-'+(loanOf(t)||'null')); }
     e.classList.toggle('doubt',doubted(t));
     e.classList.toggle('ug',isUg(t));
+    e.classList.toggle('unconf',t.source==='user'&&!isConfirmed(t));
     e.classList.toggle('sel',id===st.sel);
     e.classList.toggle('near',id===near&&id!==st.sel);
   }

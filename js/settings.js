@@ -2,7 +2,7 @@
 const SETTINGS_KEY='loo-settings';
 const APP_VERSION='1.0';
 const DEFAULT_SETTINGS={theme:'auto',mapColor:'simple',lang:(navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en',vibrate:true,pace:80,nearConv:true,showUnknown:true};
-const KIND_LABEL={clean:'きれい','crowded':'混んでた',closed:'使えなかった',missing:'ここにはなかった','loan-yes':'借りられる','loan-ask':'声をかけて借りる','loan-no':'借りられない'};
+const KIND_LABEL={clean:'きれい','crowded':'混んでた',closed:'使えなかった',missing:'ここにはなかった','loan-yes':'借りられる','loan-ask':'声をかけて借りる','loan-no':'借りられない','lv-gr':'地上','lv-ug':'地下','lv-up':'2階以上','stall-1':'個室 1','stall-2':'個室 2','stall-3':'個室 3','stall-4':'個室 4','stall-5':'個室 5以上'};
 
 const LOC_TEXT={ok:'取得できています(地図の青い点です)',pending:'取得中…',denied:'許可されていません。端末の設定で、このサイトの位置情報をオンにしてね(iPhone: 設定 → プライバシー → 位置情報サービス → Safari)',unavailable:'いまは取得できません。電波のよいところでためしてね'};
 function loadSettings(){

@@ -16,12 +16,13 @@ function pickPlace(first){
   $('pok').onclick=()=>showForm(map.getCenter());
 }
 const FLOORS=[['-1','B1'],['1','1F'],['2','2F'],['3','3F'],['4','4F'],['5','5F'],['6','6F'],['7','7F'],['8','8F'],['9','9F'],['10','10F〜'],['','わからない']];
+const STALLS=[['1','1'],['2','2'],['3','3'],['4','4'],['5','5以上'],['','わからない']];
 const FEES=[['free','無料'],['paid','有料'],['','わからない']];
 const WHEELS=[['yes','使える'],['no','使えない'],['','わからない']];
 // 選択済みの値(再描画したとき用)。floor は数値、fee/wheelchair は真偽値、他は文字列
 function sel(k,v,cur){
   if (cur==null) return v===''&&k!=='brand'&&k!=='loan';
-  if (k==='floor') return String(cur)===v;
+  if (k==='floor'||k==='stalls') return String(cur)===v;
   if (k==='fee') return (cur===false&&v==='free')||(cur===true&&v==='paid');
   if (k==='wheelchair') return (cur===true&&v==='yes')||(cur===false&&v==='no');
   return cur===v;
@@ -35,7 +36,7 @@ function starPick(k,cur){
   return '<div class="stars" data-k="'+k+'">'+[1,2,3,4,5].map(n=>'<button type="button" data-v="'+n+'" class="'+(n<=(cur||0)?'on':'')+'" aria-label="'+n+'">'+starSvg(30)+'</button>').join('')+'</div>';
 }
 function showForm(loc,keep){
-  const f=Object.assign({type:'toilet',brand:null,loan:null,fee:null,wheelchair:null,floor:null,ease:null,find:null,name:'',note:''},keep||{});
+  const f=Object.assign({type:'toilet',brand:null,loan:null,fee:null,wheelchair:null,floor:null,stalls:null,ease:null,find:null,name:'',note:''},keep||{});
   const conv=f.type==='conv';
   const sg=(k,opts,scroll)=>seg(k,opts,scroll,f[k]);
   $('sbody').innerHTML='<div class="form"><div class="step"><i></i><i class="on"></i>&nbsp;2 / 2 情報</div><div class="hd">'+bearSvg(40)+'<span>この場所のことを教えてね</span></div>'
@@ -47,6 +48,7 @@ function showForm(loc,keep){
         +'<input type="text" id="fname" maxlength="40" placeholder="店名・場所(例: ○○店。なくてOK)">'
       :'<input type="text" id="fname" maxlength="40" placeholder="名前・場所(例: ○○ビル)">'
         +'<div class="lb">階(地下はB1・B2)</div>'+sg('floor',FLOORS.map(x=>[x[0],x[1]]),true)
+        +'<div class="lb">個室の数(男女別なら、合わせて)</div>'+sg('stalls',STALLS,true)
         +'<div class="lb">料金</div>'+sg('fee',FEES)
         +'<div class="lb">車いす</div>'+sg('wheelchair',WHEELS))
     +'<div class="lb">使いやすさ <span class="hn">広さ・きれいさ・入りやすさ</span></div>'+starPick('ease',f.ease)
@@ -60,7 +62,7 @@ function showForm(loc,keep){
     buzz(); const v=btn.dataset.v, k=g.dataset.k;
     if (k==='type'){ snap(); f.type=v; showForm(loc,f); return; }
     g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false')); btn.setAttribute('aria-pressed','true');
-    f[k]=k==='floor'?(v===''?null:Number(v)):k==='fee'?(v==='free'?false:v==='paid'?true:null):k==='wheelchair'?(v==='yes'?true:v==='no'?false:null):v;
+    f[k]=(k==='floor'||k==='stalls')?(v===''?null:Number(v)):k==='fee'?(v==='free'?false:v==='paid'?true:null):k==='wheelchair'?(v==='yes'?true:v==='no'?false:null):v;
   }));
   document.querySelectorAll('#sbody .stars').forEach(g=>g.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{
     buzz(); const k=g.dataset.k, v=Number(btn.dataset.v);
@@ -76,7 +78,7 @@ function showForm(loc,keep){
       const bl=brandLabel(f.brand); name=f.brand==='other'?(name||'コンビニ'):(name?bl+' '+name:bl);
     } else if (!name){ toast('名前か場所を入れてね'); return; }
     const t=conv?{name,lat:loc.lat,lng:loc.lng,fee:null,wheelchair:null,floor:null,ease:f.ease,find:f.find,type:'conv',brand:f.brand,loan:f.loan,note:f.note.trim()}
-      :{name,lat:loc.lat,lng:loc.lng,fee:f.fee,wheelchair:f.wheelchair,floor:f.floor,ease:f.ease,find:f.find,type:'toilet',brand:null,loan:null,note:f.note.trim()};
+      :{name,lat:loc.lat,lng:loc.lng,fee:f.fee,wheelchair:f.wheelchair,floor:f.floor,stalls:f.stalls,ease:f.ease,find:f.find,type:'toilet',brand:null,loan:null,note:f.note.trim()};
     if (!inArea(loc)){ toast('ここは対象のエリア(すすきの〜札幌駅)の外です'); return; }
     const lim=postLimit(); if (lim){ toast(lim); return; }
     const dup=st.toilets.filter(x=>x.type===t.type&&(t.type==='toilet'||x.brand===t.brand)).map(x=>({x,d:distanceM(loc,x)})).sort((a,b)=>a.d-b.d)[0];

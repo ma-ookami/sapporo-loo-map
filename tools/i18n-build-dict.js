@@ -43,7 +43,7 @@ D('{n}F〜', '{n}F+'); D('わからない', 'Not sure');
 D('使える', 'Usable'); D('使えない', 'Not usable');
 D('きれい', 'Clean'); D('混んでた', 'Crowded'); D('使えなかった', "Couldn't use");
 D('{n}人', '×{n}');
-D('追加された情報', 'Added by a user');
+// (旧: 追加された情報 → 確認済み/未確認の2種類に替えた)
 D('「なかった」の報告があります', "Someone reported it isn't there");
 D('「ここにはなかった」と報告済み', 'Reported “not here” (tap to undo)');
 D('ここには、なかった', "It wasn't here");
@@ -56,7 +56,7 @@ D('すすきのへ', 'To Susukino');
 D('ちょっと遠いよ。まずはすすきの周辺だけ載ってるよ', 'This is a bit far. For now, only the Susukino area is covered.');
 D('条件に合う場所がないよ', 'No places match. Try loosening the filters.');
 D('どこにある?(地上か地下か)', 'Where is it? (above or below ground)');
-D('まだ分かっていません', 'Not known yet. If you’ve been there, tell us! (Underground places get a “B” mark on the map.)');
+D('まだ分かっていません。行ったことがあれば', 'Not known yet. If you’ve been there, tell us! (Underground places get a “B” mark on the map.)');
 ADD('みんなの情報では、地下にあります。{n}人が教えてくれました。行ったことがあれば、教えてね', 'According to everyone, it’s underground. Shared by {n}. If you’ve been there, tell us too!');
 D('{n}人が教えてくれました。行ったことがあれば', 'Shared by {n}. If you’ve been there, tell us too!');
 D('{n}人が教えてくれました。借りたことがあれば', 'Shared by {n}. If you’ve borrowed it, tell us too!');
@@ -137,6 +137,15 @@ D('古い・違うこともあります', 'Information may be old or wrong. If y
 D('地図とトイレ・コンビニの位置は', 'The map and the locations of toilets and stores are © OpenStreetMap contributors data. Your location is used only on your device and is never sent.');
 D('くわしく', 'Details'); D('わかった', 'Got it');
 D('お客さん専用のトイレもあるよ', 'Some toilets are for customers only');
+
+// ---- 個室の数・確認済み・ユーザー追加 ----
+ADD('{n}以上', '{n}+'); ADD('個室 {n}', 'Stalls: {n}'); ADD('個室 {n}以上', 'Stalls: {n}+'); ADD('個室はいくつ?', 'How many stalls?'); ADD('5以上', '5+');
+ADD('個室の数(男女別なら、合わせて)', 'Number of stalls (men’s and women’s combined)');
+ADD('{n}人が教えてくれました。数えたことがあれば、あなたも教えてね', 'Shared by {n}. If you’ve counted them, tell us too!');
+ADD('まだ分かっていません。数えたことがあれば、教えてね', 'Not known yet. If you’ve counted them, tell us!');
+ADD('追加された情報(確認済み)', 'Added by a user (confirmed)'); ADD('追加された情報(未確認)', 'Added by a user (unconfirmed)');
+ADD('トイレ: ユーザー追加(点線は未確認)', 'Toilet: added by users (dashed = unconfirmed)');
+ADD('地上', 'Ground'); ADD('2階以上', 'Floor 2+');
 
 // ---- 確認: 辞書に入った件数と、足りないもの ----
 if (fresh.length) console.log('一覧に無かったので新しく入れた:', fresh.length, '件', JSON.stringify(fresh).slice(0, 600));

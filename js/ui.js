@@ -9,6 +9,7 @@ function reportCounts(id){
   return {c,mine};
 }
 const tagsOf=t=>(t.type==='conv'?`<span class="tag">${esc(brandLabel(t.brand))}</span>${(l=>`<span class="tag loan-${l||'null'}">${l?loanLabel(l):'借りられるか不明'}</span>`)(loanOf(t))}`:'')+(fl=>fl==null||t.type==='conv'?'':fl<0?`<span class="tag ug">地下 ${floorLabel(fl)}</span>`:fl===1?'<span class="tag">地上(1F)</span>':`<span class="tag">${floorLabel(fl)}</span>`)(floorOf(t))
+  +(n=>n?`<span class="tag">個室 ${n}${n>=5?'以上':''}</span>`:'')(t.type==='conv'?null:stallsOf(t))
   +(t.fee===false?'<span class="tag free">無料</span>':t.fee===true?'<span class="tag">有料</span>':'')
   +(t.wheelchair?'<span class="tag">車いす可</span>':'')+(t.hours==='24/7'?'<span class="tag free">24時間</span>':(o=>o===true?'<span class="tag free">営業中</span>':o===false?'<span class="tag loan-no">営業時間外</span>':t.hours&&t.type!=='conv'?`<span class="tag">${esc(t.hours)}</span>`:'')(openNow(t.hours)));
 
@@ -47,7 +48,7 @@ function renderSheet(){
       <div class="nmeta">${fmtDist(nearest.d)}<i>徒歩${walkMin(nearest.d)}分</i>${t.type==='conv'?`<i class="lo lo-${loanOf(t)}">${loanLabel(loanOf(t))}</i>`:''}</div></button></div>
       <button class="cta mini${far?' far':''}" id="nbtn">ナビ開始${icon('arrow',16)}</button></div>`;
   }
-  if (st.open) h+='<div class="sech"><span class="sec">近い順</span><button class="x" id="lx" aria-label="リストを閉じる">'+icon('close',16)+'</button></div><div class="list">'+st.sorted.slice(0,30).map(({t,d})=>`<button class="row" data-id="${esc(t.id)}"><span class="ri${t.type==='conv'?' conv':''}${t.source==='user'?' user':''}">${icon(t.type==='conv'?'store':'wc',20)}</span><span class="rn"><b translate="no">${esc(nameOf(t))}</b><span class="tags">${tagsOf(t)}</span></span><span class="rd">${fmtDist(d)}</span>${icon('chevron',16)}</button>`).join('')+'</div>';
+  if (st.open) h+='<div class="sech"><span class="sec">近い順</span><button class="x" id="lx" aria-label="リストを閉じる">'+icon('close',16)+'</button></div><div class="list">'+st.sorted.slice(0,30).map(({t,d})=>`<button class="row" data-id="${esc(t.id)}"><span class="ri${t.type==='conv'?' conv':''}${t.source==='user'?' user':''}${t.source==='user'&&!isConfirmed(t)?' unconf':''}">${icon(t.type==='conv'?'store':'wc',20)}</span><span class="rn"><b translate="no">${esc(nameOf(t))}</b><span class="tags">${tagsOf(t)}</span></span><span class="rd">${fmtDist(d)}</span>${icon('chevron',16)}</button>`).join('')+'</div>';
   body.innerHTML=h; body.style.animation='none'; void body.offsetWidth; body.style.animation='';
   const gs=$('gosus'); if (gs) gs.onclick=()=>{ buzz(); map.flyTo({center:[SUSUKINO.lng,SUSUKINO.lat],zoom:15.5}); };
   const lx=$('lx'); if (lx) lx.onclick=()=>setTab('map');
@@ -67,13 +68,25 @@ function floorBlock(t){
     +LVK.map(([k,l])=>'<button data-lv="'+k+'" aria-pressed="'+(mineLv===k)+'"><i></i>'+l+(c[k]?' <b>'+c[k]+'</b>':'')+'</button>').join('')+'</div>'
     +'<div class="repnote">'+(n?(fl!=null&&fl<0?'みんなの情報では、地下にあります。':'')+n+'人が教えてくれました。行ったことがあれば、教えてね':'まだ分かっていません。行ったことがあれば、教えてね(地下の場所には、地図に「B」の印が付きます)')+'</div>';
 }
+// 「個室はいくつ?」。公開データに無いので、行った人に教えてもらう(中央値)。トイレだけ
+const STK=[['stall-1','1'],['stall-2','2'],['stall-3','3'],['stall-4','4'],['stall-5','5以上']];
+function stallBlock(t){
+  if (t.type==='conv') return '';
+  const c={}; let mineSt=null; STK.forEach(([k])=>{ c[k]=0; });
+  for (const r of st.reports){ if (r.toiletId!==t.id||c[r.kind]===undefined) continue; c[r.kind]++; if (r.mine) mineSt=r.kind; }
+  const n=stallVotes(t).length;
+  return '<div class="sec2">個室はいくつ?</div><div class="reps st">'
+    +STK.map(([k,l])=>'<button data-st="'+k+'" aria-pressed="'+(mineSt===k)+'"><i></i>'+l+(c[k]?' <b>'+c[k]+'</b>':'')+'</button>').join('')+'</div>'
+    +'<div class="repnote">'+(n?'{n}人が教えてくれました。数えたことがあれば、あなたも教えてね'.replace('{n}',n):'まだ分かっていません。数えたことがあれば、教えてね')+'</div>';
+}
 function renderDetail(body,t){
-  const d=distanceM(origin(),t), {c,mine:mine0}=reportCounts(t.id), lc=loanCounts(t.id), mine=(st.reports.find(r=>r.toiletId===t.id&&r.mine&&!r.kind.startsWith('lv-'))||{}).kind||mine0;
+  const d=distanceM(origin(),t), {c,mine:mine0}=reportCounts(t.id), lc=loanCounts(t.id), mine=(st.reports.find(r=>r.toiletId===t.id&&r.mine&&!r.kind.startsWith('lv-')&&!r.kind.startsWith('stall-'))||{}).kind||mine0;
   body.innerHTML=`<div class="dhead"><div class="av">${bearSvg(36)}</div><div><h2 translate="no">${esc(nameOf(t))}</h2>
     <div class="d">${fmtDist(d)}・徒歩${walkMin(d)}分</div></div><button class="x" id="dx" aria-label="閉じる">${icon('close',16)}</button></div>
-    <div class="tags">${tagsOf(t)}${t.source==='user'?'<span class="tag user">追加された情報</span>':''}${doubted(t)?'<span class="tag loan-no">「なかった」の報告があります</span>':''}</div>
+    <div class="tags">${tagsOf(t)}${t.source==='user'?(isConfirmed(t)?'<span class="tag user">追加された情報(確認済み)</span>':'<span class="tag user dashed">追加された情報(未確認)</span>'):''}${doubted(t)?'<span class="tag loan-no">「なかった」の報告があります</span>':''}</div>
     ${t.note?`<div class="note" translate="no">${esc(t.note)}</div>`:''}
     ${floorBlock(t)}
+    ${stallBlock(t)}
     ${(t.ease||t.find)?`<div class="rate">${t.ease?`<div><span>使いやすさ</span><span>${starsRow(t.ease)}</span></div>`:''}${t.find?`<div><span>場所のわかりやすさ</span><span>${starsRow(t.find)}</span></div>`:''}</div>`:''}
     ${t.type==='conv'
       ?`<div class="sec2">このコンビニのトイレ、借りられる?</div>
@@ -87,13 +100,17 @@ function renderDetail(body,t){
     ${t.mine?'<button class="del" id="del">この情報を削除</button>':''}`;
   placeLegend();
   $('dx').onclick=unselect;
-  body.querySelectorAll('.reps:not(.lv) button,.lq button').forEach(b=>b.onclick=async()=>{
+  body.querySelectorAll('.reps:not(.lv):not(.st) button,.lq button').forEach(b=>b.onclick=async()=>{
     buzz(); const k=b.dataset.k;
     try{ await cloud.report(t.id,mine===k?null:k); }catch(e){ toast('送れませんでした'); }
   });
   body.querySelectorAll('.reps.lv button').forEach(b=>b.onclick=async()=>{
     buzz(); const k=b.dataset.lv, mineLv=(st.reports.find(r=>r.toiletId===t.id&&r.mine&&r.kind.startsWith('lv-'))||{}).kind;
     try{ await cloud.reportFloor(t.id,mineLv===k?null:k); }catch(e){ toast('送れませんでした'); }
+  });
+  body.querySelectorAll('.reps.st button').forEach(b=>b.onclick=async()=>{
+    buzz(); const k=b.dataset.st, mineSt=(st.reports.find(r=>r.toiletId===t.id&&r.mine&&r.kind.startsWith('stall-'))||{}).kind;
+    try{ await cloud.reportStall(t.id,mineSt===k?null:k); }catch(e){ toast('送れませんでした'); }
   });
   const ms=$('miss'); if (ms) ms.onclick=async()=>{ buzz(); try{ await cloud.report(t.id,mine==='missing'?null:'missing'); }catch(e){ toast('送れませんでした'); } };
   const go=$('go'); if (go) go.onclick=e=>{ e.preventDefault(); buzz(); goRoute(t); };
@@ -156,13 +173,13 @@ function showGuide(){
 // ---- 凡例(左下)。下のシートの上に並べて、シートが伸び縮みしても重ならないよう追従する ----
 const LEGEND_ROWS=[
   ['pin','wc','トイレ: 公開データ'],
-  ['pin user','wc','トイレ: ユーザ追加'],
+  ['pin user unconf','wc','トイレ: ユーザー追加(点線は未確認)'],
   ['pin conv b-other loan-yes','store','コンビニ: 借りられる'],
   ['pin conv b-other loan-no','store','コンビニ: 借りられない'],
   ['pin ug','wc','地下にある(Bの印)']
 ];
 function legendHtml(){
-  return LEGEND_ROWS.map(r=>'<div class="lrow2"><span class="lm">'+(r[1]?'<div class="'+r[0]+'"><div class="pi">'+icon(r[1],13)+(r[0].includes('conv')?'<i class="ld"></i>':'')+(r[0].includes(' ug')?'<i class="ugb">B</i>':'')+'</div></div>':'<div class="'+r[0]+'"></div>')+'</span><span>'+r[2]+'</span></div>').join('');
+  return LEGEND_ROWS.map(r=>'<div class="lrow2"><span class="lm">'+(r[1]?'<div class="'+r[0]+'"><div class="pi">'+icon(r[1],13)+(r[0].includes('conv')?'<i class="ld"></i>':'')+(r[0].includes(' ug')?'<i class="ugb">B</i>':'')+(r[0].includes(' user')?'<i class="ub">'+PERSON_SVG+'</i>':'')+'</div></div>':'<div class="'+r[0]+'"></div>')+'</span><span>'+r[2]+'</span></div>').join('');
 }
 const WIDE=()=>matchMedia('(min-width:600px)').matches;   // 広い画面(PC・タブレット)は凡例を出しっぱなし、スマホはボタンで開く
 function placeLegend(){

@@ -26,3 +26,6 @@ const PIN_SVG='<svg width="34" height="46" viewBox="0 0 34 46" aria-hidden="true
 // 星(5段階の評価)
 const starSvg=(size)=>`<svg width="${size||22}" height="${size||22}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1L3.2 9.6l6.1-.8z"/></svg>`;
 const starsRow=(n,size)=>[1,2,3,4,5].map(i=>`<span class="st${i<=n?' on':''}">${starSvg(size||14)}</span>`).join('');
+
+// ユーザーが追加した場所のバッジ(ピンの右上)
+const PERSON_SVG='<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4.6"/><path d="M3.5 21.5c0-4.8 3.8-8.2 8.5-8.2s8.5 3.4 8.5 8.2z"/></svg>';

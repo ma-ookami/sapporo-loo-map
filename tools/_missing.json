@@ -1,3 +1,8 @@
 [
- "Open Google Maps and show walking directions to “Toilet (near 泉の像)”. Continue?"
+ "Open Google Maps and show walking directions to “Toilet (near 泉の像)”. Continue?",
+ "{n}以上",
+ "まだ分かっていません。数えたことがあれば、教えてね",
+ "トイレ: ユーザー追加(点線は未確認)",
+ "個室の数(男女別なら、合わせて)",
+ "個室はいくつ?"
 ]

@@ -312,12 +312,12 @@ body.adding #sheet{max-height:calc(var(--vh,1vh)*86)}
 #filters [hidden],.frow[hidden]{display:none}
 
 /* ユーザーが追加したトイレは紫(データのトイレは青赤)。コンビニは右上に紫の点 */
-:root{--user:#7c4dd8}
+:root{--user:var(--ok)}
 .pin.user:not(.conv) .pi{background:var(--user)}
 .pin.user.sel:not(.conv) .pi{background:var(--ink)}
-.pin.user.conv .pi::before{content:"";position:absolute;top:-4px;left:-4px;width:12px;height:12px;border-radius:50%;background:var(--user);border:2px solid #fff;z-index:1}
+/* (ユーザー追加のコンビニの紫の点は、右上の人のバッジに替えた) */
 .ri.user:not(.conv){background:var(--user);color:#fff}
-.tag.user{background:rgba(124,77,216,.14);color:var(--user)}
+.tag.user{background:var(--ok-soft);color:var(--ok)}
 
 /* 凡例 */
 #legend{position:fixed;left:12px;bottom:200px;z-index:3;padding:6px 10px 5px 6px;border-radius:14px;background:var(--glass);background:color-mix(in srgb,var(--glass) 62%,transparent);-webkit-backdrop-filter:saturate(160%) blur(6px);backdrop-filter:saturate(160%) blur(6px);box-shadow:0 1px 6px rgba(29,26,23,.1);pointer-events:none}
@@ -384,3 +384,15 @@ body.adding .legend-btn,body.adding #legend{display:none}
 .gfoot a{margin-left:.35em}
 
 .lrow.close{justify-content:center;background:var(--accent);color:#fff;margin-top:10px}
+
+/* ユーザーが追加した場所: 右上に人のバッジ。確認されるまでは点線(うすい緑のまま)。確認(ほかの2人以上の報告)で、こい緑の実線 */
+.ub{display:none;position:absolute;right:-6px;top:-6px;width:16px;height:16px;border-radius:50%;background:#fff;color:var(--user);border:1.5px solid var(--user);z-index:2;place-items:center}
+.ub svg{display:block}
+.pin.user .ub{display:grid}
+.pin.user.unconf:not(.conv) .pi{background:var(--ok-soft);color:var(--user);border:2.5px dashed var(--user)}
+.pin.user.unconf.conv .pi{border-style:dashed}
+.pin.user.unconf.sel:not(.conv) .pi{background:var(--ink);color:var(--on-ink);border-color:#fff}
+.ri.user.unconf:not(.conv){background:var(--ok-soft);color:var(--user);outline:2px dashed var(--user);outline-offset:-3px}
+.tag.user.dashed{border:1px dashed var(--ok)}
+.reps.st i{background:#8fb39a}
+.pin.conv .ub{right:auto;left:-6px}

@@ -445,3 +445,8 @@ body.adding .legend-btn,body.adding #legend{display:none}
 .ltab button{padding:7px 14px;font-size:13px;display:flex;align-items:center;gap:4px}
 .ltab .ic{color:#d99a00}
 .rfav{color:#f0b429;display:flex;flex:none}
+
+/* 個室のボタン: つなげず、1つずつ離す。選んだものは黒く */
+.seg.stl{background:none;padding:0;gap:8px;margin-top:4px}
+.seg.stl button{flex:1;padding:11px 0;border-radius:14px;background:var(--tint);color:var(--ink);font-weight:700;box-shadow:none}
+.seg.stl button[aria-pressed=true]{background:var(--ink);color:var(--on-ink);box-shadow:none}

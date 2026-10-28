@@ -31,6 +31,18 @@ function setTab(tab){
   syncPins(); renderSheet(); map.setPadding({top:0,left:0,right:0,bottom:0});
 }
 
+// リストの1行(近い順でも、お気に入りでも同じ)
+function rowHtml(t,d){
+  return `<button class="row" data-id="${esc(t.id)}"><span class="ri${t.type==='conv'?' conv':''}${t.source==='user'?' user':''}${t.source==='user'&&!isConfirmed(t)?' unconf':''}">${icon(t.type==='conv'?'store':'wc',20)}</span><span class="rn"><b translate="no">${esc(nameOf(t))}</b><span class="tags">${tagsOf(t)}</span></span>${isFav(t)?'<span class="rfav">'+starSvg(13)+'</span>':''}<span class="rd">${fmtDist(d)}</span>${icon('chevron',16)}</button>`;
+}
+function listHtml(){
+  const fav=st.listMode==='fav';
+  let rows;
+  if (fav){ const o=origin(); rows=st.toilets.filter(t=>st.favs.has(t.id)&&!t.pending).map(t=>({t,d:distanceM(o,t)})).sort((a,b)=>a.d-b.d); }
+  else rows=st.sorted.slice(0,30);
+  return '<div class="sech"><div class="seg ltab"><button type="button" data-lm="near" aria-pressed="'+!fav+'">近い順</button><button type="button" data-lm="fav" aria-pressed="'+fav+'">'+icon('star',13)+'お気に入り</button></div><button class="x" id="lx" aria-label="リストを閉じる">'+icon('close',16)+'</button></div>'
+    +'<div class="list">'+(rows.length?rows.map(r=>rowHtml(r.t,r.d)).join(''):'<div class="empty">まだありません。詳細の星のボタンで、よく使う場所を登録できます</div>')+'</div>';
+}
 function renderSheet(){
   if (st.adding) return;
   const sh=$('sheet'), body=$('sbody');
@@ -48,10 +60,11 @@ function renderSheet(){
       <div class="nmeta">${fmtDist(nearest.d)}<i>徒歩${walkMin(nearest.d)}分</i>${t.type==='conv'?`<i class="lo lo-${loanOf(t)}">${loanLabel(loanOf(t))}</i>`:''}</div></button></div>
       <button class="cta mini${far?' far':''}" id="nbtn">ナビ開始${icon('arrow',16)}</button></div>`;
   }
-  if (st.open) h+='<div class="sech"><span class="sec">近い順</span><button class="x" id="lx" aria-label="リストを閉じる">'+icon('close',16)+'</button></div><div class="list">'+st.sorted.slice(0,30).map(({t,d})=>`<button class="row" data-id="${esc(t.id)}"><span class="ri${t.type==='conv'?' conv':''}${t.source==='user'?' user':''}${t.source==='user'&&!isConfirmed(t)?' unconf':''}">${icon(t.type==='conv'?'store':'wc',20)}</span><span class="rn"><b translate="no">${esc(nameOf(t))}</b><span class="tags">${tagsOf(t)}</span></span><span class="rd">${fmtDist(d)}</span>${icon('chevron',16)}</button>`).join('')+'</div>';
+  if (st.open) h+=listHtml();
   body.innerHTML=h; body.style.animation='none'; void body.offsetWidth; body.style.animation='';
   const gs=$('gosus'); if (gs) gs.onclick=()=>{ buzz(); map.flyTo({center:[SUSUKINO.lng,SUSUKINO.lat],zoom:15.5}); };
   const lx=$('lx'); if (lx) lx.onclick=()=>setTab('map');
+  body.querySelectorAll('[data-lm]').forEach(b=>b.onclick=()=>{ buzz(); st.listMode=b.dataset.lm; renderSheet(); });
   const nb=$('nbtn'); if (nb) nb.onclick=()=>{ buzz(); goRoute(nearest.t); };
   body.querySelectorAll('.row,#nhead').forEach(r=>r.onclick=()=>focus(r.dataset.id));
   placeLegend();
@@ -82,7 +95,7 @@ function stallBlock(t){
 function renderDetail(body,t){
   const d=distanceM(origin(),t), {c,mine:mine0}=reportCounts(t.id), lc=loanCounts(t.id), mine=(st.reports.find(r=>r.toiletId===t.id&&r.mine&&!r.kind.startsWith('lv-')&&!r.kind.startsWith('stall-'))||{}).kind||mine0;
   body.innerHTML=`<div class="dhead"><div class="av">${bearSvg(36)}</div><div><h2 translate="no">${esc(nameOf(t))}</h2>
-    <div class="d">${fmtDist(d)}・徒歩${walkMin(d)}分</div></div>${t.pending?'':`<button class="x" id="dsh" aria-label="この場所を共有">${icon('share',16)}</button>`}<button class="x" id="dx" aria-label="閉じる">${icon('close',16)}</button></div>
+    <div class="d">${fmtDist(d)}・徒歩${walkMin(d)}分</div></div>${t.pending?'':`<button class="x fav${isFav(t)?' on':''}" id="dfav" aria-pressed="${isFav(t)}" aria-label="${isFav(t)?'お気に入りから外す':'お気に入りに追加'}">${icon('star',16)}</button>`}${t.pending?'':`<button class="x" id="dsh" aria-label="この場所を共有">${icon('share',16)}</button>`}<button class="x" id="dx" aria-label="閉じる">${icon('close',16)}</button></div>
     <div class="tags">${tagsOf(t)}${t.source==='user'?(t.pending?'<span class="tag user dashed">運営の確認待ち(あなたにだけ見えています)</span>':isConfirmed(t)?'<span class="tag user">追加された情報(確認済み)</span>':'<span class="tag user dashed">追加された情報(未確認)</span>'):''}${doubted(t)?'<span class="tag loan-no">「なかった」の報告があります</span>':''}</div>
     ${t.note?`<div class="note" translate="no">${esc(t.note)}</div>`:''}
     ${floorBlock(t)}
@@ -101,6 +114,7 @@ function renderDetail(body,t){
   placeLegend();
   $('dx').onclick=unselect;
   if ($('dsh')) $('dsh').onclick=()=>shareSpot(t);
+  if ($('dfav')) $('dfav').onclick=()=>{ buzz(); toggleFav(t.id); syncPins(); renderSheet(); };
   body.querySelectorAll('.reps:not(.lv) button,.lq button').forEach(b=>b.onclick=async()=>{
     buzz(); const k=b.dataset.k;
     try{ await cloud.report(t.id,mine===k?null:k); }catch(e){ toast('送れませんでした'); }

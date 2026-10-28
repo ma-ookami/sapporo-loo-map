@@ -434,3 +434,14 @@ body.adding .legend-btn,body.adding #legend{display:none}
 .lm .pin.conv.loan-no .ld{width:14px;height:14px;top:-5px;right:-5px;font-size:11px}
 .tag.user{background:var(--tint);color:var(--sub)}
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* お気に入り: 詳細の★ボタン、ピンの星のバッジ(左下)、リストの切り替えと行の星 */
+.x.fav.on{color:#d99a00;background:rgba(240,180,41,.22)}
+.x.fav.on .ic{fill:currentColor}
+.fb{display:none;position:absolute;left:-5px;bottom:-5px;width:14px;height:14px;border-radius:50%;background:#f0b429;color:#fff;border:1.5px solid #fff;z-index:2;place-items:center}
+.fb svg{display:block}
+.pin.fav .fb{display:grid}
+.ltab{flex:0 1 auto}
+.ltab button{padding:7px 14px;font-size:13px;display:flex;align-items:center;gap:4px}
+.ltab .ic{color:#d99a00}
+.rfav{color:#f0b429;display:flex;flex:none}

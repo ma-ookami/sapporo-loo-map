@@ -85,7 +85,7 @@ function renderSettings(){
   v.querySelectorAll('[data-rep]').forEach(b=>b.onclick=async()=>{ try{ await cloud.report(b.dataset.rep,null); }catch(e){ toast('取り消せませんでした'); } renderSettings(); });
   $('sguide').onclick=()=>{ hideSettings(); showGuide(); };
   $('sreset').onclick=()=>{ if(!confirm('この端末の設定と記録を消します。(ほかの人にも見えている投稿は消えません)')) return;
-    try{ ['loo-settings','loo-guide','loo-added','loo-reports'].forEach(k=>localStorage.removeItem(k)); }catch(e){}
+    try{ ['loo-settings','loo-guide','loo-added','loo-reports','loo-favs'].forEach(k=>localStorage.removeItem(k)); }catch(e){}
     location.reload(); };
 }
 function showSettings(){ const v=$('settings'); v.hidden=false; renderSettings(); }

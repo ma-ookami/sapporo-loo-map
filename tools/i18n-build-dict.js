@@ -151,6 +151,10 @@ ADD('追加された情報(確認済み)', 'Added by a user (confirmed)'); ADD('
 ADD('トイレ: ユーザー追加(点線は未確認)', 'Toilet: added by users (dashed = unconfirmed)');
 ADD('地上', 'Ground'); ADD('2階以上', 'Floor 2+');
 
+// ---- お気に入り ----
+ADD('お気に入り', 'Favorites'); ADD('お気に入りに追加', 'Add to favorites'); ADD('お気に入りから外す', 'Remove from favorites');
+ADD('まだありません。詳細の星のボタンで、よく使う場所を登録できます', 'None yet. Use the star button on a place’s details to save the ones you use often.');
+
 // ---- 確認: 辞書に入った件数と、足りないもの ----
 if (fresh.length) console.log('一覧に無かったので新しく入れた:', fresh.length, '件', JSON.stringify(fresh).slice(0, 600));
 const need = keys.filter(k => dict[k] === undefined && !k.startsWith('&nbsp;') && !k.startsWith('"') && k !== 'トイレ(' && k !== '付近)' && k !== '・' && k !== '徒歩' && k !== '分' && k !== '人' && k !== '・徒歩' && !k.startsWith('firebase') && !k.includes('Toilet (near'));

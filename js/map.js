@@ -92,6 +92,14 @@ const MISS_N=3;   // 「ここにはなかった」がこの人数になった�
 const missCount=id=>st.reports.filter(r=>r.toiletId===id&&r.kind==='missing').length;
 const doubted=t=>t.source==='user'&&missCount(t.id)>=MISS_N;
 const usable=t=>!doubted(t)&&(t.type!=='conv'||convMode()||st.filters.conv||(st.settings.nearConv&&['yes','ask'].includes(loanOf(t))));
+// お気に入り: よく使う場所の ID をこの端末に保存(ログインしないので、端末をまたいでは共有されない)
+const FAV_KEY='loo-favs';
+st.favs=(()=>{ try{ return new Set(JSON.parse(localStorage.getItem(FAV_KEY)||'[]')); }catch(e){ return new Set(); } })();
+const isFav=t=>st.favs.has(t.id);
+function toggleFav(id){
+  if (st.favs.has(id)) st.favs.delete(id); else st.favs.add(id);
+  try{ localStorage.setItem(FAV_KEY,JSON.stringify([...st.favs])); }catch(e){}
+}
 function resort(){
   const o=origin();
   st.sorted=st.toilets.filter(t=>passes(t)&&usable(t)).map(t=>({t,d:distanceM(o,t)})).sort((a,b)=>a.d-b.d);
@@ -102,7 +110,7 @@ function syncMarkers(){
   for (const [id,m] of markers) if (!ids.has(id)){ m.remove(); markers.delete(id); }
   for (const t of st.toilets){
     if (markers.has(t.id)) continue;
-    const e=document.createElement('div'); e.className='pin'+(t.type==='conv'?' conv b-'+(BRAND_KEYS.includes(t.brand)?t.brand:'other')+' loan-'+(loanOf(t)||'null'):'')+(t.source==='user'?' user':''); e.innerHTML='<div class="pi">'+icon(t.type==='conv'?'store':'wc',18)+(t.type==='conv'?'<i class="ld"></i>':'')+DASH_SVG+'<i class="ugb">B</i><i class="ub">'+PERSON_SVG+'</i></div>';
+    const e=document.createElement('div'); e.className='pin'+(t.type==='conv'?' conv b-'+(BRAND_KEYS.includes(t.brand)?t.brand:'other')+' loan-'+(loanOf(t)||'null'):'')+(t.source==='user'?' user':''); e.innerHTML='<div class="pi">'+icon(t.type==='conv'?'store':'wc',18)+(t.type==='conv'?'<i class="ld"></i>':'')+DASH_SVG+'<i class="ugb">B</i><i class="ub">'+PERSON_SVG+'</i><i class="fb">'+starSvg(8)+'</i></div>';
     e.onclick=ev=>{ ev.stopPropagation(); if(!st.adding) focus(t.id); };
     markers.set(t.id,new maplibregl.Marker({element:e,anchor:'center'}).setLngLat([t.lng,t.lat]).addTo(map));
   }
@@ -118,6 +126,7 @@ function syncPins(){
     e.classList.toggle('doubt',doubted(t));
     e.classList.toggle('ug',isUg(t));
     e.classList.toggle('unconf',t.source==='user'&&!isConfirmed(t));
+    e.classList.toggle('fav',isFav(t));
     e.classList.toggle('sel',id===st.sel);
     e.classList.toggle('near',id===near&&id!==st.sel);
   }

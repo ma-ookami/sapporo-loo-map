@@ -31,7 +31,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   await p.evaluate(i => focus(i), ug); await p.waitForTimeout(500); await harvest(p, '詳細(地下の場所)'); await clickIf(p, '#dx');
   const un = await p.evaluate(() => st.toilets.find(t => t.floor == null && t.type === 'toilet').id);
   await p.evaluate(i => focus(i), un); await p.waitForTimeout(500); await harvest(p, '詳細(階が不明)');
-  await clickIf(p, '.reps.lv button[data-lv=lv-ug]'); await harvest(p, '階を教えた後'); await clickIf(p, '.reps:not(.lv) button[data-k=clean]'); await harvest(p, '様子を報告'); await clickIf(p, '#go'); await clickIf(p, '#dx');
+  await clickIf(p, '.teach summary'); await clickIf(p, '.reps.lv button[data-lv=lv-ug]'); await harvest(p, '階を教えた後'); await clickIf(p, '.reps:not(.lv) button[data-k=clean]'); await harvest(p, '様子を報告'); await clickIf(p, '#go'); await clickIf(p, '#dx');
   const cv = await p.evaluate(() => st.toilets.find(t => t.type === 'conv' && t.floor == null).id);
   await p.evaluate(i => focus(i), cv); await p.waitForTimeout(500); await harvest(p, '詳細(コンビニ不明)');
   for (const k of ['loan-yes', 'loan-ask', 'loan-no']) { await clickIf(p, `.lq button[data-k=${k}]`); await harvest(p, '貸し出し ' + k); }

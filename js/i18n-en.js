@@ -46,6 +46,7 @@ I18N.en={
  "このコンビニのトイレ、借りられた?": "Could you borrow this store’s toilet?",
  "このコンビニのトイレ、借りられる?": "Can you borrow this store’s toilet?",
  "この場所のことを教えてね": "Tell us about this place",
+ "この場所の情報を教える": "Help improve this place",
  "この場所を共有": "Share this place",
  "この情報を削除": "Delete this entry",
  "この端末の設定と記録を消します。(ほかの人にも見えている投稿は消えません)": "This clears settings and records on this device. (Posts that other people can see will not be removed.)",

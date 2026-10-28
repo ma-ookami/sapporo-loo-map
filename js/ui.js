@@ -14,6 +14,7 @@ const tagsOf=t=>(t.type==='conv'?`<span class="tag">${esc(brandLabel(t.brand))}<
   +(t.wheelchair?'<span class="tag">車いす可</span>':'')+(t.type!=='conv'&&reportCounts(t.id).c.closed?'<span class="tag loan-no">最近、使えなかった報告</span>':'')+(t.hours==='24/7'?'<span class="tag free">24時間</span>':(o=>o===true?'<span class="tag free">営業中</span>':o===false?'<span class="tag loan-no">営業時間外</span>':t.hours&&t.type!=='conv'?`<span class="tag">${esc(t.hours)}</span>`:'')(openNow(t.hours)));
 
 function focus(id){
+  { const tt=st.toilets.find(x=>x.id===id); st.teachOpen=!!tt&&tt.type==='conv'&&loanOf(tt)===null; }   // 貸し出しが不明のコンビニは、はじめから開く
   st.sel=id; st.open=false; buzz();
   syncPins(); renderSheet();
   const t=st.toilets.find(x=>x.id===id);
@@ -98,20 +99,25 @@ function renderDetail(body,t){
     <div class="d">${fmtDist(d)}・徒歩${walkMin(d)}分</div></div>${t.pending?'':`<button class="x fav${isFav(t)?' on':''}" id="dfav" aria-pressed="${isFav(t)}" aria-label="${isFav(t)?'お気に入りから外す':'お気に入りに追加'}">${icon('star',16)}</button>`}${t.pending?'':`<button class="x" id="dsh" aria-label="この場所を共有">${icon('share',16)}</button>`}<button class="x" id="dx" aria-label="閉じる">${icon('close',16)}</button></div>
     <div class="tags">${tagsOf(t)}${t.source==='user'?(t.pending?'<span class="tag user dashed">運営の確認待ち(あなたにだけ見えています)</span>':isConfirmed(t)?'<span class="tag user">追加された情報(確認済み)</span>':'<span class="tag user dashed">追加された情報(未確認)</span>'):''}${doubted(t)?'<span class="tag loan-no">「なかった」の報告があります</span>':''}</div>
     ${t.note?`<div class="note" translate="no">${esc(t.note)}</div>`:''}
+    ${(t.ease||t.find)?`<div class="rate">${t.ease?`<div><span>使いやすさ</span><span>${starsRow(t.ease)}</span></div>`:''}${t.find?`<div><span>場所のわかりやすさ</span><span>${starsRow(t.find)}</span></div>`:''}</div>`:''}
+    <a class="cta" id="go" href="${routeUrl(t)}" target="_blank" rel="noopener">ここへ行く${icon('arrow',20)}</a>
+    <details class="teach"${st.teachOpen?' open':''}><summary><span>この場所の情報を教える</span>${icon('chevron',16)}</summary><div class="tbody">
     ${floorBlock(t)}
     ${stallBlock(t)}
-    ${(t.ease||t.find)?`<div class="rate">${t.ease?`<div><span>使いやすさ</span><span>${starsRow(t.ease)}</span></div>`:''}${t.find?`<div><span>場所のわかりやすさ</span><span>${starsRow(t.find)}</span></div>`:''}</div>`:''}
     ${t.type==='conv'
       ?`<div class="sec2">このコンビニのトイレ、借りられる?</div>
     <div class="lq">${LKINDS.map(([k,ic,l,sub])=>`<button data-k="${k}" aria-pressed="${mine===k}"><span class="lic">${icon(ic,20)}</span><b>${l}</b><small>${sub.replace("/","<br>")}</small><em>${lc[k]?lc[k]+'人':'&nbsp;'}</em></button>`).join('')}</div>
     <div class="repnote">${(n=>n>=LOAN_MIN?`${n}人が教えてくれました。借りたことがあれば、あなたも教えてね`:n?'1人が教えてくれました。もう1人の報告で、地図に出ます。借りたことがあれば、教えてね':'まだ誰も教えてくれていません。借りたことがあれば、教えてね')(lc['loan-yes']+lc['loan-ask']+lc['loan-no'])}</div>`
       :`<div class="sec2">使えなかったら教えてね(24時間だけ表示)</div>
     <div class="reps">${KINDS.map(([k,l])=>`<button data-k="${k}" aria-pressed="${mine===k}"><i></i>${l}${c[k]?` <b>${c[k]}</b>`:''}</button>`).join('')}</div>`}
+    </div></details>
     <div class="care">${icon('info',16)}<span>${t.type==='conv'?'お店のご厚意で借りるトイレです。できればお買い物を。混んでいるときは遠慮して、きれいに使いましょう。お客さん専用のお店もあります。':'ビルやお店のトイレは、お客さん専用のこともあります。使えなかったときは、無理せず別の場所へ。'}</span></div>
+    <div class="dfoot">
     ${t.source==='user'&&!t.mine?`<button class="miss" id="miss" aria-pressed="${mine==='missing'}">${mine==='missing'?'「ここにはなかった」と報告済み(押すと取り消し)':'ここには、なかった'}</button>`:''}
-    <a class="cta" id="go" href="${routeUrl(t)}" target="_blank" rel="noopener">ここへ行く${icon('arrow',20)}</a>
-    ${t.mine?'<button class="del" id="del">この情報を削除</button>':''}`;
+    ${t.mine?'<button class="del" id="del">この情報を削除</button>':''}
+    </div>`;
   placeLegend();
+  const tc=body.querySelector('.teach'); if (tc) tc.ontoggle=()=>{ st.teachOpen=tc.open; };   // 「教える」を開いたかを覚える(押すたびに描き直すので)
   $('dx').onclick=unselect;
   if ($('dsh')) $('dsh').onclick=()=>shareSpot(t);
   if ($('dfav')) $('dfav').onclick=()=>{ buzz(); toggleFav(t.id); syncPins(); renderSheet(); };

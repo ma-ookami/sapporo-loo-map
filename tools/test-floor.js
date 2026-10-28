@@ -17,7 +17,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   await p.click('#dx'); await p.waitForTimeout(400);
   // 階が不明: ボタンが出る → 「地下」を押すと B 印とタグが付き、もう一度で取り消し
   const unId = await p.evaluate(() => st.toilets.find(t => t.floor == null && t.type === 'toilet').id);
-  await p.evaluate(i => focus(i), unId); await p.waitForTimeout(700);
+  await p.evaluate(i => focus(i), unId); await p.waitForTimeout(700); await p.click('.teach summary'); await p.waitForTimeout(300);
   console.log('3 階が不明: ボタン', await p.locator('.reps.lv button').count(), '| B 印', await p.evaluate(i => markers.get(i).getElement().classList.contains('ug'), unId));
   await p.click('.reps.lv button[data-lv=lv-ug]'); await p.waitForTimeout(500);
   console.log('4 「地下」を押した後: B 印', await p.evaluate(i => markers.get(i).getElement().classList.contains('ug'), unId), '| タグ:', await flat('#sbody .tags'), '| 押下', await p.locator('.reps.lv button[data-lv=lv-ug]').getAttribute('aria-pressed'));

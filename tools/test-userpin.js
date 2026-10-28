@@ -29,7 +29,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   await p.evaluate(i => focus(i), id); await p.waitForTimeout(600); console.log('9 詳細のタグ:', await flat('#sbody .tags')); await p.click('#dx');
   // 個室の数: 既存のトイレに教える(中央値)
   const dt = await p.evaluate(() => st.toilets.find(t => t.source === 'osm' && t.type === 'toilet').id);
-  await p.evaluate(i => focus(i), dt); await p.waitForTimeout(600);
+  await p.evaluate(i => focus(i), dt); await p.waitForTimeout(600); await p.click('.teach summary'); await p.waitForTimeout(300);
   console.log('10 データのトイレに「個室はいくつ?」:', await p.locator('.seg.stl button').count(), '個 | 今のタグ:', await flat('#sbody .tags'));
   await p.click('.seg.stl button[data-st=stall-3]'); await p.waitForTimeout(500);
   console.log('11 自分が「3」を教えた:', await flat('#sbody .tags'), '| 押下', await p.locator('.seg.stl button[data-st=stall-3]').getAttribute('aria-pressed'));
@@ -37,8 +37,8 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   const med = await p.evaluate(i => { const t = st.toilets.find(x => x.id === i), mk = ks => { st.reports = ks.map((k, n) => ({ toiletId: i, kind: k, mine: false, uid: 'v' + n, at: 0 })); return stallsOf(t); }; return { v2_5: mk(['stall-2', 'stall-5']), v2_3_5: mk(['stall-2', 'stall-3', 'stall-5']), v5_5_1: mk(['stall-5', 'stall-5', 'stall-1']), none: mk([]) }; }, dt);
   console.log('12 中央値(小さいほう):', JSON.stringify(med), '(期待: 2・5→2 / 2・3・5→3 / 5・5・1→5 / なし→null)');
   // 状態の報告と別に出せる
-  await p.click('.reps:not(.lv):not(.st) button[data-k=clean]'); await p.waitForTimeout(300);
-  console.log('13 状態の報告(きれい)と個室の報告は別:', await p.locator('.reps:not(.lv):not(.st) button[data-k=clean]').getAttribute('aria-pressed'));
+  await p.click('.reps:not(.lv):not(.st) button[data-k=closed]'); await p.waitForTimeout(300);
+  console.log('13 状態の報告(きれい)と個室の報告は別:', await p.locator('.reps:not(.lv):not(.st) button[data-k=closed]').getAttribute('aria-pressed'));
   await p.click('#dx');
   // 凡例
   await p.click('#legendBtn').catch(() => {}); await p.waitForTimeout(300);

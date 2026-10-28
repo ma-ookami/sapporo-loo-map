@@ -463,3 +463,14 @@ body.adding .legend-btn,body.adding #legend{display:none}
 .care .ic{color:var(--sub)}
 .dfoot{display:flex;justify-content:center;gap:18px;margin-top:4px}
 .dfoot .miss,.dfoot .del{margin:0}
+
+/* 設定は、リストと同じ下のシートの中。見出しと本文は、シート全体でスクロールする */
+#sbody .shead{padding:2px 2px 10px}
+#sbody .sbody2{overflow:visible;padding:0 0 8px}
+/* フッター: 押した瞬間は灰色の丸み、開いている間はオレンジの丸みと太めの線で、押したことが分かる */
+#tabs button{position:relative;isolation:isolate}
+#tabs button[data-t]:active::before{content:"";position:absolute;inset:7px 10px;border-radius:20px;background:var(--tint);z-index:-1}
+#tabs button[data-t].on::before{content:"";position:absolute;inset:7px 10px;border-radius:20px;background:var(--accent-soft);z-index:-1}
+#tabs button[data-t].on{color:var(--accent);font-weight:800}
+#tabs button[data-t].on .ic{stroke-width:2.4}
+#tabs button[data-t]:active{transform:scale(.92)}

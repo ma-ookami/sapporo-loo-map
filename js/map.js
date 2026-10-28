@@ -146,11 +146,11 @@ function onPos(p){
   if (first||!lastRender||distanceM(lastRender,h)>10){ lastRender=h; resort(); syncPins(); if(!st.adding) renderSheet(); }
   else hereMarker&&hereMarker.setLngLat([h.lng,h.lat]);
   if (first&&!st.moved&&!st.adding&&!st.sel&&distanceM(h,SUSUKINO)<3000) map.easeTo({center:[h.lng,h.lat],zoom:16,duration:600});
-  if (!$('settings').hidden) renderSettings();
+  if (settingsOpen()) renderSettings();
 }
 function onPosErr(err){
   st.locState=err&&err.code===1?'denied':'unavailable';
-  if (!$('settings').hidden) renderSettings();
+  if (settingsOpen()) renderSettings();
 }
 const LOC_HELP={
   denied:'位置情報がオフです。iPhone は「設定 → プライバシー → 位置情報サービス → Safari」でオンにして、ページを開き直してね',

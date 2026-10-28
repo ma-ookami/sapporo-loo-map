@@ -70,7 +70,7 @@
 ## 3. ファイル構成
 - `index.html`(スクリプトは順に読み込み: firebase-config, data/toilets.js, geo, hours, icons, bear, cloud, map, settings, **i18n, i18n-en**, ui, add, main)
 - `js/i18n.js` 英語表示の仕組み(辞書で日本語→英語、数字は {n} で差し込み、`translate="no"` の部分は触らない)/ `js/i18n-en.js` 辞書(**自動生成**: `tools/i18n-build-dict.js`)/ `privacy.en.html`
-- `js/geo.js` 距離・整形・ブランド/貸し出しの名前、`PACE`(徒歩速度)/ `hours.js` 営業時間の判定 / `icons.js` 細線アイコンと星 / `bear.js` くまトイ SVG(4表情・ゆれ・まばたき)/ `cloud.js` 保存(Firestore か localStorage)/ `map.js` 状態 `st`・地図・ピン・現在地・絞り込み(`passes`/`usable`/`convMode`)/ `settings.js` 設定画面 / `ui.js` シート・詳細・フッター・チップ・凡例・案内 / `add.js` 追加 / `main.js` 起動
+- `js/geo.js` 距離・整形・ブランド/貸し出しの名前、`PACE`(徒歩速度)/ `hours.js` 営業時間の判定 / `icons.js` 細線アイコンと星 / `bear.js` くまトイ SVG(4表情・ゆれ・まばたき)/ `cloud.js` 保存(Firestore か localStorage)/ `map.js` 状態 `st`・地図・ピン・現在地・絞り込み(`passes`/`usable`/`convMode`)/ `settings.js` 設定(リストと同じ下のシートに出す。フッターの「設定」はタブ `data-t=settings`、開いている間は `.on`) / `ui.js` シート・詳細・フッター・チップ・凡例・案内 / `add.js` 追加 / `main.js` 起動
 - `css/style.css` 全部(CSS 変数 → ダーク。ダークは `@media` と `html[data-theme=dark]` の2か所に同じ規則がある。設定追加時に `data-theme` 版も忘れない)
 - `data/toilets.js` 生成物(§4)/ `privacy.html` / `manifest.webmanifest` / アイコン `icon-192/512.png`・`apple-touch-icon.png`(`node tools/make-icons.js` で bear.js から生成)
 - `admin-fb7f2a3ee7b49e6613.html` + `js/admin.js`(運営の画面。§1b。合言葉を入れた端末の匿名 uid が `loo-admins` に入り、ルールの `looIsAdmin()` が見る)

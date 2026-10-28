@@ -8,7 +8,7 @@ const { chromium } = require('../../taskline/node_modules/playwright-core');
   const url = 'file:///C:/Users/masaya/dev/sapporo-loo-web/index.html?local=1';
   await p.goto(url); await p.waitForTimeout(4500);
   const walk = async () => (await p.locator('.nmeta').innerText()).split(String.fromCharCode(10)).join(' ');
-  await p.click('#info'); console.log('1 settings open:', await p.locator('#settings').isVisible());
+  await p.click('#info'); console.log('1 settings open:', await p.locator('#sbody .shead').isVisible());
   await p.screenshot({ path: 'tools/shot-settings.png' });
   const bg0 = await p.evaluate(() => getComputedStyle(document.body).backgroundColor);
   await p.click('.seg[data-s=theme] button[data-v=dark]'); await p.waitForTimeout(600);

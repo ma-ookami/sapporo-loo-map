@@ -54,8 +54,8 @@ function mineRows(){
 }
 
 function renderSettings(){
-  const v=$('settings'), keep=v.querySelector('.sbody2'), top=keep?keep.scrollTop:0, m=mineRows();
-  v.innerHTML=`<div class="spanel"><div class="shead"><h3>設定</h3><button class="x" id="sx" aria-label="閉じる">${icon('close',16)}</button></div>
+  const v=$('sbody'), top=v.scrollTop, m=mineRows();   // リストと同じ、下のシートの中に出す
+  v.innerHTML=`<div class="shead"><h3>設定</h3><button class="x" id="sx" aria-label="閉じる">${icon('close',16)}</button></div>
   <div class="sbody2">
     <div class="sg"><div class="sl">テーマ</div>${seg3('theme',[['auto','自動'],['light','ライト'],['dark','ダーク']])}<div class="shint">自動は、端末の設定に合わせます</div></div>
     <div class="sg srow"><div><div class="sl">現在地</div><div class="shint">${LOC_TEXT[st.locState]||LOC_TEXT.pending}</div></div><button class="sub small" id="slocate">さがす</button></div>
@@ -74,11 +74,10 @@ function renderSettings(){
     <div class="lrow plain"><span>版</span><span class="shint" style="margin:0">${APP_VERSION}</span></div>
     <button class="lrow danger" id="sreset">この端末の設定と記録を消す</button>
     <button class="lrow close" id="sclose">閉じる</button>
-  </div></div>`;
-  const nb=v.querySelector('.sbody2'); nb.scrollTop=top;
+  </div>`;
+  v.scrollTop=top;
   $('sx').onclick=hideSettings; $('sclose').onclick=hideSettings;   // 上の×と、親指で届く下の「閉じる」
   $('slocate').onclick=()=>{ hideSettings(); locateNow(); };
-  v.onclick=e=>{ if (e.target===v) hideSettings(); };
   v.querySelectorAll('.seg[data-s] button').forEach(b=>b.onclick=()=>{ buzz(); const k=b.parentNode.dataset.s, val=b.dataset.v; setSetting(k,k==='pace'?Number(val):val); renderSettings(); });
   v.querySelectorAll('.sw[data-s]').forEach(b=>b.onclick=()=>{ buzz(); setSetting(b.dataset.s,!st.settings[b.dataset.s]); renderSettings(); });
   v.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{ if(!confirm('削除しますか?')) return; try{ await cloud.remove(b.dataset.del); }catch(e){ toast('削除できませんでした'); } renderSettings(); });
@@ -88,5 +87,7 @@ function renderSettings(){
     try{ ['loo-settings','loo-guide','loo-added','loo-reports','loo-favs'].forEach(k=>localStorage.removeItem(k)); }catch(e){}
     location.reload(); };
 }
-function showSettings(){ const v=$('settings'); v.hidden=false; renderSettings(); }
-function hideSettings(){ $('settings').hidden=true; }
+// 設定は、リストと同じ下のシート。フッターの「設定」で開閉(もう一度押す・×・地図のタップ・下へのスワイプで閉じる)
+const settingsOpen=()=>st.tab==='settings'&&st.open&&!st.sel&&!st.adding;
+function showSettings(){ setTab('settings'); }
+function hideSettings(){ if (st.tab==='settings') setTab('map'); }

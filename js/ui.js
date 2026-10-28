@@ -25,9 +25,14 @@ function unselect(){
   if (!st.sel) return;
   st.sel=null; syncPins(); renderSheet(); map.setPadding({top:0,left:0,right:0,bottom:0});
 }
+// フッターのボタン: 開いている(リスト・設定)ものを色つきの丸みで示す
+function syncTabs(){
+  const on=st.open&&!st.sel?st.tab:null;
+  document.querySelectorAll('#tabs [data-t]').forEach(b=>{ const a=b.dataset.t===on; b.classList.toggle('on',a); b.setAttribute('aria-pressed',String(a)); });
+}
 function setTab(tab){
   if (st.adding) return;
-  buzz(); st.tab=tab; st.sel=null; st.open=tab==='list';
+  buzz(); st.tab=tab; st.sel=null; st.open=tab==='list'||tab==='settings';
   document.querySelectorAll('#tabs [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
   syncPins(); renderSheet(); map.setPadding({top:0,left:0,right:0,bottom:0});
 }
@@ -48,8 +53,10 @@ function renderSheet(){
   if (st.adding) return;
   const sh=$('sheet'), body=$('sbody');
   sh.classList.toggle('open',st.open&&!st.sel);
+  syncTabs();
   const sel=st.sel&&st.toilets.find(x=>x.id===st.sel);
   if (sel) return renderDetail(body,sel);
+  if (st.tab==='settings'&&st.open) return renderSettings();
   const nearest=st.sorted[0], far=!nearest||nearest.d>FAR_M;
   let h='';
   if (!nearest) h+=`<div class="bubble">${bearSvg(36,true)}<span>条件に合う場所がないよ。絞り込みをゆるめてみてね</span></div>`;
@@ -159,11 +166,10 @@ function openSharedSpot(){
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.textContent=msg; d.style.bottom=(innerHeight-$('sheet').getBoundingClientRect().top+12)+'px'; document.body.appendChild(d); setTimeout(()=>d.remove(),Math.max(2200,msg.length*90)); }
 
 function initUi(){
-  document.querySelectorAll('#tabs [data-t]').forEach(b=>b.onclick=()=>setTab(b.dataset.t==='list'&&st.open&&!st.sel?'map':b.dataset.t));
+  document.querySelectorAll('#tabs [data-t]').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; setTab(st.tab===t&&st.open&&!st.sel?'map':t); });
   $('tabadd').onclick=startAdd;
-  $('brand').innerHTML=bearSvg(30)+'札幌トイレ・コンビニマップ'; $('here').innerHTML=icon('locate',22); $('layers').innerHTML=icon('layers',22); $('layers').onclick=()=>{ buzz(); setSetting('mapColor',st.settings.mapColor==='color'?'simple':'color'); toast(st.settings.mapColor==='color'?'地図: カラー':'地図: シンプル'); if(!$('settings').hidden) renderSettings(); };
+  $('brand').innerHTML=bearSvg(30)+'札幌トイレ・コンビニマップ'; $('here').innerHTML=icon('locate',22); $('layers').innerHTML=icon('layers',22); $('layers').onclick=()=>{ buzz(); setSetting('mapColor',st.settings.mapColor==='color'?'simple':'color'); toast(st.settings.mapColor==='color'?'地図: カラー':'地図: シンプル'); if (settingsOpen()) renderSettings(); };
   initLegend();
-  $('info').onclick=()=>showSettings();
   $('ic-list').innerHTML=icon('list',23); $('ic-set').innerHTML=icon('gear',23); $('ic-add').innerHTML=icon('plus',28);
   document.querySelectorAll('#filters [data-k]').forEach(b=>b.onclick=()=>{
     buzz(); const k=b.dataset.k;
@@ -185,7 +191,7 @@ function initUi(){
     const dy=e.changedTouches[0].clientY-y0; y0=null; tAt=Date.now();
     if (st.sel){ if(dy>30) unselect(); return; }
     if (dy<-30) st.open=true; else if (dy>30) st.open=false; else st.open=!st.open;
-    st.tab=st.open?'list':'map'; document.querySelectorAll('#tabs [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===st.tab)); renderSheet();
+    st.tab=st.open?(st.tab==='settings'?'settings':'list'):'map'; document.querySelectorAll('#tabs [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===st.tab)); renderSheet();
   });
   g.onclick=()=>{ if (Date.now()-tAt<600) return; if (st.sel) unselect(); else { st.open=!st.open; renderSheet(); } };
 }
